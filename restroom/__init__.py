@@ -23,6 +23,8 @@ class API(object):
 api = API()
 
 
-def expose(kls):
-    api.register(kls)
-    return kls
+def expose(**options):
+    def expose_api(kls):
+        api.register(kls, options)
+        return kls
+    return expose_api
