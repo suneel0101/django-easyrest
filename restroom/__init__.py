@@ -1,5 +1,8 @@
 from django.conf.urls import url, patterns
 from collections import OrderedDict
+import simplejson as json
+from django.views.generic.base import View
+from django.http import HttpResponse
 
 
 class API(object):
@@ -123,6 +126,29 @@ class API(object):
             'view': 'restroom.views.base',
             'name': '{}_api'.format(table_name),
         }
+
+    def generate_view(self, table_name):
+        """
+        Dynamically generates the Django view
+        that will power the API endpoint for the model
+        whose table_name is `table_name`
+
+        Only GET requests are enabled currently, but
+        POST, PUT and DELETE will be added, as well as
+        such requests on /table_name/{id} for single item
+        interactions.
+        """
+        def get(request, *args, **kwargs):
+            data = self.retrieve(table_name)
+            return HttpResponse(
+                json.dumps(data),
+                mimetype='application/json')
+
+        class RestroomView(View):
+            def get(self, request, *args, **kwargs):
+                return get(request, *args, **kwargs)
+
+        return RestroomView
 
 api = API()
 
