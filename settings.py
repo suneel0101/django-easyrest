@@ -1,5 +1,6 @@
 INSTALLED_APPS = (
     'unclebob',
+    'restroom',
 )
 
 TEST_RUNNER = 'unclebob.runners.Nose'
@@ -13,7 +14,7 @@ UNCLEBOB_EXTRA_NOSE_ARGS = [
 DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'restroom',
+            'NAME': 'db',
             'USER': '',
             'PASSWORD': '',
             'HOST': '',

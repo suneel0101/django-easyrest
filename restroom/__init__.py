@@ -22,6 +22,12 @@ class API(object):
             'allowed_methods': allowed_methods,
         }
 
+    def retrieve(self, table_name):
+        model_data = self.table_model_map[table_name]
+        model_class = model_data['model']
+        fields = model_data['fields']
+        return list(model_class.objects.values(*fields))
+
 api = API()
 
 
