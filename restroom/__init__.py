@@ -80,6 +80,11 @@ class API(object):
         return list(model_class.objects.values(*fields))
 
     def get_url_data(self, table_name, model_data):
+        """
+        Given the table_name and corresponding model_data,
+        which is found as a key, value pair in
+        self.table_model_map
+        """
         return {
             'regex': r'^{}/$'.format(table_name),
             'view': 'restroom.views.base',
