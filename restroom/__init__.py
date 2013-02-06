@@ -80,6 +80,13 @@ class API(object):
         return list(model_class.objects.values(*fields))
 
     @property
+    def url_patterns(self):
+        """
+        Returns urlpatterns for all of the registered models
+        """
+        return self.construct_url_patterns(self.url_data)
+
+    @property
     def url_data(self):
         """
         Returns a list of dictionaries each containing url data,
@@ -88,6 +95,22 @@ class API(object):
         """
         return [self.get_url_data(name, data)
          for name, data in self.table_model_map.items()]
+
+    def construct_url_patterns(self, url_data_list):
+        """
+        Constructs the urlpatterns to be plugged into
+        your urls.py, e.g.
+        patterns('',
+            url(r'^table_mymodel/$',
+                'some.view.name',
+                name='table_mymodel_api'),
+            ...
+        )
+
+        """
+        urls = [url(data['regex'], data['view'], name=data['name'])
+                for data in url_data_list]
+        return patterns('', *urls)
 
     def get_url_data(self, table_name, model_data):
         """
