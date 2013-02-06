@@ -79,6 +79,16 @@ class API(object):
         fields = model_data['fields']
         return list(model_class.objects.values(*fields))
 
+    @property
+    def url_data(self):
+        """
+        Returns a list of dictionaries each containing url data,
+        returned by self.get_url_data, for all of the models
+        registered to the API
+        """
+        return [self.get_url_data(name, data)
+         for name, data in self.table_model_map.items()]
+
     def get_url_data(self, table_name, model_data):
         """
         Given the table_name and corresponding model_data,
