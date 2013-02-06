@@ -46,14 +46,16 @@ def test_registering_with_non_default_options():
 
 def test_expose_with_no_arguments():
 
+    restroom_api = API()
+
     # When we decorate a Django Model with expose
-    @expose()
+    @expose(api=restroom_api)
     class ExposedModel(models.Model):
         title = models.CharField(max_length=150)
         active = models.BooleanField(default=False)
 
     table_name = ExposedModel._meta.db_table
-    registered_value = api.table_model_map[table_name]
+    registered_value = restroom_api.table_model_map[table_name]
 
     expected_value = {
         'model': ExposedModel,
@@ -62,7 +64,6 @@ def test_expose_with_no_arguments():
     }
     # It registers it correctly with the Restroom API
     expect(registered_value).to.equal(expected_value)
-    del api.table_model_map[table_name]
 
 
 def test_expose_with_options():
@@ -70,7 +71,11 @@ def test_expose_with_options():
     # When we decorate a Django Model with expose and
     # non-default options of allowable methods
     # and exposed fields
-    @expose(allowed_methods=['GET', 'POST'], fields=['short_title', 'author'])
+    restroom_api = API()
+
+    @expose(api=restroom_api,
+            allowed_methods=['GET', 'POST'],
+            fields=['short_title', 'author'])
     class ExposedModelWithOptions(models.Model):
         short_title = models.CharField(max_length=150)
         expired = models.BooleanField(default=False)
@@ -78,7 +83,7 @@ def test_expose_with_options():
         status = models.IntegerField(default=1)
 
     table_name = ExposedModelWithOptions._meta.db_table
-    registered_value = api.table_model_map[table_name]
+    registered_value = restroom_api.table_model_map[table_name]
 
     expected_value = {
         'model': ExposedModelWithOptions,
@@ -88,11 +93,14 @@ def test_expose_with_options():
 
     # It should register it correctly with the Restroom API
     expect(registered_value).to.equal(expected_value)
-    del registered_value
 
 
 def test_retrieval_of_restroom_api():
-    from restroom.models import ExposedModelToSerialize
+    from restroom.models import (
+        ExposedModelToSerialize,
+        exposed_model_to_serialize_api)
+
+    table_name = ExposedModelToSerialize._meta.db_table
 
     # When we delete all existing ExposedModelToSerialize objects
     ExposedModelToSerialize.objects.all().delete()
@@ -105,7 +113,7 @@ def test_retrieval_of_restroom_api():
 
     # and retrieve this data from the database using the retrieve
     # method of the Restroom API
-    serialized_data = api.retrieve('restroom_exposedmodeltoserialize')
+    serialized_data = exposed_model_to_serialize_api.retrieve(table_name)
 
     expected_data = [
         {
@@ -115,3 +123,26 @@ def test_retrieval_of_restroom_api():
     ]
     # We should get back the expected serialized data
     expect(serialized_data).to.equal(expected_data)
+
+
+def test_urls_of_restroom_api():
+    from django.conf.urls import patterns, url
+    restroom_api = API()
+    restroom_api.register(MyModel)
+
+    class OtherModel(models.Model):
+        short_title = models.CharField(max_length=150)
+        expired = models.BooleanField(default=False)
+        author = models.CharField(max_length=120)
+        status = models.IntegerField(default=1)
+
+
+    restroom_api.register(OtherModel,
+        {'fields': ['short_title', 'status']})
+    url_patterns = restroom_api.url_patterns
+    get_url = lambda name: url(r'^{}/$'.format(name), 'restroom.views.base')
+
+    table_names = ['restroom_mymodel', 'functional_othermodel']
+    expected_urls = [get_url(name) for name in table_names]
+    expected_url_patterns = patterns('', *expected_urls)
+    expect(url_patterns).to.equal(expected_url_patterns)

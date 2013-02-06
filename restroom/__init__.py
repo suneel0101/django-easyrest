@@ -1,15 +1,21 @@
+from django.conf.urls import url, patterns
+from collections import OrderedDict
+
+
 class API(object):
     """
     This API will keep track of all of the Models that are
     registered to it.
     """
-    # map of table_name to model_data
-    # such as `fields` to expose
-    # and allowed_methods of calling the model resource
-    table_model_map = {}
     default_configuration = {
         'allowed_methods': ['GET'],
     }
+
+    def __init__(self):
+        # map of table_name to model_data
+        # such as `fields` to expose
+        # and allowed_methods of calling the model resource
+        self.table_model_map = OrderedDict()
 
     def register(self, model_class, options={}):
         """
@@ -56,7 +62,6 @@ class API(object):
         ```
         from django.db import models
         from restroom import expose
-
         @expose(fields=['id', 'title', 'author'])
         class Book(models.Model)
             title = models.CharField(max_length=250)
@@ -74,10 +79,17 @@ class API(object):
         fields = model_data['fields']
         return list(model_class.objects.values(*fields))
 
+    def get_url_data(self, table_name, model_data):
+        return {
+            'regex': r'^{}/$'.format(table_name),
+            'view': 'restroom.views.base',
+            'name': '{}_api'.format(table_name),
+        }
+
 api = API()
 
 
-def expose(**options):
+def expose(api=api, **options):
     """
     This is the recommended way of exposing a model
     to be accessible via the Restroom's Restful API.
@@ -99,7 +111,7 @@ def expose(**options):
         name = models.CharField(max_length=100)
         is_active = models.BooleanField(default=False)
     """
-    def expose_api(kls):
+    def expose_api(kls, api=api):
         api.register(kls, options)
         return kls
     return expose_api
