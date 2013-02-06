@@ -5,6 +5,10 @@ class API(object):
     }
 
     def register(self, model_class, options={}):
+        model_data = self.get_model_data(model_class, options)
+        self.table_model_map[model_class._meta.db_table] = model_data
+
+    def get_model_data(self, model_class, options):
         allowed_methods = (options.get('allowed_methods')
                            or self.default_configuration['allowed_methods'])
         fields = [field.attname for field in model_class._meta.fields]
@@ -12,13 +16,11 @@ class API(object):
         if field_names:
             fields = [field for field in fields if field in field_names]
 
-        model_data = {
+        return {
             'model': model_class,
             'fields': fields,
             'allowed_methods': allowed_methods,
         }
-        self.table_model_map[model_class._meta.db_table] = model_data
-
 
 api = API()
 

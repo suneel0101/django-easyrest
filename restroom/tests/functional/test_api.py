@@ -6,21 +6,24 @@ from django.db import models
 
 
 def test_registering_a_model_adds_it_to_the_table_model_map():
-    api = API()
-    api.register(MyModel)
+    restroom_api = API()
+    restroom_api.register(MyModel)
     expected_dict = {
         'model': MyModel,
         'fields': ['id', 'name'],
         'allowed_methods': ['GET'],
     }
+
     (expect([field.attname for field in MyModel._meta.fields])
      .to.equal(expected_dict['fields']))
-    expect(api.table_model_map['dummyapp_mymodel']).to.equal(expected_dict)
+
+    (expect(restroom_api.table_model_map['dummyapp_mymodel'])
+    .to.equal(expected_dict))
 
 
 def test_registering_with_non_default_options():
-    api = API()
-    api.register(MyModel,
+    restroom_api = API()
+    restroom_api.register(MyModel,
                  {'allowed_methods': ['POST'],
                   'fields': ['name']})
     expected_dict = {
@@ -28,7 +31,9 @@ def test_registering_with_non_default_options():
         'fields': ['name'],
         'allowed_methods': ['POST'],
     }
-    expect(api.table_model_map['dummyapp_mymodel']).to.equal(expected_dict)
+
+    (expect(restroom_api.table_model_map['dummyapp_mymodel'])
+     .to.equal(expected_dict))
 
 
 @expose()
