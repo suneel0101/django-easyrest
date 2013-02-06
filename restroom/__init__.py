@@ -1,14 +1,37 @@
 class API(object):
+    """
+    This API will keep track of all of the Models that are
+    registered to it.
+    """
+    # map of table_name to model_data
+    # such as `fields` to expose
+    # and allowed_methods of calling the model resource
     table_model_map = {}
     default_configuration = {
         'allowed_methods': ['GET'],
     }
 
     def register(self, model_class, options={}):
+        """
+        Registers a model_class with API along with the
+        options that are passed in.
+
+        >>> from myapp.models import MyModel
+        >>> from restroom import api
+        >>> api.register(MyModel, options={'fields': ['id', 'name']})
+
+        However, this is not the recommended method registration.
+        Instead, you should use the `expose` decorator.
+        """
         model_data = self.get_model_data(model_class, options)
         self.table_model_map[model_class._meta.db_table] = model_data
 
     def get_model_data(self, model_class, options):
+        """
+        Gets the model_data from the model_class and options dictionary
+        and defaults to the default_configuration when there is no
+        other specification.
+        """
         allowed_methods = (options.get('allowed_methods')
                            or self.default_configuration['allowed_methods'])
         fields = [field.attname for field in model_class._meta.fields]
@@ -23,6 +46,29 @@ class API(object):
         }
 
     def retrieve(self, table_name):
+        """
+        Given a table_name,
+        This finds the model_data in self.table_model_map,
+        queries the database, and returns the objects, serialized
+        according to the fields specified.
+
+        In apps/library/models.py
+        ```
+        from django.db import models
+        from restroom import expose
+
+        @expose(fields=['id', 'title', 'author'])
+        class Book(models.Model)
+            title = models.CharField(max_length=250)
+            author = models.CharField(max_length=100)
+
+        ```
+        >>> from library.models import Book
+        >>> Book.objects.create(title='My Book', author='Me')
+        >>> from restroom import api
+        >>> api.retrieve("library_book")
+        [{"id": 1, "title": "My Book", "author": "Me"}]
+        """
         model_data = self.table_model_map[table_name]
         model_class = model_data['model']
         fields = model_data['fields']
@@ -32,6 +78,27 @@ api = API()
 
 
 def expose(**options):
+    """
+    This is the recommended way of exposing a model
+    to be accessible via the Restroom's Restful API.
+
+    Example 1:
+
+    # limited to GET requests
+    # all fields will be exposed in the data
+    @expose()
+    class My Model(models.Model):
+        pass
+
+    Example 2:
+
+    # limited to GET and POST requests
+    # only the id and name will be exposed in the data
+    @expose(allowed_methods=['GET', 'POST'], fields=['id', name'])
+    class Person(models.Model):
+        name = models.CharField(max_length=100)
+        is_active = models.BooleanField(default=False)
+    """
     def expose_api(kls):
         api.register(kls, options)
         return kls
