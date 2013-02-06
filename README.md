@@ -28,8 +28,14 @@ urlpatterns = ("",
 )
 ```
 
+In the shell:
+
+```
 >>> from myapp.models import Book
 >>> Book.objects.create(title="Best book ever", author="Yours truly")
+```
 
-When a GET request is made to `/whateveryouwant/myapp_book/`, the response will be the following JSON:
+Finally, when a GET request is made `/whateveryouwant/myapp_book/`, here's the response:
+```
 [{"title": "Best book ever", "author": "Yours truly"}]
+```
