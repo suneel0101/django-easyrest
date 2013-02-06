@@ -12,7 +12,7 @@ In  `myapp/models.py`:
 from django.db import models
 from restroom import expose
 
-@expose(allowed_method=["GET", "POST"], fields=["id", "title", "author"])
+@expose(allowed_methods=["GET", "POST"], fields=["id", "title", "author"])
 class Book(models.Model):
     title = models.CharField(max_length=250)
     author = models.CharField(max_length=100)
