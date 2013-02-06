@@ -39,5 +39,5 @@ In the shell:
 
 Finally, when a GET request is made to `/whateveryouwant/myapp_book/`, here's the response:
 ```
-[{"title": "Best book ever", "author": "Yours truly"}]
+{"results": [{"title": "Best book ever", "author": "Yours truly"}]}
 ```
