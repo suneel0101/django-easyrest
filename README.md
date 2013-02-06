@@ -21,6 +21,8 @@ class Book(models.Model):
 In your `urls.py`:
 
 ```python
+import restroom
+
 urlpatterns = ("",
    …
    url(r"^whateveryouwant/", include(restroom.urls)),
