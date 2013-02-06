@@ -37,7 +37,7 @@ In the shell:
 >>> Book.objects.create(title="Best book ever", author="Yours truly")
 ```
 
-Finally, when a GET request is made `/whateveryouwant/myapp_book/`, here's the response:
+Finally, when a GET request is made to `/whateveryouwant/myapp_book/`, here's the response:
 ```
 [{"title": "Best book ever", "author": "Yours truly"}]
 ```
