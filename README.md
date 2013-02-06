@@ -16,6 +16,10 @@ from restroom import expose
 class Book(models.Model):
     title = models.CharField(max_length=250)
     author = models.CharField(max_length=100)
+    status = models.IntegerField()
+    is_active = models.BooleanField()
+    date_published = models.DateTimeField()
+    publisher = models.ForeignKey('otherapp.Publisher')
 ```
 
 In your `urls.py`:
