@@ -4,7 +4,7 @@ Django-Restroom is a lightweight API framework for Django.
 
 All you have to do is decorate the model classes that you want to expose in a RESTful API and include `restroom.urls` in your main urls.py file and you've got yourself an API for your app.
 
-## Sample usage:
+## Usage:
 
 In  `myapp/models.py`:
 
