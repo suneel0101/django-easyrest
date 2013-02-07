@@ -1,6 +1,6 @@
 INSTALLED_APPS = (
     'unclebob',
-    'restroom',
+    'tests',
 )
 
 TEST_RUNNER = 'unclebob.runners.Nose'

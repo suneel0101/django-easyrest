@@ -1,5 +1,5 @@
-from restroom.models import MyModel
-from restroom import API, api, expose
+from tests.models import MyModel
+from restroom import API, expose
 from sure import expect
 
 from django.db import models
@@ -22,7 +22,7 @@ def test_registering_a_model_adds_it_to_the_table_model_map():
      .to.equal(expected_dict['fields']))
 
     # and the model_data should be the default
-    (expect(restroom_api.table_model_map['restroom_mymodel'])
+    (expect(restroom_api.table_model_map['tests_mymodel'])
     .to.equal(expected_dict))
 
 
@@ -40,7 +40,7 @@ def test_registering_with_non_default_options():
     # Since we specified 'POST' and only want to expose the `name` field
     # The model_data `fields` should be just ['name'] and the only allowable
     # method of calling this resource should be POST
-    (expect(restroom_api.table_model_map['restroom_mymodel'])
+    (expect(restroom_api.table_model_map['tests_mymodel'])
      .to.equal(expected_dict))
 
 
@@ -97,7 +97,7 @@ def test_expose_with_options():
 
 
 def test_retrieval():
-    from restroom.models import (
+    from tests.models import (
         ExposedModelToSerialize,
         exposed_model_to_serialize_api)
 
@@ -130,7 +130,7 @@ def test_retrieval():
 
 
 def test_retrieve_one_with_existent_record():
-    from restroom.models import (
+    from tests.models import (
         ExposedModelToSerialize,
         exposed_model_to_serialize_api)
 
@@ -162,7 +162,7 @@ def test_retrieve_one_with_existent_record():
 
 
 def test_retrieve_one_for_nonexistent_record():
-    from restroom.models import (
+    from tests.models import (
         ExposedModelToSerialize,
         exposed_model_to_serialize_api)
 
@@ -183,7 +183,7 @@ def test_retrieve_one_for_nonexistent_record():
 
 
 def test_serialize_one():
-    from restroom.models import (
+    from tests.models import (
         ExposedModelToSerialize,
         exposed_model_to_serialize_api)
 
@@ -204,7 +204,7 @@ def test_serialize_one():
 
 
 def test_create_record():
-    from restroom.models import (
+    from tests.models import (
         ExposedModelToSerialize,
         exposed_model_to_serialize_api)
 
@@ -215,7 +215,7 @@ def test_create_record():
 
     _api = exposed_model_to_serialize_api
     record = _api.create_record(
-        'restroom_exposedmodeltoserialize',
+        'tests_exposedmodeltoserialize',
         {
             'author': 'James Joyce',
             'expired': True,
@@ -239,7 +239,7 @@ def test_create_record():
 
 
 def test_create_record_where_model_validation_fails():
-    from restroom.models import (
+    from tests.models import (
         another_test_api,
         AnotherModel,
     )
@@ -250,7 +250,7 @@ def test_create_record_where_model_validation_fails():
     _api = another_test_api
 
     record_1 = _api.create_record(
-        'restroom_anothermodel',
+        'tests_anothermodel',
         {
             'text': 'Some text',
             'slug': 'coolest-ever'
@@ -259,7 +259,7 @@ def test_create_record_where_model_validation_fails():
     # since we are creating a record with the same slug
     # and the slug is unique=True in the model declaration
     record_2 = _api.create_record(
-        'restroom_anothermodel',
+        'tests_anothermodel',
         {
             'text': 'Some more text',
             'slug': 'coolest-ever'
