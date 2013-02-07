@@ -193,14 +193,21 @@ class API(object):
         such requests on /table_name/{id} for single item
         interactions.
         """
+        model_data = self.table_model_map[table_name]
+        allowed_methods = model_data['allowed_methods']
+
         def get(request, *args, **kwargs):
             data = self.retrieve(table_name)
             return HttpResponse(
                 json.dumps(data),
                 mimetype='application/json')
 
-        model_data = self.table_model_map[table_name]
-        allowed_methods = model_data['allowed_methods']
+        def post(request, *args, **kwargs):
+            post_data = {k: v for k, v in request.POST.items()}
+            data = self.create_record(table_name, post_data)
+            return HttpResponse(
+                json.dumps(data),
+                mimetype='application/json')
 
         class RestroomView(View):
             def get(self, request, *args, **kwargs):
@@ -208,4 +215,11 @@ class API(object):
                     return get(request, *args, **kwargs)
                 else:
                     return HttpResponseForbidden()
+
+            def post(self, request, *args, **kwargs):
+                if 'POST' in allowed_methods:
+                    return post(request, *args, **kwargs)
+                else:
+                    return HttpResponseForbidden()
+
         return RestroomView
