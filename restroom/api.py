@@ -137,6 +137,27 @@ class API(object):
             return {'error': e.message}
         return self.serialize_one(_object)
 
+    def delete_record(self, table_name, object_id):
+        """
+        This deletes a record from the `table_name` table
+        with id=object_id
+        """
+        model_data = self.table_model_map[table_name]
+        model_class = model_data['model']
+        try:
+            _object = model_class.objects.get(id=object_id)
+        except model_class.DoesNotExist:
+            error_message = ('no matching object found for id: {}'
+                             .format(object_id))
+            return {'error': error_message}
+
+        try:
+            _object.delete()
+        except IntegrityError as e:
+            return {'error': e.message}
+        else:
+            return {'status': 'deletion successful'}
+
     @property
     def url_patterns(self):
         """
@@ -182,7 +203,7 @@ class API(object):
             'name': '{}_api'.format(table_name),
         }
 
-    def generate_view(self, table_name):
+    def generate_list_view(self, table_name):
         """
         Dynamically generates the Django view
         that will power the API endpoint for the model

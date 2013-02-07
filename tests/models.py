@@ -18,10 +18,10 @@ class ExposedModelToSerialize(models.Model):
 
 another_test_api = API()
 
+
 @expose(api=another_test_api,
         fields=['text', 'slug', 'id', 'active'])
 class AnotherModel(models.Model):
     text = models.CharField(null=False, blank=False, max_length=50)
     slug = models.SlugField(unique=True)
     active = models.BooleanField(blank=False)
-

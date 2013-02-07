@@ -270,3 +270,40 @@ def test_create_record_where_model_validation_fails():
 
     # Delete all existing AnotherModel objects
     AnotherModel.objects.all().delete()
+
+
+def test_delete_record():
+    from tests.models import (
+        ExposedModelToSerialize,
+        exposed_model_to_serialize_api)
+
+    table_name = ExposedModelToSerialize._meta.db_table
+
+    # When we delete all existing ExposedModelToSerialize objects
+    ExposedModelToSerialize.objects.all().delete()
+
+    # and we create a record
+    record = (ExposedModelToSerialize.objects
+              .create(short_title='This is awesome',
+                      author='Me'))
+
+    # we expect Django ORM to return that there is now 1
+    # record in this table
+    (expect(ExposedModelToSerialize.objects
+            .filter(id=record.id)
+            .count())
+     .to.equal(1))
+
+    # Then through the restroom api we delete this record
+    _api = exposed_model_to_serialize_api
+    returned_data = _api.delete_record(table_name, record.id)
+
+    # and expect nice success JSON
+    expect(returned_data).to.equal({'status': 'deletion successful'})
+
+    # and Django ORM to return that there are now 0 records
+    # in this table
+    (expect(ExposedModelToSerialize.objects
+            .filter(id=record.id)
+            .count())
+     .to.equal(0))

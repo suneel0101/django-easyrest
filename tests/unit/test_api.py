@@ -122,7 +122,7 @@ def test_url_patterns():
      .to.equal(transform_to_attrs_dict(expected_patterns)))
 
 
-def test_generate_view_for_get():
+def test_generate_list_view_for_get():
     # Given a restroom API instance
     api = API()
 
@@ -139,13 +139,14 @@ def test_generate_view_for_get():
     # should return the expected json data when requested
     # via GET
     request = Mock(method='GET')
-    response_from_GET = api.generate_view("table_mymodel").as_view()(request)
+    response_from_GET = (api.generate_list_view("table_mymodel")
+                         .as_view()(request))
     expected_response_json = [{'id': 1, 'text': 'Shalom'}]
     response_json = ast.literal_eval(response_from_GET.content)
     expect(response_json).to.equal(expected_response_json)
 
 
-def test_generate_view_for_post():
+def test_generate_list_view_for_post():
     # Given a restroom API instance
     api = API()
 
@@ -172,7 +173,8 @@ def test_generate_view_for_post():
     # via POST
     request = Mock(method='POST')
     request.POST = QueryDict('text=Shalom')
-    response_from_POST = api.generate_view("table_mymodel").as_view()(request)
+    response_from_POST = (api.generate_list_view("table_mymodel")
+                          .as_view()(request))
     expected_response_json = {'id': 1, 'text': 'Shalom'}
     response_json = ast.literal_eval(response_from_POST.content)
     expect(response_json).to.equal(expected_response_json)
