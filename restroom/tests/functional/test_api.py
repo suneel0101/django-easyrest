@@ -95,7 +95,7 @@ def test_expose_with_options():
     expect(registered_value).to.equal(expected_value)
 
 
-def test_retrieval_of_restroom_api():
+def test_retrieval():
     from restroom.models import (
         ExposedModelToSerialize,
         exposed_model_to_serialize_api)
@@ -106,10 +106,11 @@ def test_retrieval_of_restroom_api():
     ExposedModelToSerialize.objects.all().delete()
 
     # And we create an ExposedModelToSerialize object
-    ExposedModelToSerialize.objects.create(
+    exposed_model_obj = ExposedModelToSerialize.objects.create(
         short_title="This is a short title",
         author="Edgar Allen Poe",
     )
+    _id = exposed_model_obj.id
 
     # and retrieve this data from the database using the retrieve
     # method of the Restroom API
@@ -117,32 +118,66 @@ def test_retrieval_of_restroom_api():
 
     expected_data = [
         {
+            'id': _id,
             'short_title': 'This is a short title',
             'author': "Edgar Allen Poe",
         },
     ]
     # We should get back the expected serialized data
     expect(serialized_data).to.equal(expected_data)
+    exposed_model_obj.delete()
 
 
-def test_urls_of_restroom_api():
-    from django.conf.urls import patterns, url
-    restroom_api = API()
-    restroom_api.register(MyModel)
+def test_retrieve_one_with_existent_record():
+    from restroom.models import (
+        ExposedModelToSerialize,
+        exposed_model_to_serialize_api)
 
-    class OtherModel(models.Model):
-        short_title = models.CharField(max_length=150)
-        expired = models.BooleanField(default=False)
-        author = models.CharField(max_length=120)
-        status = models.IntegerField(default=1)
+    table_name = ExposedModelToSerialize._meta.db_table
+
+    # When we delete all existing ExposedModelToSerialize objects
+    ExposedModelToSerialize.objects.all().delete()
+
+    # And we create an ExposedModelToSerialize object
+    exposed_model_obj = ExposedModelToSerialize.objects.create(
+        short_title="This is a short title",
+        author="Edgar Allen Poe",
+    )
+    _id = exposed_model_obj.id
+
+    # and retrieve this data from the database using the retrieve_one
+    # method of the Restroom API
+    serialized_data = exposed_model_to_serialize_api.retrieve_one(table_name, _id)
+
+    expected_data = {
+        'id': _id,
+        'short_title': 'This is a short title',
+        'author': "Edgar Allen Poe",
+    }
+
+    # We should get back the expected serialized data
+    expect(serialized_data).to.equal(expected_data)
+    exposed_model_obj.delete()
 
 
-    restroom_api.register(OtherModel,
-        {'fields': ['short_title', 'status']})
-    url_patterns = restroom_api.url_patterns
-    get_url = lambda name: url(r'^{}/$'.format(name), 'restroom.views.base')
+def test_retrieve_one_for_nonexistent_record():
+    from restroom.models import (
+        ExposedModelToSerialize,
+        exposed_model_to_serialize_api)
 
-    table_names = ['restroom_mymodel', 'functional_othermodel']
-    expected_urls = [get_url(name) for name in table_names]
-    expected_url_patterns = patterns('', *expected_urls)
-    expect(url_patterns).to.equal(expected_url_patterns)
+    table_name = ExposedModelToSerialize._meta.db_table
+
+    # When we delete all existing ExposedModelToSerialize objects
+    ExposedModelToSerialize.objects.all().delete()
+
+    # and we try to retrieve_one record of id = 1
+    serialized_data = exposed_model_to_serialize_api.retrieve_one(table_name, 1)
+
+    expected_data = {
+        'error': 'no matching object found for id: 1'
+    }
+
+    # We should get back the expected serialized data
+    expect(serialized_data).to.equal(expected_data)
+
+

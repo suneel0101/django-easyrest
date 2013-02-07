@@ -82,6 +82,23 @@ class API(object):
         fields = model_data['fields']
         return list(model_class.objects.values(*fields))
 
+    def retrieve_one(self, table_name, _id):
+        """
+        This retrieves the record from table_name with id=_id.
+        If not found, it returns an error dictionary.
+        """
+        model_data = self.table_model_map[table_name]
+        model_class = model_data['model']
+        fields = model_data['fields']
+        try:
+            obj = model_class.objects.get(id=_id)
+        except model_class.DoesNotExist:
+            return {'error': 'no matching object found for id: {}'.format(_id)}
+        else:
+            return {field: getattr(obj, field)
+             for field in fields
+             if hasattr(obj, field)}
+
     @property
     def url_patterns(self):
         """

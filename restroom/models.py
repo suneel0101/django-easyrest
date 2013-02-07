@@ -9,7 +9,7 @@ exposed_model_to_serialize_api = API()
 
 
 @expose(api=exposed_model_to_serialize_api,
-        fields=['short_title', 'author'])
+        fields=['short_title', 'author', 'id'])
 class ExposedModelToSerialize(models.Model):
     short_title = models.CharField(max_length=150)
     expired = models.BooleanField(default=False)
