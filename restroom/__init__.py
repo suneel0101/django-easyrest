@@ -1,4 +1,4 @@
-from restroom.api import API
+from .api import API
 
 api = API()
 
