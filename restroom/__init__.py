@@ -95,9 +95,40 @@ class API(object):
         except model_class.DoesNotExist:
             return {'error': 'no matching object found for id: {}'.format(_id)}
         else:
-            return {field: getattr(obj, field)
-             for field in fields
-             if hasattr(obj, field)}
+            return self.serialize_one(obj)
+
+    def serialize_one(self, model_instance):
+        """
+        Given a model instance (like a Person object from above),
+        this returns the serialized object with only the fields
+        as specified when registering it; defaults to all fields
+        if no fields list is specified upon registration.
+        """
+        table_name = model_instance.__class__._meta.db_table
+        model_data = self.table_model_map[table_name]
+        fields = model_data['fields']
+        return {field: getattr(model_instance, field) for field in fields}
+
+    def create_record(self, table_name, object_data):
+        """
+        This creates a record in the `table_name` table
+        with column values given by the object_data dictionary.
+
+        Given the following model in app/people/models.py
+        ```
+        class Person(models.Model):
+            name = models.CharField(max_length=150)
+            is_awesome = models.BooleanField(default=True)
+            age = models.PositiveIntegerField()
+        ```
+
+        api.create_record('people_person', {'name': 'James', 'age': 19})
+        will create a Person object whose name is James, whose age is 19,
+        and who is_awesome.
+        """
+        model_data = self.table_model_map[table_name]
+        model_class = model_data['model']
+        return self.serialize_one(model_class.objects.create(**object_data))
 
     @property
     def url_patterns(self):

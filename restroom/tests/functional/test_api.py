@@ -76,6 +76,7 @@ def test_expose_with_options():
     @expose(api=restroom_api,
             allowed_methods=['GET', 'POST'],
             fields=['short_title', 'author'])
+
     class ExposedModelWithOptions(models.Model):
         short_title = models.CharField(max_length=150)
         expired = models.BooleanField(default=False)
@@ -181,3 +182,57 @@ def test_retrieve_one_for_nonexistent_record():
     expect(serialized_data).to.equal(expected_data)
 
 
+def test_serialize_one():
+    from restroom.models import (
+        ExposedModelToSerialize,
+        exposed_model_to_serialize_api)
+
+    # When we delete all existing ExposedModelToSerialize objects
+    ExposedModelToSerialize.objects.all().delete()
+
+    # Create an ExposedModelToSerialize object
+    obj = ExposedModelToSerialize.objects.create(
+        author='John Steinbeck',
+        short_title='Grapes of Wrath')
+
+    serialized_obj = exposed_model_to_serialize_api.serialize_one(obj)
+    expected_serialized_obj = {
+        'id': obj.id,
+        'author': 'John Steinbeck',
+        'short_title': 'Grapes of Wrath',
+    }
+
+
+def test_create_record():
+    from restroom.models import (
+        ExposedModelToSerialize,
+        exposed_model_to_serialize_api)
+
+    table_name = ExposedModelToSerialize._meta.db_table
+
+    # When we delete all existing ExposedModelToSerialize objects
+    ExposedModelToSerialize.objects.all().delete()
+
+    _api = exposed_model_to_serialize_api
+    record = _api.create_record(
+        'restroom_exposedmodeltoserialize',
+        {
+            'author': 'James Joyce',
+            'expired': True,
+            'short_title': 'The Dubliners'
+        })
+
+    _id = record['id']
+
+    # and we try to get record where id = _id through
+    # the Django ORM
+    _object = ExposedModelToSerialize.objects.get(id=_id)
+
+    # We expect that the object should be the one we created
+    expect(_object.author).to.equal('James Joyce')
+    expect(_object.expired).to.equal(True)
+    expect(_object.short_title).to.equal('The Dubliners')
+    expect(_object.status).to.equal(1)
+    expect(_object.id).to.equal(_id)
+
+    _object.delete()
