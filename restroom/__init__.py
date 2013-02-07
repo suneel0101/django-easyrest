@@ -1,8 +1,11 @@
-from django.conf.urls import url, patterns
 from collections import OrderedDict
 import simplejson as json
-from django.views.generic.base import View
+
+from django.conf.urls import url, patterns
+from django.db import IntegrityError
 from django.http import HttpResponse
+from django.views.generic.base import View
+
 
 
 class API(object):
@@ -128,7 +131,11 @@ class API(object):
         """
         model_data = self.table_model_map[table_name]
         model_class = model_data['model']
-        return self.serialize_one(model_class.objects.create(**object_data))
+        try:
+            _object = model_class.objects.create(**object_data)
+        except IntegrityError as e:
+            return {'error': e.message}
+        return self.serialize_one(_object)
 
     @property
     def url_patterns(self):

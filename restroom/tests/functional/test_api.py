@@ -236,3 +236,37 @@ def test_create_record():
     expect(_object.id).to.equal(_id)
 
     _object.delete()
+
+
+def test_create_record_where_model_validation_fails():
+    from restroom.models import (
+        another_test_api,
+        AnotherModel,
+    )
+
+    # When we delete all existing AnotherModel objects
+    AnotherModel.objects.all().delete()
+
+    _api = another_test_api
+
+    record_1 = _api.create_record(
+        'restroom_anothermodel',
+        {
+            'text': 'Some text',
+            'slug': 'coolest-ever'
+        })
+
+    # since we are creating a record with the same slug
+    # and the slug is unique=True in the model declaration
+    record_2 = _api.create_record(
+        'restroom_anothermodel',
+        {
+            'text': 'Some more text',
+            'slug': 'coolest-ever'
+        })
+
+    # We expect to receive an error message about this
+    expect(record_2).to.equal({'error': 'column slug is not unique'})
+
+    # Delete all existing AnotherModel objects
+    AnotherModel.objects.all().delete()

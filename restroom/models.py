@@ -15,3 +15,13 @@ class ExposedModelToSerialize(models.Model):
     expired = models.BooleanField(default=False)
     author = models.CharField(max_length=120)
     status = models.IntegerField(default=1)
+
+another_test_api = API()
+
+@expose(api=another_test_api,
+        fields=['text', 'slug', 'id', 'active'])
+class AnotherModel(models.Model):
+    text = models.CharField(null=False, blank=False, max_length=50)
+    slug = models.SlugField(unique=True)
+    active = models.BooleanField(blank=False)
+
