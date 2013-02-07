@@ -40,7 +40,17 @@ In the shell:
 >>> Book.objects.create(title="Best book ever", author="Yours truly")
 ```
 
-Finally, when a GET request is made to `/whateveryouwant/myapp_book/`, here's the response:
+## Accessing the REST endpoints:
+`GET /whateveryouwant/myapp_book/` responds with
 ```
-{"results": [{"id": 1, "title": "Best book ever", "author": "Yours truly"}]}
+[{"id": 1, "title": "Best book ever", "author": "Yours truly"}]
 ```
+`GET /whateveryouwant/myapp_book/1/` responds with
+```
+{"id": 1, "title": "Best book ever", "author": "Yours truly"}
+```
+`POST /whateveryouwant/myapp_book/?title=Awesomeness&author=Zeus` responds with
+```
+{"id": 2, "title": "Awesomess", "author": "Zeus"}
+```
+This endpoint creates a record and returns it serialized.
