@@ -3,7 +3,7 @@ import simplejson as json
 
 from django.conf.urls import url, patterns
 from django.db import IntegrityError
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.views.generic.base import View
 
 
@@ -199,10 +199,15 @@ class API(object):
                 json.dumps(data),
                 mimetype='application/json')
 
+        model_data = self.table_model_map[table_name]
+        allowed_methods = model_data['allowed_methods']
+
         class RestroomView(View):
             def get(self, request, *args, **kwargs):
-                return get(request, *args, **kwargs)
-
+                if 'GET' in allowed_methods:
+                    return get(request, *args, **kwargs)
+                else:
+                    return HttpResponseForbidden()
         return RestroomView
 
 api = API()
