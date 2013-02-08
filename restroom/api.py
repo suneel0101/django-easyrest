@@ -13,10 +13,6 @@ class API(object):
     This API will keep track of all of the Models that are
     registered to it.
     """
-    default_configuration = {
-        'allowed_methods': ['GET'],
-    }
-
     def __init__(self):
         # map of table_name to model_data
         # such as `fields` to expose
@@ -44,8 +40,19 @@ class API(object):
         and defaults to the default_configuration when there is no
         other specification.
         """
-        allowed_methods = (options.get('allowed_methods')
-                           or self.default_configuration['allowed_methods'])
+        # Register allowed_methods data
+        optional_allowed_methods = options.get('allowed_methods')
+        if optional_allowed_methods:
+            is_valid, offending_method = (self.validate_allowed_methods(
+                    optional_allowed_methods))
+            if not is_valid:
+                message = "{} is not a valid allowable HTTP method".format(offending_method)
+                raise RestroomError(message)
+            allowed_methods = optional_allowed_methods
+        else:
+            allowed_methods = ['GET']
+
+        # Register exposable fields data
         model_fields = [field.attname for field in model_class._meta.fields]
         option_fields = options.get('fields')
 

@@ -70,6 +70,26 @@ def test_validate_allowed_methods_with_invalid_methods():
      .to.equal((False, 'RANDOMMETHOD')))
 
 
+def test_validate_registration_invalid_http_methods_raises_error():
+    api = API()
+
+    model_class = Mock()
+    fields = [
+        Mock(attname='id'),
+        Mock(attname='text'),
+        Mock(attname='status'),
+    ]
+    model_class._meta = Mock(fields=fields, object_name='MyModel')
+    options = {
+        'fields': ['id', 'text'],
+        'allowed_methods': ['GET', 'HELLO']
+    }
+    (api.register
+     .when.called_with(model_class, options)
+     .should
+     .throw(RestroomError, "HELLO is not a valid allowable HTTP method"))
+
+
 def test_get_url_data():
     # Given a restroom API instance
     api = API()
