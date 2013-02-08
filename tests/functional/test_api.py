@@ -309,3 +309,110 @@ def test_delete_record():
             .filter(id=record.id)
             .count())
      .to.equal(0))
+
+
+def test_update_one():
+    from tests.models import (
+        ExposedModelToSerialize,
+        exposed_model_to_serialize_api)
+
+    table_name = ExposedModelToSerialize._meta.db_table
+
+    # When we delete all existing ExposedModelToSerialize objects
+    ExposedModelToSerialize.objects.all().delete()
+
+    # And we create an ExposedModelToSerialize object
+    exposed_model_obj = ExposedModelToSerialize.objects.create(
+        short_title="This is a short title",
+        author="Edgar Allen Poe",
+    )
+    _id = exposed_model_obj.id
+
+    # Now we update and specify the fields
+    # to be changed and their new values
+
+    changes = {
+        'short_title': 'This is a better short title',
+    }
+
+    serialized_data = (exposed_model_to_serialize_api
+                       .update_one(table_name,
+                                   _id,
+                                   changes))
+
+    expected_data = {
+        'id': _id,
+        'short_title': 'This is a better short title',
+        'author': "Edgar Allen Poe",
+    }
+
+    # We should get back the expected serialized data
+    expect(serialized_data).to.equal(expected_data)
+    exposed_model_obj.delete()
+
+
+def test_update_one_with_invalid_field():
+    from tests.models import (
+        ExposedModelToSerialize,
+        exposed_model_to_serialize_api)
+
+    table_name = ExposedModelToSerialize._meta.db_table
+
+    # When we delete all existing ExposedModelToSerialize objects
+    ExposedModelToSerialize.objects.all().delete()
+
+    # And we create an ExposedModelToSerialize object
+    exposed_model_obj = ExposedModelToSerialize.objects.create(
+        short_title="This is a short title",
+        author="Edgar Allen Poe",
+    )
+    _id = exposed_model_obj.id
+
+    # Now we update and specify the fields
+    # to be changed and their new values
+
+    changes = {
+        'an_invalid_field': 'This is a better short title',
+    }
+
+    serialized_data = (exposed_model_to_serialize_api
+                       .update_one(table_name,
+                                   _id,
+                                   changes))
+
+    expected_data = {
+        "error": "cannot update inaccessible field 'an_invalid_field'"
+    }
+
+    # We should get back the expected serialized data
+    expect(serialized_data).to.equal(expected_data)
+    exposed_model_obj.delete()
+
+
+def test_update_one_for_nonexistent_id():
+    from tests.models import (
+        ExposedModelToSerialize,
+        exposed_model_to_serialize_api)
+
+    table_name = ExposedModelToSerialize._meta.db_table
+
+    # When we delete all existing ExposedModelToSerialize objects
+    ExposedModelToSerialize.objects.all().delete()
+
+    changes = {
+        'short_title': 'This is the perfect title for a nonexistent object',
+    }
+
+    _id = 12345
+
+    serialized_data = (exposed_model_to_serialize_api
+                       .update_one(table_name,
+                                   _id,
+                                   changes))
+
+    expected_data = {
+        "error": "no matching object found for id: 12345"
+    }
+
+    # We should get back the expected serialized data
+    expect(serialized_data).to.equal(expected_data)

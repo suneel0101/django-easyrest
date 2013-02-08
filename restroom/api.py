@@ -123,7 +123,6 @@ class API(object):
         """
         model_data = self.table_model_map[table_name]
         model_class = model_data['model']
-        fields = model_data['fields']
         try:
             obj = model_class.objects.get(id=_id)
         except model_class.DoesNotExist:
@@ -142,6 +141,32 @@ class API(object):
         model_data = self.table_model_map[table_name]
         fields = model_data['fields']
         return {field: getattr(model_instance, field) for field in fields}
+
+    def update_one(self, table_name, _id, changes):
+        """
+        This updates the record with id `_id` in table `table_name`
+        with the fields and new values in the dictionary `changes`
+        """
+        _object = self.retrieve_one(table_name, _id)
+
+        if _object.get('error'):
+            return _object
+
+        model_data = self.table_model_map[table_name]
+        is_valid, offending_field = (self.validate_fields(
+            changes.keys(),
+            model_data['fields']))
+
+        if not is_valid:
+            message = "cannot update inaccessible field '{}'".format(
+                offending_field)
+            return {"error": message}
+
+        model_obj = model_data['model'].objects.get(id=_id)
+        for field_name, new_value in changes.iteritems():
+            setattr(model_obj, field_name, new_value)
+        model_obj.save()
+        return self.serialize_one(model_obj)
 
     def create_record(self, table_name, object_data):
         """
@@ -203,8 +228,8 @@ class API(object):
         returned by self.get_url_data, for all of the models
         registered to the API
         """
-        return [self.get_url_data(name, data)
-         for name, data in self.table_model_map.items()]
+        return [self.get_url_data(table_name)
+                for table_name in self.table_model_map.keys()]
 
     def construct_url_patterns(self, url_data_list):
         """
@@ -230,7 +255,7 @@ class API(object):
                     name=data['single_item_name']))
         return patterns('', *urls)
 
-    def get_url_data(self, table_name, model_data):
+    def get_url_data(self, table_name):
         """
         Given the table_name and corresponding model_data,
         which is found as a key, value pair in

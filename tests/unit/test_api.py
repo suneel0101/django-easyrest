@@ -104,7 +104,7 @@ def test_get_url_data():
 
     # When I get the url_data for the table `table_model`
     # with data {}
-    url_data = api.get_url_data('table_model', {})
+    url_data = api.get_url_data('table_model')
 
     # I should get back a dictionary containing
     # the URL Regex, the View string and the URL name
