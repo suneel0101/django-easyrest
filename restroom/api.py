@@ -62,15 +62,22 @@ class API(object):
         return allowed_methods
 
     def get_exposed_fields(self, option_fields, model_class):
+        fk_format = lambda field: "{}_id".format(field)
         model_fields = [field.attname for field in model_class._meta.fields]
+
         if option_fields:
-            is_valid, offending_field = self.validate_fields(option_fields, model_fields)
+            option_fields = [field if not fk_format(field) in model_fields
+                             else fk_format(field)
+                             for field in option_fields]
+            is_valid, offending_field = self.validate_fields(option_fields,
+                                                             model_fields)
             if not is_valid:
                 message = "{} is not a valid field of {}".format(
                     offending_field,
                     model_class._meta.object_name)
                 raise RestroomError(message)
-            exposed_fields = [field for field in model_fields if field in option_fields]
+            exposed_fields = [field for field in model_fields
+                              if field in option_fields]
         else:
             exposed_fields = model_fields
         return exposed_fields

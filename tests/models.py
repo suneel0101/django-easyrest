@@ -25,3 +25,27 @@ class AnotherModel(models.Model):
     text = models.CharField(null=False, blank=False, max_length=50)
     slug = models.SlugField(unique=True)
     active = models.BooleanField(blank=False)
+
+
+test_api = API()
+
+
+@expose(api=test_api, fields=['awesome', 'slogan', 'id'])
+class ExposedFK(models.Model):
+    slug = models.SlugField()
+    awesome = models.BooleanField(default=True)
+    slogan = models.CharField(max_length=300)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+
+class MyFK(models.Model):
+    active = models.BooleanField()
+    name = models.CharField(max_length=150)
+    exposed_fk = models.ForeignKey('tests.ExposedFK')
+
+
+@expose(api=test_api,
+        fields=['text', 'id', 'my_fk'])
+class ModelWithFK(models.Model):
+    text = models.CharField(null=False, blank=False, max_length=50)
+    my_fk = models.ForeignKey('tests.MyFK')

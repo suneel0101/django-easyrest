@@ -205,6 +205,49 @@ def test_serialize_one():
     expect(serialized_obj).to.equal(expected_serialized_obj)
 
 
+def test_serialize_one_with_foreign_key():
+    from tests.models import (
+        test_api,
+        ModelWithFK,
+        ExposedFK,
+        MyFK,
+    )
+
+    # When we delete all existing
+    # MyFK, ExposedFK and ModelWithFK objects
+    ModelWithFK.objects.all().delete()
+    MyFK.objects.all().delete()
+    ExposedFK.objects.all().delete()
+
+    # Create an ExposedFK object
+    exposed_fk = ExposedFK.objects.create(
+        slug='awesome-slug',
+        awesome=False,
+        slogan='I am the best model ever!',
+    )
+
+    # Create a MyFK object
+    my_fk = MyFK.objects.create(
+        active=True,
+        name='Foreign Keyson',
+        exposed_fk=exposed_fk,
+    )
+
+    # Create an ModelWithFK object
+    model_with_fk = ModelWithFK.objects.create(
+        text='It was the best of times',
+        my_fk=my_fk)
+
+    serialized_obj = test_api.serialize_one(model_with_fk)
+    expected_serialized_obj = {
+        'id': model_with_fk.id,
+        'text': 'It was the best of times',
+        'my_fk_id':  my_fk.id,
+    }
+
+    expect(serialized_obj).to.equal(expected_serialized_obj)
+
+
 def test_create_record():
     from tests.models import (
         ExposedModelToSerialize,
