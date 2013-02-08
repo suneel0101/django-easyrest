@@ -6,7 +6,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseForbidden
 from django.views.generic.base import View
 
-from restroom.errors import RestroomError
+from .errors import RestroomError
 
 
 class API(object):
