@@ -285,12 +285,26 @@ class API(object):
                 json.dumps(data),
                 mimetype='application/json')
 
+        def delete(request, _id, *args, **kwargs):
+            data = self.delete_record(table_name, _id)
+            return HttpResponse(
+                json.dumps(data),
+                mimetype='application/json')
+
+
         class RestroomSingleItemView(View):
             def get(self, request, _id, *args, **kwargs):
                 if 'GET' in allowed_methods:
                     return get(request, _id, *args, **kwargs)
                 else:
                     return HttpResponseForbidden()
+
+            def delete(self, request, _id, *args, **kwargs):
+                if 'DELETE' in allowed_methods:
+                    return delete(request, _id, *args, **kwargs)
+                else:
+                    return HttpResponseForbidden()
+
 
         return RestroomSingleItemView
 

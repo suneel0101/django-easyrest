@@ -286,3 +286,35 @@ def test_generate_single_item_view_for_get():
     expected_response_json = {'id': _id, 'text': 'Shalom'}
     response_json = ast.literal_eval(response_from_GET.content)
     expect(response_json).to.equal(expected_response_json)
+
+
+def test_generate_single_item_view_for_delete():
+    # Given a restroom API instance
+    api = API()
+
+    # And we have a model
+    MyModel = Mock()
+    fields = [Mock(attname='id'), Mock(attname='text')]
+    db_table = "table_mymodel"
+    _meta = Mock(fields=fields, db_table=db_table)
+    MyModel._meta = _meta
+
+    _id = 1
+
+    returned_object = Mock()
+    returned_object.id = _id
+    returned_object.text = 'Shalom'
+    returned_object.__class__ = MyModel
+    MyModel.objects.get.return_value = returned_object
+
+    MyModel.objects.values.return_value = [{'id': _id, 'text': 'Shalom'}]
+    # And we register this model to the api
+    api.register(MyModel, {'allowed_methods': ['GET', 'POST', 'DELETE']})
+
+    request = Mock(method='DELETE')
+    response_from_DELETE = (api.generate_single_item_view("table_mymodel")
+                         .as_view()(request, _id))
+    expected_response_json = {'status': 'deletion successful'}
+    response_json = ast.literal_eval(response_from_DELETE.content)
+    expect(response_json).to.equal(expected_response_json)
+    returned_object.delete.assert_called_once()
