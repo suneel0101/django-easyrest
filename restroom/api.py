@@ -281,6 +281,9 @@ class API(object):
                 else:
                     return HttpResponseForbidden()
 
+            def delete(self, request, *args, **kwargs):
+                return HttpResponseForbidden()
+
         return RestroomListView
 
     def generate_single_item_view(self, table_name):
@@ -297,6 +300,9 @@ class API(object):
                         mimetype='application/json')
                 else:
                     return HttpResponseForbidden()
+
+            def post(self, request, *args, **kwargs):
+                return HttpResponseForbidden()
 
             def delete(self, request, _id, *args, **kwargs):
                 if 'DELETE' in allowed_methods:
