@@ -1,6 +1,6 @@
 import ast
 
-from restroom import API
+from restroom import API, RestroomError
 from mock import Mock
 from sure import expect
 from django.conf.urls import url, patterns
@@ -15,6 +15,25 @@ def transform_to_attrs_dict(url_patterns):
              'view': pattern._callback_str,
              'name': pattern.name}
             for pattern in url_patterns]
+
+
+def test_validate_registration_invalid_fields_raises_error():
+    api = API()
+
+    model_class = Mock()
+    fields = [
+        Mock(attname='id'),
+        Mock(attname='text'),
+        Mock(attname='status'),
+    ]
+    model_class._meta = Mock(fields=fields, object_name='MyModel')
+    options = {
+        'fields': ['id', 'timestamp']
+    }
+    (api.register
+     .when.called_with(model_class, options)
+     .should
+     .throw(RestroomError, "timestamp is not a valid field of MyModel"))
 
 
 def test_get_url_data():

@@ -1,7 +1,7 @@
 from .api import API
+from .errors import RestroomError
 
 api = API()
-
 
 def expose(api=api, **options):
     """

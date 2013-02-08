@@ -6,7 +6,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseForbidden
 from django.views.generic.base import View
 
-
+from restroom.errors import RestroomError
 
 class API(object):
     """
@@ -46,16 +46,32 @@ class API(object):
         """
         allowed_methods = (options.get('allowed_methods')
                            or self.default_configuration['allowed_methods'])
-        fields = [field.attname for field in model_class._meta.fields]
-        field_names = options.get('fields')
-        if field_names:
-            fields = [field for field in fields if field in field_names]
+        model_fields = [field.attname for field in model_class._meta.fields]
+        option_fields = options.get('fields')
+
+        if option_fields:
+            is_valid, offending_field = self.validate_fields(option_fields, model_fields)
+            if not is_valid:
+                message = "{} is not a valid field of {}".format(
+                    offending_field,
+                    model_class._meta.object_name)
+                raise RestroomError(message)
+            exposed_fields = [field for field in model_fields if field in option_fields]
+        else:
+            exposed_fields = model_fields
 
         return {
             'model': model_class,
-            'fields': fields,
+            'fields': exposed_fields,
             'allowed_methods': allowed_methods,
         }
+
+    def validate_fields(self, option_fields, model_fields):
+        for option in option_fields:
+            if option not in model_fields:
+                return False, option
+        return True, None
+
 
     def retrieve(self, table_name):
         """
@@ -244,3 +260,4 @@ class API(object):
                     return HttpResponseForbidden()
 
         return RestroomView
+
