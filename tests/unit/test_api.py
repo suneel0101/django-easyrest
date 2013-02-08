@@ -36,6 +36,24 @@ def test_validate_registration_invalid_fields_raises_error():
      .throw(RestroomError, "timestamp is not a valid field of MyModel"))
 
 
+def test_validate_fields_with_valid_fields():
+    api = API()
+
+    (expect(api.validate_fields(
+                ['id', 'address'],
+                ['id', 'address', 'city', 'ZIP']))
+     .to.equal((True, None)))
+
+
+def test_validate_fields_with_invalid_fields():
+    api = API()
+
+    (expect(api.validate_fields(
+                ['id', 'name'],
+                ['id', 'address', 'city', 'ZIP']))
+     .to.equal((False, 'name')))
+
+
 def test_get_url_data():
     # Given a restroom API instance
     api = API()
