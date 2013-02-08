@@ -172,7 +172,10 @@ class API(object):
         model_obj = model_data['model'].objects.get(id=_id)
         for field_name, new_value in changes.iteritems():
             setattr(model_obj, field_name, new_value)
-        model_obj.save()
+        try:
+            model_obj.save()
+        except IntegrityError:
+            return {'error': 'There was an error saving!'}
         return self.serialize_one(model_obj)
 
     def create_record(self, table_name, object_data):
@@ -335,6 +338,16 @@ class API(object):
 
             def post(self, request, *args, **kwargs):
                 return HttpResponseForbidden()
+
+            def put(self, request, _id, *args, **kwargs):
+                if 'PUT' in allowed_methods:
+                    put_data = {k: v for k, v in request.PUT.items()}
+                    data = api.update_one(table_name, _id, put_data)
+                    return HttpResponse(
+                        json.dumps(data),
+                        mimetype='application/json')
+                else:
+                    return HttpResponseForbidden()
 
             def delete(self, request, _id, *args, **kwargs):
                 if 'DELETE' in allowed_methods:
