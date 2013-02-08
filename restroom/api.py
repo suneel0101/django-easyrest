@@ -66,6 +66,13 @@ class API(object):
             'allowed_methods': allowed_methods,
         }
 
+    def validate_allowed_methods(self, option_allowed_methods):
+        allowed_methods = ['GET', 'POST', 'PUT', 'DELETE']
+        for method in option_allowed_methods:
+            if method not in allowed_methods:
+                return False, method
+        return True, None
+
     def validate_fields(self, option_fields, model_fields):
         for option in option_fields:
             if option not in model_fields:

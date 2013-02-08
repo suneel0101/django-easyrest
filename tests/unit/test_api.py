@@ -54,6 +54,22 @@ def test_validate_fields_with_invalid_fields():
      .to.equal((False, 'name')))
 
 
+def test_validate_allowed_methods_with_valid_methods():
+    api = API()
+
+    (expect(api.validate_allowed_methods(
+                ['GET', 'POST']))
+     .to.equal((True, None)))
+
+
+def test_validate_allowed_methods_with_invalid_methods():
+    api = API()
+
+    (expect(api.validate_allowed_methods(
+                ['GET', 'RANDOMMETHOD']))
+     .to.equal((False, 'RANDOMMETHOD')))
+
+
 def test_get_url_data():
     # Given a restroom API instance
     api = API()
