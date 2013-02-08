@@ -72,7 +72,6 @@ class API(object):
                 return False, option
         return True, None
 
-
     def retrieve(self, table_name):
         """
         Given a table_name,
@@ -246,7 +245,7 @@ class API(object):
                 json.dumps(data),
                 mimetype='application/json')
 
-        class RestroomView(View):
+        class RestroomListView(View):
             def get(self, request, *args, **kwargs):
                 if 'GET' in allowed_methods:
                     return get(request, *args, **kwargs)
@@ -259,5 +258,24 @@ class API(object):
                 else:
                     return HttpResponseForbidden()
 
-        return RestroomView
+        return RestroomListView
+
+    def generate_single_item_view(self, table_name):
+        model_data = self.table_model_map[table_name]
+        allowed_methods = model_data['allowed_methods']
+
+        def get(request, _id, *args, **kwargs):
+            data = self.retrieve_one(table_name, _id)
+            return HttpResponse(
+                json.dumps(data),
+                mimetype='application/json')
+
+        class RestroomSingleItemView(View):
+            def get(self, request, _id, *args, **kwargs):
+                if 'GET' in allowed_methods:
+                    return get(request, _id, *args, **kwargs)
+                else:
+                    return HttpResponseForbidden()
+
+        return RestroomSingleItemView
 
