@@ -3,6 +3,7 @@ from .errors import RestroomError
 
 api = API()
 
+
 def expose(api=api, **options):
     """
     This is the recommended way of exposing a model

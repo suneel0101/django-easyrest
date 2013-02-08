@@ -23,14 +23,14 @@ def test_registering_a_model_adds_it_to_the_table_model_map():
 
     # and the model_data should be the default
     (expect(restroom_api.table_model_map['tests_mymodel'])
-    .to.equal(expected_dict))
+     .to.equal(expected_dict))
 
 
 def test_registering_with_non_default_options():
     restroom_api = API()
     restroom_api.register(MyModel,
-                 {'allowed_methods': ['POST'],
-                  'fields': ['name']})
+                          {'allowed_methods': ['POST'],
+                           'fields': ['name']})
     expected_dict = {
         'model': MyModel,
         'fields': ['name'],
@@ -76,7 +76,6 @@ def test_expose_with_options():
     @expose(api=restroom_api,
             allowed_methods=['GET', 'POST'],
             fields=['short_title', 'author'])
-
     class ExposedModelWithOptions(models.Model):
         short_title = models.CharField(max_length=150)
         expired = models.BooleanField(default=False)
@@ -148,7 +147,8 @@ def test_retrieve_one_with_existent_record():
 
     # and retrieve this data from the database using the retrieve_one
     # method of the Restroom API
-    serialized_data = exposed_model_to_serialize_api.retrieve_one(table_name, _id)
+    serialized_data = (exposed_model_to_serialize_api
+                       .retrieve_one(table_name, _id))
 
     expected_data = {
         'id': _id,
@@ -172,7 +172,8 @@ def test_retrieve_one_for_nonexistent_record():
     ExposedModelToSerialize.objects.all().delete()
 
     # and we try to retrieve_one record of id = 1
-    serialized_data = exposed_model_to_serialize_api.retrieve_one(table_name, 1)
+    serialized_data = (exposed_model_to_serialize_api
+                       .retrieve_one(table_name, 1))
 
     expected_data = {
         'error': 'no matching object found for id: 1'
@@ -201,6 +202,7 @@ def test_serialize_one():
         'author': 'John Steinbeck',
         'short_title': 'Grapes of Wrath',
     }
+    expect(serialized_obj).to.equal(expected_serialized_obj)
 
 
 def test_create_record():
@@ -215,7 +217,7 @@ def test_create_record():
 
     _api = exposed_model_to_serialize_api
     record = _api.create_record(
-        'tests_exposedmodeltoserialize',
+        table_name,
         {
             'author': 'James Joyce',
             'expired': True,
@@ -249,7 +251,7 @@ def test_create_record_where_model_validation_fails():
 
     _api = another_test_api
 
-    record_1 = _api.create_record(
+    _api.create_record(
         'tests_anothermodel',
         {
             'text': 'Some text',

@@ -6,6 +6,7 @@ from sure import expect
 from django.conf.urls import url, patterns
 from django.http import QueryDict
 
+
 def transform_to_attrs_dict(url_patterns):
     """
     Transforms url patterns to dictionaries of
@@ -39,9 +40,8 @@ def test_validate_registration_invalid_fields_raises_error():
 def test_validate_fields_with_valid_fields():
     api = API()
 
-    (expect(api.validate_fields(
-                ['id', 'address'],
-                ['id', 'address', 'city', 'ZIP']))
+    (expect(api.validate_fields(['id', 'address'],
+     ['id', 'address', 'city', 'ZIP']))
      .to.equal((True, None)))
 
 
@@ -49,8 +49,8 @@ def test_validate_fields_with_invalid_fields():
     api = API()
 
     (expect(api.validate_fields(
-                ['id', 'name'],
-                ['id', 'address', 'city', 'ZIP']))
+     ['id', 'name'],
+     ['id', 'address', 'city', 'ZIP']))
      .to.equal((False, 'name')))
 
 
@@ -58,7 +58,7 @@ def test_validate_allowed_methods_with_valid_methods():
     api = API()
 
     (expect(api.validate_allowed_methods(
-                ['GET', 'POST']))
+     ['GET', 'POST']))
      .to.equal((True, None)))
 
 
@@ -66,7 +66,7 @@ def test_validate_allowed_methods_with_invalid_methods():
     api = API()
 
     (expect(api.validate_allowed_methods(
-                ['GET', 'RANDOMMETHOD']))
+     ['GET', 'RANDOMMETHOD']))
      .to.equal((False, 'RANDOMMETHOD')))
 
 
@@ -97,7 +97,10 @@ def test_get_url_data():
     api.generate_list_view = Mock()
     api.generate_single_item_view = Mock()
     api.generate_list_view.return_value.as_view.return_value = 'list view'
-    api.generate_single_item_view.return_value.as_view.return_value = 'single item view'
+    (api.generate_single_item_view
+     .return_value
+     .as_view
+     .return_value) = 'single item view'
 
     # When I get the url_data for the table `table_model`
     # with data {}
@@ -136,7 +139,10 @@ def test_api_url_data_property():
     api.generate_list_view = Mock()
     api.generate_single_item_view = Mock()
     api.generate_list_view.return_value.as_view.return_value = 'list view'
-    api.generate_single_item_view.return_value.as_view.return_value = 'single item view'
+    (api.generate_single_item_view
+     .return_value
+     .as_view
+     .return_value) = 'single item view'
 
     # We should get back a list of dictionaries containing
     # the url data for each of these models
@@ -177,13 +183,13 @@ def test_api_construct_url_pattern():
 
     url_patterns = api.construct_url_patterns(url_data)
     expected_patterns = patterns('',
-        url(r'^table_mymodel/$',
-            'list view',
-            name='table_mymodel_list_api'),
-        url(r'^table_mymodel/(?P<_id>[\d]+)/$',
-            'single item view',
-            name='table_mymodel_single_item_api'),
-    )
+                                 url(r'^table_mymodel/$',
+                                     'list view',
+                                     name='table_mymodel_list_api'),
+                                 url(r'^table_mymodel/(?P<_id>[\d]+)/$',
+                                     'single item view',
+                                     name='table_mymodel_single_item_api'),
+                                 )
 
     (expect(transform_to_attrs_dict(url_patterns))
      .to.equal(transform_to_attrs_dict(expected_patterns)))
@@ -209,23 +215,25 @@ def test_url_patterns():
     api.generate_list_view = Mock()
     api.generate_single_item_view = Mock()
     api.generate_list_view.return_value.as_view.return_value = 'list view'
-    api.generate_single_item_view.return_value.as_view.return_value = 'single item view'
+    (api.generate_single_item_view
+     .return_value
+     .as_view
+     .return_value) = 'single item view'
 
     expected_patterns = patterns('',
-        url(r'^table_mymodel/$',
-            'list view',
-            name='table_mymodel_list_api'),
-        url(r'^table_mymodel/(?P<_id>[\d]+)/$',
-            'single item view',
-            name='table_mymodel_single_item_api'),
-        url(r'^table_yourmodel/$',
-            'list view',
-            name='table_yourmodel_list_api'),
-        url(r'^table_yourmodel/(?P<_id>[\d]+)/$',
-            'single item view',
-            name='table_yourmodel_single_item_api'),
-
-    )
+                                 url(r'^table_mymodel/$',
+                                     'list view',
+                                     name='table_mymodel_list_api'),
+                                 url(r'^table_mymodel/(?P<_id>[\d]+)/$',
+                                     'single item view',
+                                     name='table_mymodel_single_item_api'),
+                                 url(r'^table_yourmodel/$',
+                                     'list view',
+                                     name='table_yourmodel_list_api'),
+                                 url(r'^table_yourmodel/(?P<_id>[\d]+)/$',
+                                     'single item view',
+                                     name='table_yourmodel_single_item_api'),
+                                 )
     url_patterns = api.url_patterns
 
     (expect(transform_to_attrs_dict(url_patterns))
@@ -350,7 +358,7 @@ def test_generate_single_item_view_for_delete():
 
     request = Mock(method='DELETE')
     response_from_DELETE = (api.generate_single_item_view("table_mymodel")
-                         .as_view()(request, _id))
+                            .as_view()(request, _id))
     expected_response_json = {'status': 'deletion successful'}
     response_json = ast.literal_eval(response_from_DELETE.content)
     expect(response_json).to.equal(expected_response_json)

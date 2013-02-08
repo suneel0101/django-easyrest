@@ -8,6 +8,7 @@ from django.views.generic.base import View
 
 from restroom.errors import RestroomError
 
+
 class API(object):
     """
     This API will keep track of all of the Models that are
@@ -307,4 +308,3 @@ class API(object):
                     return HttpResponseForbidden()
 
         return RestroomSingleItemView
-
