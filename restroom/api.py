@@ -217,8 +217,16 @@ class API(object):
         )
 
         """
-        urls = [url(data['regex'], data['view'], name=data['name'])
-                for data in url_data_list]
+        urls = []
+        for data in url_data_list:
+            urls.append(
+                url(data['list_regex'],
+                    data['list_view'],
+                    name=data['list_name']))
+            urls.append(
+                url(data['single_item_regex'],
+                    data['single_item_view'],
+                    name=data['single_item_name']))
         return patterns('', *urls)
 
     def get_url_data(self, table_name, model_data):
@@ -228,9 +236,13 @@ class API(object):
         self.table_model_map
         """
         return {
-            'regex': r'^{}/$'.format(table_name),
-            'view': 'restroom.views.base',
-            'name': '{}_api'.format(table_name),
+            "list_regex": r"^{}/$".format(table_name),
+            "single_item_regex": r"^{}/(?P<_id>[\d]+)/$".format(table_name),
+            "list_view": self.generate_list_view(table_name).as_view(),
+            "single_item_view": (self.generate_single_item_view(table_name)
+                                 .as_view()),
+            "list_name": "{}_list_api".format(table_name),
+            "single_item_name": "{}_single_item_api".format(table_name),
         }
 
     def generate_list_view(self, table_name):

@@ -93,6 +93,12 @@ def test_validate_registration_invalid_http_methods_raises_error():
 def test_get_url_data():
     # Given a restroom API instance
     api = API()
+
+    api.generate_list_view = Mock()
+    api.generate_single_item_view = Mock()
+    api.generate_list_view.return_value.as_view.return_value = 'list view'
+    api.generate_single_item_view.return_value.as_view.return_value = 'single item view'
+
     # When I get the url_data for the table `table_model`
     # with data {}
     url_data = api.get_url_data('table_model', {})
@@ -100,9 +106,12 @@ def test_get_url_data():
     # I should get back a dictionary containing
     # the URL Regex, the View string and the URL name
     expected_data = {
-        'regex': r'^table_model/$',
-        'view': 'restroom.views.base',
-        'name': 'table_model_api',
+        'list_regex': r'^table_model/$',
+        'list_view': 'list view',
+        'list_name': 'table_model_list_api',
+        'single_item_regex': r'^table_model/(?P<_id>[\d]+)/$',
+        'single_item_view': 'single item view',
+        'single_item_name': 'table_model_single_item_api',
     }
     expect(url_data).to.equal(expected_data)
 
@@ -124,19 +133,30 @@ def test_api_url_data_property():
     api.register(MyModel)
     api.register(YourModel)
 
+    api.generate_list_view = Mock()
+    api.generate_single_item_view = Mock()
+    api.generate_list_view.return_value.as_view.return_value = 'list view'
+    api.generate_single_item_view.return_value.as_view.return_value = 'single item view'
+
     # We should get back a list of dictionaries containing
     # the url data for each of these models
     # when we call url_data
     expected_data = [
         {
-            'regex': r'^table_mymodel/$',
-            'view': 'restroom.views.base',
-            'name': 'table_mymodel_api',
+            'list_regex': r'^table_mymodel/$',
+            'list_view': 'list view',
+            'list_name': 'table_mymodel_list_api',
+            'single_item_regex': r'^table_mymodel/(?P<_id>[\d]+)/$',
+            'single_item_view': 'single item view',
+            'single_item_name': 'table_mymodel_single_item_api',
         },
         {
-            'regex': r'^table_yourmodel/$',
-            'view': 'restroom.views.base',
-            'name': 'table_yourmodel_api',
+            'list_regex': r'^table_yourmodel/$',
+            'list_view': 'list view',
+            'list_name': 'table_yourmodel_list_api',
+            'single_item_regex': r'^table_yourmodel/(?P<_id>[\d]+)/$',
+            'single_item_view': 'single item view',
+            'single_item_name': 'table_yourmodel_single_item_api',
         },
     ]
     expect(api.url_data).to.equal(expected_data)
@@ -147,16 +167,22 @@ def test_api_construct_url_pattern():
     api = API()
 
     url_data = [{
-        'regex': r'^table_mymodel/$',
-        'view': 'restroom.views.base',
-        'name': 'table_mymodel_api',
+        'list_regex': r'^table_mymodel/$',
+        'list_view': 'list view',
+        'list_name': 'table_mymodel_list_api',
+        'single_item_regex': r'^table_mymodel/(?P<_id>[\d]+)/$',
+        'single_item_view': 'single item view',
+        'single_item_name': 'table_mymodel_single_item_api',
     }]
 
     url_patterns = api.construct_url_patterns(url_data)
     expected_patterns = patterns('',
         url(r'^table_mymodel/$',
-            'restroom.views.base',
-            name='table_mymodel_api'),
+            'list view',
+            name='table_mymodel_list_api'),
+        url(r'^table_mymodel/(?P<_id>[\d]+)/$',
+            'single item view',
+            name='table_mymodel_single_item_api'),
     )
 
     (expect(transform_to_attrs_dict(url_patterns))
@@ -180,13 +206,24 @@ def test_url_patterns():
     api.register(MyModel)
     api.register(YourModel)
 
+    api.generate_list_view = Mock()
+    api.generate_single_item_view = Mock()
+    api.generate_list_view.return_value.as_view.return_value = 'list view'
+    api.generate_single_item_view.return_value.as_view.return_value = 'single item view'
+
     expected_patterns = patterns('',
         url(r'^table_mymodel/$',
-            'restroom.views.base',
-            name='table_mymodel_api'),
+            'list view',
+            name='table_mymodel_list_api'),
+        url(r'^table_mymodel/(?P<_id>[\d]+)/$',
+            'single item view',
+            name='table_mymodel_single_item_api'),
         url(r'^table_yourmodel/$',
-            'restroom.views.base',
-            name='table_yourmodel_api'),
+            'list view',
+            name='table_yourmodel_list_api'),
+        url(r'^table_yourmodel/(?P<_id>[\d]+)/$',
+            'single item view',
+            name='table_yourmodel_single_item_api'),
 
     )
     url_patterns = api.url_patterns
