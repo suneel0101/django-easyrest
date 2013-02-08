@@ -40,8 +40,15 @@ class API(object):
         and defaults to the default_configuration when there is no
         other specification.
         """
-        # Register allowed_methods data
-        optional_allowed_methods = options.get('allowed_methods')
+        return {
+            'model': model_class,
+            'allowed_methods': self.get_allowed_methods(
+                options.get('allowed_methods')),
+            'fields': self.get_exposed_fields(
+                options.get('fields'), model_class),
+        }
+
+    def get_allowed_methods(self, optional_allowed_methods):
         if optional_allowed_methods:
             is_valid, offending_method = (self.validate_allowed_methods(
                     optional_allowed_methods))
@@ -51,11 +58,10 @@ class API(object):
             allowed_methods = optional_allowed_methods
         else:
             allowed_methods = ['GET']
+        return allowed_methods
 
-        # Register exposable fields data
+    def get_exposed_fields(self, option_fields, model_class):
         model_fields = [field.attname for field in model_class._meta.fields]
-        option_fields = options.get('fields')
-
         if option_fields:
             is_valid, offending_field = self.validate_fields(option_fields, model_fields)
             if not is_valid:
@@ -66,12 +72,7 @@ class API(object):
             exposed_fields = [field for field in model_fields if field in option_fields]
         else:
             exposed_fields = model_fields
-
-        return {
-            'model': model_class,
-            'fields': exposed_fields,
-            'allowed_methods': allowed_methods,
-        }
+        return exposed_fields
 
     def validate_allowed_methods(self, option_allowed_methods):
         allowed_methods = ['GET', 'POST', 'PUT', 'DELETE']
