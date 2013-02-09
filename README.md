@@ -1,5 +1,7 @@
 # Django-Restroom: a super lightweight REST API framework
 
+### Status: This project is still under development!
+
 Whether you want to create an API for your product for external consumption or you just want to expose a REST API for your own frontend application, Django-Restroom is an incredibly easy and fast way to accomplish that.
 
 There are only two steps:
@@ -26,7 +28,7 @@ These are the fields of the model you want to expose to consumers of your api.
 The object's `id` will always be exposed. If you do not pass in anything, it will default to exposing all fields.
 When the REST endpoints for a model are requested by any method other than the ones you have allowed, a 403 Forbidden response will be returned.
 
-Sample usage:
+### Sample usage:
 ```python
 from django.db import models
 from restroom import expose
