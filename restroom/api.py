@@ -76,11 +76,9 @@ class API(object):
                     offending_field,
                     model_class._meta.object_name)
                 raise RestroomError(message)
-            exposed_fields = [field for field in model_fields
-                              if field in option_fields]
+            return option_fields
         else:
-            exposed_fields = model_fields
-        return exposed_fields
+            return model_fields
 
     def validate_allowed_methods(self, option_allowed_methods):
         allowed_methods = ['GET', 'POST', 'PUT', 'DELETE']
