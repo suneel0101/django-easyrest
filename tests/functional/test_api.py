@@ -1,4 +1,5 @@
 import ast
+import datetime
 from mock import Mock
 from tests.models import MyModel
 from restroom import API, expose
@@ -248,6 +249,30 @@ def test_serialize_one_with_foreign_key():
         'my_fk_id':  my_fk.id,
     }
 
+    expect(serialized_obj).to.equal(expected_serialized_obj)
+
+
+def test_serialize_one_with_datetime_field():
+    from tests.models import (
+        test_datetime_api,
+        DateTimeModel)
+
+    # When we delete all existing DateTimeModel objects
+    DateTimeModel.objects.all().delete()
+
+    # January 1, 1990
+    new_years_1990 = datetime.datetime(1990, 1, 1)
+    # Create an DateTimeModel object
+    obj = DateTimeModel.objects.create(
+        text='this is a datetime model',
+        timestamp=new_years_1990)
+
+    serialized_obj = test_datetime_api.serialize_one(obj)
+
+    expected_serialized_obj = {
+        'id': obj.id,
+        'timestamp': new_years_1990.isoformat()
+    }
     expect(serialized_obj).to.equal(expected_serialized_obj)
 
 

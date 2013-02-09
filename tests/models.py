@@ -49,3 +49,12 @@ class MyFK(models.Model):
 class ModelWithFK(models.Model):
     text = models.CharField(null=False, blank=False, max_length=50)
     my_fk = models.ForeignKey('tests.MyFK')
+
+
+test_datetime_api = API()
+
+
+@expose(api=test_datetime_api, fields=['timestamp', 'id'])
+class DateTimeModel(models.Model):
+    timestamp = models.DateTimeField()
+    text = models.CharField(max_length=150)

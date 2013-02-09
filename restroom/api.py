@@ -1,3 +1,4 @@
+import datetime
 from collections import OrderedDict
 
 from django.conf.urls import url, patterns
@@ -145,7 +146,18 @@ class API(object):
         table_name = model_instance.__class__._meta.db_table
         model_data = self.table_model_map[table_name]
         fields = model_data['fields']
-        return {field: getattr(model_instance, field) for field in fields}
+        return {field: self.get_field_value(model_instance, field)
+                for field in fields}
+
+    def get_field_value(self, model_instance, field_name):
+        """
+        Gets the value of model_instance.{field_name}
+        And if it's a datetime, returns the isoformat.
+        """
+        field_val = getattr(model_instance, field_name)
+        if isinstance(field_val, datetime.datetime):
+            return field_val.isoformat()
+        return field_val
 
     def update_one(self, table_name, _id, changes):
         """
