@@ -354,6 +354,41 @@ def test_delete_record():
      .to.equal(0))
 
 
+def test_delete_nonexistent_record():
+    from tests.models import (
+        ExposedModelToSerialize,
+        exposed_model_to_serialize_api)
+
+    table_name = ExposedModelToSerialize._meta.db_table
+
+    # When we delete all existing ExposedModelToSerialize objects
+    ExposedModelToSerialize.objects.all().delete()
+
+    _id = 1
+
+    # we expect Django ORM to return that there is now 1
+    # record in this table
+    (expect(ExposedModelToSerialize.objects
+            .filter(id=_id)
+            .count())
+     .to.equal(0))
+
+    # Then through the restroom api we delete this record
+    _api = exposed_model_to_serialize_api
+    returned_data = _api.delete_record(table_name, _id)
+
+    # and expect nice success JSON
+    expected_data = {'error': 'no matching object found for id: 1'}
+    expect(returned_data).to.equal(expected_data)
+
+    # and Django ORM to return that there are now 0 records
+    # in this table
+    (expect(ExposedModelToSerialize.objects
+            .filter(id=_id)
+            .count())
+     .to.equal(0))
+
+
 def test_update_one():
     from tests.models import (
         ExposedModelToSerialize,
