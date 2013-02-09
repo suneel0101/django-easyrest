@@ -1,4 +1,4 @@
-# Django-Restroom: a super lightweight API framework for Django.
+# Django-Restroom: a super lightweight REST API framework
 
 Whether you want to create an API for your product for external consumption or you just want to expose a REST API for your own frontend application, Django-Restroom is an incredibly easy and fast way to accomplish that.
 
