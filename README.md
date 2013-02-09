@@ -10,7 +10,7 @@ There are only two steps:
 2. Include restroom.urls in your main urls.py file, which will create the REST endpoints.
 
 
-## 1. @expose
+## 1. @expose your Models
 
 `@expose` registers a Django model to your API.
 
@@ -56,7 +56,7 @@ api.register(Book, {
 ````
 
 
-## 2. REST endpoints
+## 2. Create REST endpoints automatically
 
 Once you have exposed the models you want to create a RESTful API for, you should include the following in your `urls.py`:
 
@@ -69,7 +69,7 @@ urlpatterns += patterns("",
 )
 ```
 
-This will create REST endpoints for each of your registered models.
+This will automatically create REST endpoints for each of your registered models.
 Let’s use the examples of the Book and Movie models registered above.
 
 ### GET /api/book/
