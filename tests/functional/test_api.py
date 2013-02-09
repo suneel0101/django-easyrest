@@ -1,8 +1,11 @@
+import ast
+from mock import Mock
 from tests.models import MyModel
 from restroom import API, expose
 from sure import expect
 
 from django.db import models
+from django.http import HttpResponseBadRequest
 
 
 def test_registering_a_model_adds_it_to_the_table_model_map():
@@ -494,3 +497,28 @@ def test_update_one_for_nonexistent_id():
 
     # We should get back the expected serialized data
     expect(serialized_data).to.equal(expected_data)
+
+
+def test_generate_single_item_view_for_GET_for_non_existent_item():
+    from tests.models import (
+        ExposedModelToSerialize,
+        exposed_model_to_serialize_api)
+
+    api = exposed_model_to_serialize_api
+    table_name = ExposedModelToSerialize._meta.db_table
+
+    # When we delete all existing ExposedModelToSerialize objects
+    ExposedModelToSerialize.objects.all().delete()
+
+    _id = 12345
+
+    request = Mock(method='GET')
+    response_from_GET = (api.generate_single_item_view(table_name)
+                         .as_view()(request, _id))
+    expected_response_json = {
+        'error': 'no matching object found for id: {}'.format(_id)
+    }
+    response_json = ast.literal_eval(response_from_GET.content)
+    expect(response_json).to.equal(expected_response_json)
+    bad_response = HttpResponseBadRequest()
+    expect(response_from_GET.status_code).to.equal(bad_response.status_code)

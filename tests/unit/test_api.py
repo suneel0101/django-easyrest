@@ -4,7 +4,8 @@ from restroom import API, RestroomError
 from mock import Mock
 from sure import expect
 from django.conf.urls import url, patterns
-from django.http import QueryDict, HttpResponseForbidden
+from django.http import (QueryDict,
+                         HttpResponseForbidden)
 
 
 def transform_to_attrs_dict(url_patterns):

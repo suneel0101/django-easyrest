@@ -1,12 +1,11 @@
 from collections import OrderedDict
-import simplejson as json
 
 from django.conf.urls import url, patterns
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseForbidden
-from django.views.generic.base import View
 
 from .errors import RestroomError
+from.views import (BaseRestroomListView,
+                   BaseRestroomSingleItemView)
 
 
 class API(object):
@@ -52,9 +51,10 @@ class API(object):
     def get_allowed_methods(self, optional_allowed_methods):
         if optional_allowed_methods:
             is_valid, offending_method = (self.validate_allowed_methods(
-                    optional_allowed_methods))
+                optional_allowed_methods))
             if not is_valid:
-                message = "{} is not a valid allowable HTTP method".format(offending_method)
+                message = "{} is not a valid allowable HTTP method".format(
+                    offending_method)
                 raise RestroomError(message)
             allowed_methods = optional_allowed_methods
         else:
@@ -251,7 +251,6 @@ class API(object):
                 name='table_mymodel_api'),
             ...
         )
-
         """
         urls = []
         for data in url_data_list:
@@ -292,70 +291,24 @@ class API(object):
         such requests on /table_name/{id} for single item
         interactions.
         """
+        class RestroomListView(BaseRestroomListView):
+            pass
+
         model_data = self.table_model_map[table_name]
-        allowed_methods = model_data['allowed_methods']
-        api = self
+        view = RestroomListView
+        view.allowed_methods = model_data['allowed_methods']
+        view.api = self
+        view.table_name = table_name
 
-        class RestroomListView(View):
-            def get(self, request, *args, **kwargs):
-                if 'GET' in allowed_methods:
-                    data = api.retrieve(table_name)
-                    return HttpResponse(
-                        json.dumps(data),
-                        mimetype='application/json')
-                else:
-                    return HttpResponseForbidden()
-
-            def post(self, request, *args, **kwargs):
-                if 'POST' in allowed_methods:
-                    post_data = {k: v for k, v in request.POST.items()}
-                    data = api.create_record(table_name, post_data)
-                    return HttpResponse(
-                        json.dumps(data),
-                        mimetype='application/json')
-                else:
-                    return HttpResponseForbidden()
-
-            def delete(self, request, *args, **kwargs):
-                return HttpResponseForbidden()
-
-        return RestroomListView
+        return view
 
     def generate_single_item_view(self, table_name):
+        class RestroomSingleItemView(BaseRestroomSingleItemView):
+            pass
+
         model_data = self.table_model_map[table_name]
-        allowed_methods = model_data['allowed_methods']
-        api = self
-
-        class RestroomSingleItemView(View):
-            def get(self, request, _id, *args, **kwargs):
-                if 'GET' in allowed_methods:
-                    data = api.retrieve_one(table_name, _id)
-                    return HttpResponse(
-                        json.dumps(data),
-                        mimetype='application/json')
-                else:
-                    return HttpResponseForbidden()
-
-            def post(self, request, *args, **kwargs):
-                return HttpResponseForbidden()
-
-            def put(self, request, _id, *args, **kwargs):
-                if 'PUT' in allowed_methods:
-                    put_data = {k: v for k, v in request.PUT.items()}
-                    data = api.update_one(table_name, _id, put_data)
-                    return HttpResponse(
-                        json.dumps(data),
-                        mimetype='application/json')
-                else:
-                    return HttpResponseForbidden()
-
-            def delete(self, request, _id, *args, **kwargs):
-                if 'DELETE' in allowed_methods:
-                    data = api.delete_record(table_name, _id)
-                    return HttpResponse(
-                        json.dumps(data),
-                        mimetype='application/json')
-                else:
-                    return HttpResponseForbidden()
-
-        return RestroomSingleItemView
+        view = RestroomSingleItemView
+        view.allowed_methods = model_data['allowed_methods']
+        view.api = self
+        view.table_name = table_name
+        return view
