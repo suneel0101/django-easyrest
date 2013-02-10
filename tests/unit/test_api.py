@@ -250,7 +250,7 @@ def test_generate_list_view_for_get():
     MyModel._meta.fields = [Mock(attname='id'), Mock(attname='text')]
     MyModel._meta.db_table = "table_mymodel"
 
-    MyModel.objects.values.return_value = [{'id': 1, 'text': 'Shalom'}]
+    MyModel.objects.filter.return_value.values.return_value = [{'id': 1, 'text': 'Shalom'}]
     # And we register this model to the api
     api.register(MyModel)
 

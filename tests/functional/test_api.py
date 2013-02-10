@@ -132,6 +132,76 @@ def test_retrieval():
     exposed_model_obj.delete()
 
 
+def test_retrieval_with_filter_params():
+    from tests.models import (
+        ExposedModelToSerialize,
+        exposed_model_to_serialize_api)
+
+    table_name = ExposedModelToSerialize._meta.db_table
+
+    # When we delete all existing ExposedModelToSerialize objects
+    ExposedModelToSerialize.objects.all().delete()
+
+    # And we create an ExposedModelToSerialize object
+    exposed_model_obj = ExposedModelToSerialize.objects.create(
+        short_title="This is a short title",
+        author="Edgar Allen Poe",
+    )
+    _id = exposed_model_obj.id
+
+    another_obj = ExposedModelToSerialize.objects.create(
+        short_title="This is another short title",
+        author="Robert Frost",
+    )
+
+    another_id = another_obj.id
+
+    # and retrieve this data from the database using the retrieve
+    # method of the Restroom API
+    serialized_data = exposed_model_to_serialize_api.retrieve(
+        table_name,
+        [{'field': 'short_title',
+         'operator': '=',
+         'value': 'This is a short title'}])
+
+    expected_data = [
+        {
+            'id': _id,
+            'short_title': 'This is a short title',
+            'author': "Edgar Allen Poe",
+        },
+    ]
+    # We should get back the expected serialized data
+    expect(serialized_data).to.equal(expected_data)
+
+    multiple_results = exposed_model_to_serialize_api.retrieve(
+        table_name,
+        [{'field': 'id',
+         'operator': 'in',
+         'value': [_id, another_id]
+          }])
+
+    expected_multiple_data = [
+        {
+            'id': _id,
+            'short_title': 'This is a short title',
+            'author': "Edgar Allen Poe",
+        },
+        {
+            'id': another_id,
+            'short_title': 'This is another short title',
+            'author': "Robert Frost",
+        },
+
+    ]
+
+    (expect(multiple_results)
+     .to.equal(expected_multiple_data))
+
+    exposed_model_obj.delete()
+    another_obj.delete()
+
+
 def test_retrieve_one_with_existent_record():
     from tests.models import (
         ExposedModelToSerialize,

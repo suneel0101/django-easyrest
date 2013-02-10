@@ -94,7 +94,7 @@ class API(object):
                 return False, option
         return True, None
 
-    def retrieve(self, table_name):
+    def retrieve(self, table_name, filters={}):
         """
         Given a table_name,
         This finds the model_data in self.table_model_map,
@@ -120,7 +120,40 @@ class API(object):
         model_data = self.table_model_map[table_name]
         model_class = model_data['model']
         fields = model_data['fields']
-        return list(model_class.objects.values(*fields))
+
+        try:
+            is_valid, offending_field = self.validate_fields(
+                [_filter["field"] for _filter in filters],
+                fields)
+        except KeyError as e:
+            return {'error': e.message}
+
+        if not is_valid:
+            return {'error': '{} is an invalid field'.format(offending_field)}
+
+        try:
+            filter_dict = self.construct_filter_dict(filters)
+        except KeyError as e:
+            return {'error': e.message}
+
+        try:
+            return list(model_class.objects
+                        .filter(**filter_dict)
+                        .values(*fields))
+        except IntegrityError as e:
+            return {'error': e.message}
+
+    def construct_filter_dict(self, filters):
+        filter_dict = {}
+        for _filter in filters:
+            if _filter['operator'] == '=':
+                filter_dict[_filter['field']] = _filter['value']
+            else:
+                filter_key = "{}__{}".format(
+                    _filter['field'],
+                    _filter['operator'])
+                filter_dict[filter_key] = _filter['value']
+        return filter_dict
 
     def retrieve_one(self, table_name, _id):
         """
