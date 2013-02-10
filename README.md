@@ -89,6 +89,29 @@ HTTP 200 OK
 }
 ```
 
+#### Querying API
+To filter the set of results, you can also request this endpoint with a `query` parameter, which is a list of filter parameters.
+specifying the field you want to query on, the operation (=, gte, in, etc), and the restricting value. See below for an example.
+```
+GET /api/book/
+{"query": [
+    {"field": "id",
+     "operator": "in",
+     "value": [1, 2]},
+     {"field": "title",
+     "operator": "=",
+     "value": "Crime and Punishment"}
+     ]
+}
+
+HTTP 200 OK
+{
+    "results": [
+        {"id": 1, "title": "Crime and Punishment", "author": "Fyodor Dostoevsky"}
+    ]
+}
+```
+
 ### GET /api/book/{int: id}
 This returns the Book with the specified ID.
 
