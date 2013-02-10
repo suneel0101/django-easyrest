@@ -5,8 +5,9 @@ from django.conf.urls import url, patterns
 from django.db import IntegrityError
 
 from .errors import RestroomError
-from.views import (BaseRestroomListView,
-                   BaseRestroomSingleItemView)
+from .views import (
+    BaseRestroomListView,
+    BaseRestroomSingleItemView)
 
 
 class API(object):
