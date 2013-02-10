@@ -183,7 +183,7 @@ HTTP 400
 ### PUT /api/book/{int: id}
 This updates the Book with the specified ID.
 
-#### Sample responsea
+#### Sample responses
 
 ```
 PUT /api/book/1/
