@@ -92,6 +92,7 @@ HTTP 200 OK
 #### Querying API
 To filter the set of results, you can also request this endpoint with a `query` parameter, which is a list of filter parameters.
 specifying the field you want to query on, the operation (=, gte, in, etc), and the restricting value. See below for an example.
+(This pattern was inspired by Flask Restless, an awesome API framework for Flask)
 ```
 GET /api/book/
 {"query": [
