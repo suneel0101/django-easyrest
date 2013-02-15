@@ -8,4 +8,4 @@ from tests.unit.test_api import transform_to_attrs_dict
 
 def test_restroom_urls_equals_api_url_patterns():
     (expect(transform_to_attrs_dict(urlpatterns))
-     .to.equal(transform_to_attrs_dict(api.url_patterns)))
+     .to.equal(transform_to_attrs_dict(api.get_urls())))

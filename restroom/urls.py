@@ -1,3 +1,3 @@
 from restroom import api
 
-urlpatterns = api.url_patterns
+urlpatterns = api.get_urls()

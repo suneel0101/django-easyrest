@@ -7,7 +7,7 @@ from django.http import (
 from django.views.generic.base import View
 
 
-class BaseRestroomListView(View):
+class RestroomListView(View):
     allowed_methods = ['GET']
     api = None
     table_name = None
@@ -36,7 +36,11 @@ class BaseRestroomListView(View):
         return HttpResponseForbidden()
 
 
-class BaseRestroomSingleItemView(View):
+class RestroomSingleItemView(View):
+    allowed_methods = ['GET']
+    api = None
+    table_name = None
+
     def get(self, request, _id, *args, **kwargs):
         if 'GET' in self.allowed_methods:
             data = self.api.retrieve_one(self.table_name, _id)

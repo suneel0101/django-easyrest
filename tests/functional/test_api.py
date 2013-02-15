@@ -3,6 +3,7 @@ import datetime
 from mock import Mock
 from tests.models import MyModel
 from restroom import API, expose
+from restroom.views import RestroomSingleItemView
 from sure import expect
 
 from django.db import models
@@ -594,7 +595,7 @@ def test_update_one_for_nonexistent_id():
     expect(serialized_data).to.equal(expected_data)
 
 
-def test_generate_single_item_view_for_GET_for_non_existent_item():
+def test_restroom_single_item_view_for_GET_for_non_existent_item():
     from tests.models import (
         ExposedModelToSerialize,
         exposed_model_to_serialize_api)
@@ -608,8 +609,10 @@ def test_generate_single_item_view_for_GET_for_non_existent_item():
     _id = 12345
 
     request = Mock(method='GET')
-    response_from_GET = (api.generate_single_item_view(table_name)
-                         .as_view()(request, _id))
+    view = RestroomSingleItemView.as_view(api=api,
+                                  allowed_methods='GET',
+                                  table_name=table_name)
+    response_from_GET = view(request, _id)
     expected_response_json = {
         'error': 'no matching object found for id: {}'.format(_id)
     }

@@ -6,8 +6,8 @@ from django.db import IntegrityError
 
 from .errors import RestroomError
 from .views import (
-    BaseRestroomListView,
-    BaseRestroomSingleItemView)
+    RestroomListView,
+    RestroomSingleItemView)
 
 
 class API(object):
@@ -30,7 +30,7 @@ class API(object):
         >>> from restroom import api
         >>> api.register(MyModel, options={'fields': ['id', 'name']})
 
-        However, this is not the recommended method registration.
+        However, this is not the recommended method of registration.
         Instead, you should use the `expose` decorator.
         """
         model_data = self.get_model_data(model_class, options)
@@ -227,17 +227,8 @@ class API(object):
         This creates a record in the `table_name` table
         with column values given by the object_data dictionary.
 
-        Given the following model in app/people/models.py
-        ```
-        class Person(models.Model):
-            name = models.CharField(max_length=150)
-            is_awesome = models.BooleanField(default=True)
-            age = models.PositiveIntegerField()
-        ```
-
         api.create_record('people_person', {'name': 'James', 'age': 19})
-        will create a Person object whose name is James, whose age is 19,
-        and who is_awesome.
+        will create a Person object whose name=James and age=19,
         """
         model_data = self.table_model_map[table_name]
         model_class = model_data['model']
@@ -268,91 +259,25 @@ class API(object):
         else:
             return {'status': 'deletion successful'}
 
-    @property
-    def url_patterns(self):
-        """
-        Returns urlpatterns for all of the registered models
-        """
-        return self.construct_url_patterns(self.url_data)
-
-    @property
-    def url_data(self):
-        """
-        Returns a list of dictionaries each containing url data,
-        returned by self.get_url_data, for all of the models
-        registered to the API
-        """
-        return [self.get_url_data(table_name)
-                for table_name in self.table_model_map.keys()]
-
-    def construct_url_patterns(self, url_data_list):
+    def get_urls(self):
         """
         Constructs the urlpatterns to be plugged into
-        your urls.py, e.g.
-        patterns('',
-            url(r'^table_mymodel/$',
-                'some.view.name',
-                name='table_mymodel_api'),
-            ...
-        )
+        your urls.py
         """
         urls = []
-        for data in url_data_list:
-            urls.append(
-                url(data['list_regex'],
-                    data['list_view'],
-                    name=data['list_name']))
-            urls.append(
-                url(data['single_item_regex'],
-                    data['single_item_view'],
-                    name=data['single_item_name']))
+        for table_name, model_data in self.table_model_map.iteritems():
+            data = {
+                'api': self,
+                'allowed_methods': model_data['allowed_methods'],
+                'table_name': table_name,
+            }
+            urls.extend([
+                url(r"^{}/$".format(table_name),
+                    RestroomListView.as_view(**data),
+                    name="{}_list_api".format(table_name)),
+                url(r"^{}/(?P<_id>[\d]+)/$".format(table_name),
+                    RestroomSingleItemView.as_view(**data),
+                    name="{}_single_item_api".format(table_name)),
+            ])
+
         return patterns('', *urls)
-
-    def get_url_data(self, table_name):
-        """
-        Given the table_name and corresponding model_data,
-        which is found as a key, value pair in
-        self.table_model_map
-        """
-        return {
-            "list_regex": r"^{}/$".format(table_name),
-            "single_item_regex": r"^{}/(?P<_id>[\d]+)/$".format(table_name),
-            "list_view": self.generate_list_view(table_name).as_view(),
-            "single_item_view": (self.generate_single_item_view(table_name)
-                                 .as_view()),
-            "list_name": "{}_list_api".format(table_name),
-            "single_item_name": "{}_single_item_api".format(table_name),
-        }
-
-    def generate_list_view(self, table_name):
-        """
-        Dynamically generates the Django view
-        that will power the API endpoint for the model
-        whose table_name is `table_name`
-
-        Only GET requests are enabled currently, but
-        POST, PUT and DELETE will be added, as well as
-        such requests on /table_name/{id} for single item
-        interactions.
-        """
-        class RestroomListView(BaseRestroomListView):
-            pass
-
-        model_data = self.table_model_map[table_name]
-        view = RestroomListView
-        view.allowed_methods = model_data['allowed_methods']
-        view.api = self
-        view.table_name = table_name
-
-        return view
-
-    def generate_single_item_view(self, table_name):
-        class RestroomSingleItemView(BaseRestroomSingleItemView):
-            pass
-
-        model_data = self.table_model_map[table_name]
-        view = RestroomSingleItemView
-        view.allowed_methods = model_data['allowed_methods']
-        view.api = self
-        view.table_name = table_name
-        return view
