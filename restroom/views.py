@@ -14,7 +14,9 @@ class RestroomListView(View):
 
     def get(self, request, *args, **kwargs):
         if 'GET' in self.allowed_methods:
-            data = self.api.retrieve(self.table_name)
+            get_data = {k: v for k, v in request.GET.items()}
+            filters = get_data.get('filters') or {}
+            data = self.api.retrieve(self.table_name, filters)
             return HttpResponse(
                 json.dumps(data),
                 mimetype='application/json')

@@ -34,6 +34,7 @@ def test_restroom_list_view_for_get_when_allowed():
     # should return the expected json data when requested
     # via GET
     request = Mock(method='GET')
+    request.GET = QueryDict({})
     view = RestroomListView.as_view(api=api,
                              allowed_methods=['GET'],
                              table_name='table_mymodel')
