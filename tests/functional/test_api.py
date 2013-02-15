@@ -205,6 +205,76 @@ def test_retrieval_with_filter_params():
     another_obj.delete()
 
 
+def test_retrieval_with_pagination():
+    from tests.models import (
+        ExposedModelToSerialize,
+        exposed_model_to_serialize_api)
+
+    table_name = ExposedModelToSerialize._meta.db_table
+
+    # When we delete all existing ExposedModelToSerialize objects
+    ExposedModelToSerialize.objects.all().delete()
+
+    # And we create an ExposedModelToSerialize object
+    for x in xrange(0, 60):
+        ExposedModelToSerialize.objects.create(
+            short_title="This is a short title {}".format(x),
+            author="Edgar Allen Poe {}".format(x),
+        )
+
+    # and retrieve this data from the database using the retrieve
+    # method of the Restroom API
+    serialized_data = exposed_model_to_serialize_api.retrieve(
+        table_name, page=2)
+
+    expected_data = [
+        {
+            'id': x + 1,
+            'short_title': 'This is a short title {}'.format(x),
+            'author': "Edgar Allen Poe {}".format(x),
+        } for x in xrange(20, 40)
+    ]
+
+    # We should get back the expected serialized data
+    expect(serialized_data).to.equal(expected_data)
+    ExposedModelToSerialize.objects.all().delete()
+
+
+def test_retrieval_with_pagination_explicitly_registered():
+    from tests.models import (
+        PaginatedModel,
+        paginated_api)
+
+    table_name = PaginatedModel._meta.db_table
+
+    # When we delete all existing PaginatedModel objects
+    PaginatedModel.objects.all().delete()
+
+    # And we create an PaginatedModel object
+    for x in xrange(0, 120):
+        PaginatedModel.objects.create(
+            text="This is a text {}".format(x),
+            slug="text-slug-{}".format(x),
+        )
+
+    # and retrieve this data from the database using the retrieve
+    # method of the Restroom API
+    serialized_data = paginated_api.retrieve(
+        table_name, page=2)
+
+    expected_data = [
+        {
+            'id': x + 1,
+            'text': "This is a text {}".format(x),
+            'slug': "text-slug-{}".format(x),
+        } for x in xrange(50, 100)
+    ]
+
+    # We should get back the expected serialized data
+    expect(serialized_data).to.equal(expected_data)
+    PaginatedModel.objects.all().delete()
+
+
 def test_retrieve_one_with_existent_record():
     from tests.models import (
         ExposedModelToSerialize,

@@ -58,3 +58,15 @@ test_datetime_api = API()
 class DateTimeModel(models.Model):
     timestamp = models.DateTimeField()
     text = models.CharField(max_length=150)
+
+
+paginated_api = API()
+
+
+@expose(api=paginated_api,
+        fields=['text', 'slug', 'id'],
+        per_page=50)
+class PaginatedModel(models.Model):
+    text = models.CharField(null=False, blank=False, max_length=50)
+    slug = models.SlugField(unique=True)
+    active = models.BooleanField(blank=False)

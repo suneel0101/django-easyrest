@@ -37,13 +37,17 @@ class API(object):
         Formats data from the model_class and options dictionary,
         falling back to defaults where no options are passed in
         """
-        return {
+        base_data = {
             'model': model_class,
             'allowed_methods': self.get_allowed_methods(
                 options.get('allowed_methods')),
             'fields': self.get_exposed_fields(
                 options.get('fields'), model_class),
         }
+        per_page = options.get('per_page')
+        if isinstance(per_page, int) and per_page > 0:
+            base_data['per_page'] = per_page
+        return base_data
 
     def get_allowed_methods(self, optional_allowed_methods):
         if optional_allowed_methods:
