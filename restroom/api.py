@@ -90,7 +90,7 @@ class API(object):
                 return False, option
         return True, None
 
-    def retrieve(self, table_name, filters={}):
+    def retrieve(self, table_name, filters={}, page=None):
         """
         Powers GET requests to endpoint for `table_name`
 
@@ -130,11 +130,17 @@ class API(object):
             return {'error': e.message}
 
         try:
-            return list(model_class.objects
+            data = list(model_class.objects
                         .filter(**filter_dict)
                         .values(*fields))
         except IntegrityError as e:
             return {'error': e.message}
+
+        if page:
+            start = model_data.get('per_page', 20) * (page - 1)
+            finish = model_data.get('per_page', 20) * page
+            data = data[start:finish]
+        return data
 
     def construct_filter_dict(self, filters):
         filter_dict = {}
