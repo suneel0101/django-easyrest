@@ -17,8 +17,6 @@ class API(object):
     """
     def __init__(self):
         # map of table_name to model_data
-        # such as `fields` to expose
-        # and allowed_methods of calling the model resource
         self.table_model_map = OrderedDict()
 
     def register(self, model_class, options={}):
@@ -26,21 +24,18 @@ class API(object):
         Registers a model_class with API along with the
         options that are passed in.
 
-        >>> from myapp.models import MyModel
-        >>> from restroom import api
         >>> api.register(MyModel, options={'fields': ['id', 'name']})
 
         However, this is not the recommended method of registration.
         Instead, you should use the `expose` decorator.
         """
-        model_data = self.get_model_data(model_class, options)
-        self.table_model_map[model_class._meta.db_table] = model_data
+        self.table_model_map[model_class._meta.db_table] = self.get_model_data(
+            model_class, options)
 
     def get_model_data(self, model_class, options):
         """
-        Gets the model_data from the model_class and options dictionary
-        and defaults to the default_configuration when there is no
-        other specification.
+        Formats data from the model_class and options dictionary,
+        falling back to defaults where no options are passed in
         """
         return {
             'model': model_class,
@@ -97,21 +92,18 @@ class API(object):
 
     def retrieve(self, table_name, filters={}):
         """
-        Given a table_name,
+        Powers GET requests to endpoint for `table_name`
+
         This finds the model_data in self.table_model_map,
         queries the database, and returns the objects, serialized
-        according to the fields specified.
 
-        In apps/library/models.py
-        ```
-        from django.db import models
         from restroom import expose
         @expose(fields=['id', 'title', 'author'])
         class Book(models.Model)
             title = models.CharField(max_length=250)
             author = models.CharField(max_length=100)
 
-        ```
+
         >>> from library.models import Book
         >>> Book.objects.create(title='My Book', author='Me')
         >>> from restroom import api
