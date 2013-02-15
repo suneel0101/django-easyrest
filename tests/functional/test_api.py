@@ -1,13 +1,15 @@
 import ast
 import datetime
 from mock import Mock
-from tests.models import MyModel
-from restroom import API, expose
-from restroom.views import RestroomSingleItemView
 from sure import expect
 
 from django.db import models
 from django.http import HttpResponseBadRequest
+
+from tests.models import MyModel
+from restroom import expose
+from restroom.api import API
+from restroom.views import RestroomSingleItemView
 
 
 def test_registering_a_model_adds_it_to_the_table_model_map():

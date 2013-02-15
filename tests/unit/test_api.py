@@ -1,4 +1,5 @@
-from restroom import API, RestroomError
+from restroom.api import API
+from restroom.errors import RestroomError
 from mock import Mock
 from sure import expect
 from django.conf.urls import url, patterns
