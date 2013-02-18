@@ -505,8 +505,8 @@ def test_restroom_single_item_view_for_PUT_not_allowed_gets_forbidden():
     request = Mock(method='PUT')
     request.PUT = QueryDict('text=Hello')
     view = RestroomSingleItemView.as_view(api=api,
-                             allowed_methods=['GET', 'POST'],
-                             table_name='table_mymodel')
+                                          allowed_methods=['GET', 'POST'],
+                                          table_name='table_mymodel')
 
     response_from_PUT = view(request, returned_obj.id)
     forbidden_response = HttpResponseForbidden()

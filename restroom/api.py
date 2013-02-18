@@ -140,9 +140,13 @@ class API(object):
         except IntegrityError as e:
             return {'error': e.message}
 
-        if page:
-            start = model_data.get('per_page', 20) * (page - 1)
-            finish = model_data.get('per_page', 20) * page
+        per_page = model_data.get('per_page')
+
+        if per_page or page:
+            per_page = per_page or 20
+            page = page or 1
+            start = per_page * (page - 1)
+            finish = per_page * page
             data = data[start:finish]
         return data
 

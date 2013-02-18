@@ -19,6 +19,7 @@ class RestroomListView(View):
             filters = get_data.get('filters')
             page = get_data.get('page')
             if filters:
+                filters = json.loads(filters)
                 retrieval_kwargs['filters'] = filters
             if page:
                 try:

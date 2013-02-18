@@ -2,6 +2,15 @@ from django.db import models
 from restroom import expose, API
 
 
+@expose(fields=['text', 'expired', 'id'],
+        allowed_methods=['GET', 'POST', 'DELETE', 'PUT'],
+        per_page=5)
+class CrazyModel(models.Model):
+    text = models.CharField(max_length=150)
+    expired = models.BooleanField(default=False)
+    title = models.CharField(max_length=150)
+
+
 class MyModel(models.Model):
     name = models.CharField(max_length=150)
 
