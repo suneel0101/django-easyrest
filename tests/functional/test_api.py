@@ -164,7 +164,7 @@ def test_retrieval_with_filter_params():
     serialized_data = exposed_model_to_serialize_api.retrieve(
         table_name,
         [{'field': 'short_title',
-         'operator': '=',
+         'operator': 'equals',
          'value': 'This is a short title'}])
 
     expected_data = [

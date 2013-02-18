@@ -129,8 +129,9 @@ class API(object):
             return {'error': '{} is an invalid field'.format(offending_field)}
 
         try:
+            self.validate_filter_operators(filters)
             filter_dict = self.construct_filter_dict(filters)
-        except KeyError as e:
+        except (RestroomError, KeyError) as e:
             return {'error': e.message}
 
         try:
@@ -150,10 +151,20 @@ class API(object):
             data = data[start:finish]
         return data
 
+    def validate_filter_operators(self, filters):
+        valid_operators = ['equals', 'gt', 'gte', 'lt', 'lte',
+                           'contains', 'icontains' 'isnull', 'in',
+                           'icontains']
+        operators = [_filter['operator'] for _filter in filters]
+        for operator in operators:
+            if operator not in valid_operators:
+                raise RestroomError(
+                    "{} is not a valid operator".format(operator))
+
     def construct_filter_dict(self, filters):
         filter_dict = {}
         for _filter in filters:
-            if _filter['operator'] == '=':
+            if _filter['operator'] == 'equals':
                 filter_dict[_filter['field']] = _filter['value']
             else:
                 filter_key = "{}__{}".format(
