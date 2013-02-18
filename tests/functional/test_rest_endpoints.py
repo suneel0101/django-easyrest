@@ -132,3 +132,16 @@ def test_PUT_crazymodel():
     expect(to_python(final_res.content)).to.equal(
         {"text": "PUT text yo", "expired": False, "id": 1})
     CrazyModel.objects.all().delete()
+
+
+def test_DELETE_crazymodel():
+    CrazyModel.objects.all().delete()
+    new_model = CrazyModel.objects.create(text='new model')
+    _id = new_model.id
+
+    res = client.delete(reverse('tests_crazymodel_single_item_api',
+                        kwargs={'_id': _id}))
+
+    expect(to_python(res.content)).to.equal(
+        {u'status': u'deletion successful'})
+    CrazyModel.objects.all().delete()
