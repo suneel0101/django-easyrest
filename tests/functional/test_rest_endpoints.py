@@ -115,3 +115,20 @@ def test_POST_crazymodel():
     expect(to_python(res.content)).to.equal(
         {"text": "POST text yo", "expired": False, "id": 1})
     CrazyModel.objects.all().delete()
+
+
+def test_PUT_crazymodel():
+    CrazyModel.objects.all().delete()
+    # create a CrazyModel instance
+    initial_res = client.post(reverse('tests_crazymodel_list_api'),
+                              {'text': 'POST text yo'})
+
+    expect(to_python(initial_res.content)).to.equal(
+        {"text": "POST text yo", "expired": False, "id": 1})
+
+    final_res = client.put(
+        reverse('tests_crazymodel_single_item_api', kwargs={'_id': 1}),
+        {'text': 'PUT text yo'})
+    expect(to_python(final_res.content)).to.equal(
+        {"text": "PUT text yo", "expired": False, "id": 1})
+    CrazyModel.objects.all().delete()

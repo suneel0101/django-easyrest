@@ -466,7 +466,7 @@ def test_restroom_single_item_view_for_PUT():
     # should return the expected json data when requested
     # via POST
     request = Mock(method='PUT')
-    request.PUT = QueryDict('text=Hello')
+    request.POST = QueryDict('text=Hello')
     view = RestroomSingleItemView.as_view(api=api,
                              allowed_methods=['GET', 'POST', 'PUT'],
                              table_name='table_mymodel')
@@ -503,7 +503,7 @@ def test_restroom_single_item_view_for_PUT_not_allowed_gets_forbidden():
     # should return the expected json data when requested
     # via POST
     request = Mock(method='PUT')
-    request.PUT = QueryDict('text=Hello')
+    request.POST = QueryDict('text=Hello')
     view = RestroomSingleItemView.as_view(api=api,
                                           allowed_methods=['GET', 'POST'],
                                           table_name='table_mymodel')

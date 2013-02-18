@@ -71,7 +71,11 @@ class RestroomSingleItemView(View):
 
     def put(self, request, _id, *args, **kwargs):
         if 'PUT' in self.allowed_methods:
-            put_data = {k: v for k, v in request.PUT.items()}
+            # Hack because Django HttpRequest doesn't handle
+            # PUT requests as desired
+            request.method = 'POST'
+            put_data = {k: v for k, v in request.POST.items()}
+            request.method = 'PUT'
             data = self.api.update_one(self.table_name, _id, put_data)
             if data.get('error'):
                 response_type = HttpResponseBadRequest
