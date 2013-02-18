@@ -40,7 +40,7 @@ def test_registering_with_non_default_options():
                            'fields': ['name']})
     expected_dict = {
         'model': MyModel,
-        'fields': ['name'],
+        'fields': ['name', 'id'],
         'allowed_methods': ['POST'],
     }
 
@@ -94,7 +94,7 @@ def test_expose_with_options():
 
     expected_value = {
         'model': ExposedModelWithOptions,
-        'fields': ['short_title', 'author'],
+        'fields': ['short_title', 'author', 'id'],
         'allowed_methods': ['GET', 'POST'],
     }
 

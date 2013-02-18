@@ -67,6 +67,10 @@ class API(object):
         model_fields = [field.attname for field in model_class._meta.fields]
 
         if option_fields:
+            if not 'id' in option_fields:
+                # `id` always included
+                option_fields.append('id')
+
             option_fields = [field if not fk_format(field) in model_fields
                              else fk_format(field)
                              for field in option_fields]
