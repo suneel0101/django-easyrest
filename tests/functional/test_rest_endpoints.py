@@ -106,3 +106,12 @@ def test_GET_crazymodel_queried():
      .to.equal(expected_data_last_three))
 
     CrazyModel.objects.all().delete()
+
+
+def test_POST_crazymodel():
+    CrazyModel.objects.all().delete()
+    res = client.post(reverse('tests_crazymodel_list_api'),
+                      {'text': 'POST text yo'})
+    expect(to_python(res.content)).to.equal(
+        {"text": "POST text yo", "expired": False, "id": 1})
+    CrazyModel.objects.all().delete()
