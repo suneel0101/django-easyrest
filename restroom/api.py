@@ -234,11 +234,15 @@ class API(object):
                 offending_field)
             return {"error": message}
 
-        model_obj = model_data['model'].objects.get(id=_id)
+        try:
+            model_obj = model_data['model'].objects.get(id=_id)
+        except model_data['model'].DoesNotExist as e:
+            return {"error": e.message}
+
         for field_name, new_value in changes.iteritems():
             setattr(model_obj, field_name, new_value)
 
-        if model_obj.id != _id:
+        if model_obj.id != int(_id):
             return {"error": "cannot update the id of an object"}
 
         try:
