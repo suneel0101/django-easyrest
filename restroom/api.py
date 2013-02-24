@@ -237,6 +237,10 @@ class API(object):
         model_obj = model_data['model'].objects.get(id=_id)
         for field_name, new_value in changes.iteritems():
             setattr(model_obj, field_name, new_value)
+
+        if model_obj.id != _id:
+            return {"error": "cannot update the id of an object"}
+
         try:
             model_obj.save()
         except IntegrityError:
