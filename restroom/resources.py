@@ -81,4 +81,12 @@ class RestroomResource(object):
             return {name: getattr(self.model.objects.get(id=_id), name)
                     for name in self.field_map.keys()}
         except self.model.DoesNotExist:
-            return {'error': 'No result for the following id: {}'.format(_id)}
+            return {'error': 'No result matches id: {}'.format(_id)}
+
+    def delete(self, _id):
+        try:
+            self.model.objects.get(id=_id).delete()
+        except self.model.DoesNotExist:
+            return {'error': 'No result matches id: {}'.format(_id)}
+        else:
+            return {}

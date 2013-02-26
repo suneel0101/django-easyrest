@@ -207,4 +207,20 @@ def test_retrieve_nonexistent_one(context):
     resource = RestroomResource(Modelo,
                                 {'fields': ['text', 'slug', 'awesome']})
     expect(resource.retrieve_one(4)).to.equal(
-        {'error': 'No result for the following id: 4'})
+        {'error': 'No result matches id: 4'})
+
+
+@scenario([prepare_real_model], [delete_modelo_objects])
+def test_delete(context):
+    "Delete"
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome']})
+    expect(resource.delete(1)).to.equal({})
+
+
+@scenario([prepare_real_model], [delete_modelo_objects])
+def test_delete_nonexistent(context):
+    "Delete nonexistent model returns error JSON"
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome']})
+    expect(resource.delete(5)).to.equal({'error': 'No result matches id: 5'})
