@@ -224,3 +224,43 @@ def test_delete_nonexistent(context):
     resource = RestroomResource(Modelo,
                                 {'fields': ['text', 'slug', 'awesome']})
     expect(resource.delete(5)).to.equal({'error': 'No result matches id: 5'})
+
+
+@scenario([prepare_real_model], [delete_modelo_objects])
+def test_create(context):
+    "Create"
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome']})
+
+    (expect(resource.create(
+            {'text': 'Awesome text', 'slug': 'awesome-slug', 'awesome': True}))
+     .to.equal({'id': 3,
+                'text': 'Awesome text',
+                'slug': 'awesome-slug',
+                'awesome': True})
+     )
+
+
+@scenario([prepare_real_model], [delete_modelo_objects])
+def test_create_with_invalid_fields(context):
+    "Create with invalid fields raises error"
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome']})
+
+    (resource.create.when.called_with(
+            {'blah': 'Awesome text', 'slug': 'awesome-slug', 'awesome': True})
+     .should.throw(RestroomInvalidFieldError,
+                   "Cannot resolve the following field names: blah"))
+
+
+@scenario([prepare_real_model], [delete_modelo_objects])
+def test_create_with_failure_at_model_level(context):
+    "Create that fails at the model level, e.g. nonunique slug"
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome']})
+
+    expect(resource.create(
+            {'text': 'Awesome text',
+             'slug': 'a-slug',
+             'awesome': True})).to.equal(
+        {'error': 'column slug is not unique'})

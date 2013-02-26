@@ -1,3 +1,5 @@
+from django.db import IntegrityError
+
 from .errors import (
     RestroomInvalidFieldError,
     RestroomInvalidHTTPMethodError,
@@ -90,3 +92,12 @@ class RestroomResource(object):
             return {'error': 'No result matches id: {}'.format(_id)}
         else:
             return {}
+
+    def create(self, data):
+        self.validate_fields(data.keys())
+        try:
+            _obj = self.model.objects.create(**data)
+        except IntegrityError as e:
+            return {'error': e.message}
+        else:
+            return self.retrieve_one(_obj.id)
