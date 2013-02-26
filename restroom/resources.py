@@ -75,3 +75,10 @@ class RestroomResource(object):
                     "value" in keys):
                 raise RestroomMalformedFilterError(
                     "Received a malformed filter")
+
+    def retrieve_one(self, _id):
+        try:
+            return {name: getattr(self.model.objects.get(id=_id), name)
+                    for name in self.field_map.keys()}
+        except self.model.DoesNotExist:
+            return {'error': 'No result for the following id: {}'.format(_id)}

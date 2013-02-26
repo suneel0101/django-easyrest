@@ -188,3 +188,23 @@ def test_retrieve_with_malformed_filters_list(context):
     (resource.retrieve.when.called_with(filters=filters)
      .should.throw(RestroomMalformedFilterError,
                    "Received a malformed filter"))
+
+
+@scenario([prepare_real_model], [delete_modelo_objects])
+def test_retrieve_one(context):
+    "Retrieve one"
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome']})
+    expect(resource.retrieve_one(1)).to.equal({'id': 1,
+                                               'text': 'Some text',
+                                               'slug': 'a-slug',
+                                               'awesome': True})
+
+
+@scenario([prepare_real_model], [delete_modelo_objects])
+def test_retrieve_nonexistent_one(context):
+    "Retrieve one for nonexistent id returns error JSON"
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome']})
+    expect(resource.retrieve_one(4)).to.equal(
+        {'error': 'No result for the following id: 4'})
