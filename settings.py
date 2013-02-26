@@ -8,7 +8,7 @@ import unclebob
 unclebob.take_care_of_my_tests()
 
 UNCLEBOB_EXTRA_NOSE_ARGS = [
-    '--verbosity=2',
+    '--verbosity=3',
 ]
 
 DATABASES = {

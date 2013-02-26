@@ -79,3 +79,10 @@ class PaginatedModel(models.Model):
     text = models.CharField(null=False, blank=False, max_length=50)
     slug = models.SlugField(unique=True)
     active = models.BooleanField(blank=False)
+
+
+class Modelo(models.Model):
+    text = models.CharField(max_length=250)
+    slug = models.SlugField(unique=True)
+    awesome = models.BooleanField()
+    optional_text = models.CharField(max_length=300)

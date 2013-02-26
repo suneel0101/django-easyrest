@@ -12,3 +12,11 @@ class RestroomInvalidFieldError(RestroomError):
 
 class RestroomInvalidHTTPMethodError(RestroomError):
     pass
+
+
+class RestroomInvalidOperatorError(RestroomError):
+    pass
+
+
+class RestroomMalformedFilterError(RestroomError):
+    pass
