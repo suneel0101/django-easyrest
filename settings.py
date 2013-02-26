@@ -1,6 +1,7 @@
 INSTALLED_APPS = (
     'unclebob',
-    'tests',
+    'restroom',
+    'restroom.tests',
 )
 
 TEST_RUNNER = 'unclebob.runners.Nose'
@@ -9,6 +10,8 @@ unclebob.take_care_of_my_tests()
 
 UNCLEBOB_EXTRA_NOSE_ARGS = [
     '--verbosity=3',
+    '--with-coverage',
+    '--cover-package=restroom',
 ]
 
 DATABASES = {

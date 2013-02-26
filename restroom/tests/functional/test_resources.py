@@ -7,7 +7,7 @@ from restroom.errors import (
     RestroomInvalidOperatorError,
     RestroomMalformedFilterError)
 
-from tests.models import Modelo
+from restroom.tests.models import Modelo
 
 
 def prepare_model(context):
