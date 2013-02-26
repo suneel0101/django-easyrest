@@ -319,3 +319,66 @@ def test_update_one_when_failure_at_model_level(context):
              'slug': 'b-slug',
              'awesome': True})).to.equal(
         {'error': 'column slug is not unique'})
+
+
+@scenario([prepare_real_model], [delete_modelo_objects])
+def test_update(context):
+    "Update"
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome']})
+
+    filters = [
+        {'field': 'id', 'operator': 'in', 'value': [1, 2]},
+        {'field': 'text', 'operator': 'icontains', 'value': 'text'}]
+
+    expect(resource.update(filters, {'text': 'new text'})).to.equal(
+        {'items': [{'id': 1,
+                    'text': 'new text',
+                    'slug': 'a-slug',
+                    'awesome': True},
+                   {'id': 2,
+                    'text': 'new text',
+                    'slug': 'b-slug',
+                    'awesome': False}]})
+
+
+@scenario([prepare_real_model], [delete_modelo_objects])
+def test_update_with_invalid_field(context):
+    "Update with invalid field raises error"
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome']})
+
+    filters = [
+        {'field': 'id', 'operator': 'in', 'value': [1, 2]},
+        {'field': 'text', 'operator': 'icontains', 'value': 'text'}]
+
+    (resource.update.when.called_with(filters,
+                           {'invalidfield': 'honey badger'})
+     .should.throw(RestroomInvalidFieldError,
+                   "Cannot resolve the following field names: invalidfield"))
+
+
+@scenario([prepare_real_model], [delete_modelo_objects])
+def test_update_with_invalid_filters(context):
+    "Update with invalid field raises error"
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome']})
+    filters = [
+        {'field': 'crazy', 'operator': 'lt', 'value': 2},
+    ]
+    (resource.update.when.called_with(filters,
+                                      {'text': 'cool text'})
+     .should.throw(RestroomInvalidFieldError,
+                "Cannot resolve the following field names: crazy"))
+
+
+@scenario([prepare_real_model], [delete_modelo_objects])
+def test_update_failing_at_model_level(context):
+    "Update failure at model level"
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome']})
+    filters = [
+        {'field': 'id', 'operator': 'lt', 'value': 4},
+    ]
+    expect(resource.update(filters, {'slug': 'a-slug'})).to.equal(
+        {'error': 'column slug is not unique'})

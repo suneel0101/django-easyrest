@@ -47,9 +47,7 @@ class RestroomResource(object):
     def retrieve(self, filters=[]):
         qs = self.model.objects.all()
         if filters:
-            self.validate_filter_definition(filters)
-            self.validate_fields([f["field"] for f in filters])
-            self.validate_operators([f["operator"] for f in filters])
+            self.validate_filters(filters)
             filter_dict = {
                 "{}__{}".format(
                     _filter['field'],
@@ -59,6 +57,11 @@ class RestroomResource(object):
         return {
             'items': list(qs.values(*self.field_map.keys()))
         }
+
+    def validate_filters(self, filters):
+            self.validate_filter_definition(filters)
+            self.validate_fields([f["field"] for f in filters])
+            self.validate_operators([f["operator"] for f in filters])
 
     def validate_operators(self, operators):
         valid_operators = ["contains", "icontains", "lt", "lte",
@@ -110,14 +113,29 @@ class RestroomResource(object):
         except self.model.DoesNotExist:
             return {'error': 'No result matches id: {}'.format(_id)}
 
-        # remove `id` from change set if it is there
-        if 'id' in changes.keys():
-            del changes['id']
+        cleaned_changes = self.clean_changes(changes)
 
-        for changed_attr, new_value in changes.iteritems():
+        for changed_attr, new_value in cleaned_changes.iteritems():
             setattr(_obj, changed_attr, new_value)
         try:
             _obj.save()
         except IntegrityError as e:
             return {'error': e.message}
         return self.serialize(_obj)
+
+    def clean_changes(self, changes):
+        # remove `id` from change set if it is there
+        if 'id' in changes.keys():
+            del changes['id']
+        return changes
+
+    def update(self, filters, changes):
+        self.validate_filters(filters)
+        self.validate_fields(changes.keys())
+        ids = map(lambda x: x['id'], self.retrieve(filters)['items'])
+        cleaned_changes = self.clean_changes(changes)
+        try:
+            self.model.objects.filter(id__in=ids).update(**cleaned_changes)
+        except IntegrityError as e:
+            return {'error': e.message}
+        return self.retrieve([{'field': 'id', 'operator': 'in', 'value': ids}])
