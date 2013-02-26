@@ -264,3 +264,58 @@ def test_create_with_failure_at_model_level(context):
              'slug': 'a-slug',
              'awesome': True})).to.equal(
         {'error': 'column slug is not unique'})
+
+
+@scenario([prepare_real_model], [delete_modelo_objects])
+def test_update_one(context):
+    "Update_one"
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome']})
+
+    expect(resource.update_one(1,
+            {'text': 'Amazing text'})).to.equal(
+        {'id': 1,
+         'text': 'Amazing text',
+         'slug': 'a-slug',
+         'awesome': True})
+
+
+@scenario([prepare_real_model], [delete_modelo_objects])
+def test_update_nonexistent_one(context):
+    "Update nonexistent one"
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome']})
+
+    expect(resource.update_one(4,
+            {'text': 'Amazing text'})).to.equal(
+        {'error': 'No result matches id: 4'})
+
+
+@scenario([prepare_real_model], [delete_modelo_objects])
+def test_update_one_with_changed_id(context):
+    "Update_one with changed id does not change the id"
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome']})
+
+    expect(resource.update_one(1,
+            {'id': 5,
+             'text': 'Baller text',
+             'slug': 'awesome-slug',
+             'awesome': True})).to.equal({
+                'id': 1,
+                'text': 'Baller text',
+                'slug': 'awesome-slug',
+                'awesome': True})
+
+
+@scenario([prepare_real_model], [delete_modelo_objects])
+def test_update_one_when_failure_at_model_level(context):
+    "Update_one fails at the model level"
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome']})
+
+    expect(resource.update_one(1,
+            {'text': 'Baller text',
+             'slug': 'b-slug',
+             'awesome': True})).to.equal(
+        {'error': 'column slug is not unique'})

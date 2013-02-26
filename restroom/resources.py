@@ -80,10 +80,12 @@ class RestroomResource(object):
 
     def retrieve_one(self, _id):
         try:
-            return {name: getattr(self.model.objects.get(id=_id), name)
-                    for name in self.field_map.keys()}
+            return self.serialize(self.model.objects.get(id=_id))
         except self.model.DoesNotExist:
             return {'error': 'No result matches id: {}'.format(_id)}
+
+    def serialize(self, obj):
+        return {name: getattr(obj, name) for name in self.field_map.keys()}
 
     def delete(self, _id):
         try:
@@ -100,4 +102,22 @@ class RestroomResource(object):
         except IntegrityError as e:
             return {'error': e.message}
         else:
-            return self.retrieve_one(_obj.id)
+            return self.serialize(_obj)
+
+    def update_one(self, _id, changes):
+        try:
+            _obj = self.model.objects.get(id=_id)
+        except self.model.DoesNotExist:
+            return {'error': 'No result matches id: {}'.format(_id)}
+
+        # remove `id` from change set if it is there
+        if 'id' in changes.keys():
+            del changes['id']
+
+        for changed_attr, new_value in changes.iteritems():
+            setattr(_obj, changed_attr, new_value)
+        try:
+            _obj.save()
+        except IntegrityError as e:
+            return {'error': e.message}
+        return self.serialize(_obj)
