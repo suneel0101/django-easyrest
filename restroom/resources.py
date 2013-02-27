@@ -55,7 +55,7 @@ class RestroomResource(object):
                 for _filter in filters}
             qs = qs.filter(**filter_dict)
         return {
-            'items': list(qs.values(*self.field_map.keys()))
+            "items": list(qs.values(*self.field_map.keys()))
         }
 
     def validate_filters(self, filters):
