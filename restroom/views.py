@@ -3,14 +3,19 @@ import json
 from django.http import HttpResponse, HttpResponseForbidden
 from django.views.generic import View
 
+response = lambda data: HttpResponse(json.dumps(data),
+                                     mimetype="application/json")
+forbidden = HttpResponseForbidden
 
-class RestroomListView(View):
+
+class RestroomMixin(object):
+    def allowed(self, method):
+        return method in self.resource.http_methods
+
+
+class RestroomListView(View, RestroomMixin):
     resource = None
 
     def get(self, request, *args, **kwargs):
-        if "GET" in self.resource.http_methods:
-            return HttpResponse(
-                json.dumps(self.resource.retrieve()),
-                mimetype="application/json")
-        else:
-            return HttpResponseForbidden()
+            return (response(self.resource.retrieve())
+                    if self.allowed("GET") else forbidden())
