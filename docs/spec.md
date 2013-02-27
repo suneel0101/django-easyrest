@@ -55,7 +55,14 @@ response_type = lambda data: HttpResponseBadRequest if data.get('error') else Ht
 response = lambda data: response_type(data)(json.dumps(data), mimetype='application/json')
 
 
-class RestroomListView(View):
+class RestroomBaseView(View):
+    def dispatch(self, request, *args, **kwargs):
+        self.auth_key = request.META['HTTP_X_
+        if self.protected and not self.resource.authorize(request, kwargs.get('auth_key')):
+            return HttpResponseForbidden()
+        return super(RestroomBaseView, self).dispatch(request, *args, **kwargs)
+
+class RestroomListView(RestroomBaseView):
     def get(self, request, *args, **kwargs):
         if 'GET' in self.allowed_methods:
             filters = request.GET.get('filters', {})
@@ -71,8 +78,7 @@ class RestroomListView(View):
     def delete(self, request, *args, **kwargs):
         return HttpResponseForbidden()
 
-
-class RestroomSingleItemView(View):
+class RestroomSingleItemView(RestroomBaseView):
     def get(self, request, _id, *args, **kwargs):
         if 'GET' in self.allowed_methods:
             return response(self.resource.retrieve_one(_id))
