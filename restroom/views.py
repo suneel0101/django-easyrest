@@ -20,4 +20,5 @@ class RestroomListView(BaseRestroomView):
     resource = None
 
     def get(self, request, *args, **kwargs):
-        return self.get_response(self.resource.retrieve())
+        filters = json.loads(request.GET.get('q', '[]'))
+        return self.get_response(self.resource.retrieve(filters=filters))
