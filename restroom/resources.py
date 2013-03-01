@@ -1,10 +1,8 @@
 from django.db import IntegrityError
 
 from .errors import (
-    RestroomInvalidFieldError,
-    RestroomInvalidHTTPMethodError,
-    RestroomInvalidOperatorError,
-    RestroomMalformedFilterError)
+    RestroomValidationError,
+    RestroomValidationError)
 
 
 class RestroomResource(object):
@@ -18,7 +16,7 @@ class RestroomResource(object):
         invalid_http_methods = set(http_methods).difference(
             set(['GET', 'POST', 'PUT', 'DELETE']))
         if invalid_http_methods:
-            raise RestroomInvalidHTTPMethodError(
+            raise RestroomValidationError(
                 "The following are invalid HTTP methods: {}"
                 .format(", ".join(invalid_http_methods)))
         return http_methods
@@ -40,9 +38,9 @@ class RestroomResource(object):
         invalid_field_names = (set(field_names)
                                .difference(set(model_field_names)))
         if invalid_field_names:
-            message = ("Cannot resolve the following field names: {} "
+            message = ("Cannot resolve the following field names: {}"
                        .format(", ".join(invalid_field_names)))
-            raise RestroomInvalidFieldError(message)
+            raise RestroomValidationError(message)
 
     def retrieve(self, filters=[]):
         qs = self.model.objects.all()
@@ -68,7 +66,7 @@ class RestroomResource(object):
                            "gt", "gte", "exact", "in"]
         invalid_operators = set(operators).difference(set(valid_operators))
         if invalid_operators:
-            raise RestroomInvalidOperatorError(
+            raise RestroomValidationError(
                 "The following are invalid filter operators: {}"
                 .format(" ,".join(invalid_operators)))
 
@@ -78,7 +76,7 @@ class RestroomResource(object):
             if not ("field" in keys and
                     "operator" in keys and
                     "value" in keys):
-                raise RestroomMalformedFilterError(
+                raise RestroomValidationError(
                     "Received a malformed filter")
 
     def retrieve_one(self, _id):
@@ -109,6 +107,11 @@ class RestroomResource(object):
 
     def update_one(self, _id, changes):
         try:
+            self.validate_fields(changes.keys())
+        except RestroomValidationError as e:
+            return {'error': e.message}
+
+        try:
             _obj = self.model.objects.get(id=_id)
         except self.model.DoesNotExist:
             return {'error': 'No result matches id: {}'.format(_id)}
@@ -130,8 +133,12 @@ class RestroomResource(object):
         return changes
 
     def update(self, filters, changes):
-        self.validate_filters(filters)
-        self.validate_fields(changes.keys())
+        try:
+            self.validate_filters(filters)
+            self.validate_fields(changes.keys())
+        except RestroomValidationError as e:
+            return {'error': e.message}
+
         ids = map(lambda x: x['id'], self.retrieve(filters)['items'])
         cleaned_changes = self.clean_changes(changes)
         try:

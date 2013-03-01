@@ -1,11 +1,7 @@
 from restroom.resources import RestroomResource
 from mock import Mock
 from sure import expect, scenario
-from restroom.errors import (
-    RestroomInvalidFieldError,
-    RestroomInvalidHTTPMethodError,
-    RestroomInvalidOperatorError,
-    RestroomMalformedFilterError)
+from restroom.errors import RestroomValidationError
 
 from restroom.tests.models import Modelo
 
@@ -70,21 +66,21 @@ def test_initialization_with_nondefault_fields_without_id(context):
 
 @scenario(prepare_model)
 def test_initialization_with_invalid_field_name(context):
-    "Invalid field name raises RestroomInvalidFieldError"
+    "Invalid field name raises RestroomValidationError"
     (RestroomResource.when.called_with(context.model,
                                 {'http_methods': ['POST', 'PUT'],
                                 'fields': ['id', 'name']})
-     .should.throw(RestroomInvalidFieldError,
+     .should.throw(RestroomValidationError,
                    "Cannot resolve the following field names: name"))
 
 
 @scenario(prepare_model)
 def test_initialization_with_invalid_http_method(context):
-    "Invalid http method raises RestroomInvalidHTTPMethodError"
+    "Invalid http method raises RestroomValidationError"
     (RestroomResource.when.called_with(context.model,
                                 {'http_methods': ['PRESS', 'PUT'],
                                 'fields': ['id', 'text']})
-     .should.throw(RestroomInvalidHTTPMethodError,
+     .should.throw(RestroomValidationError,
                    "The following are invalid HTTP methods: PRESS"))
 
 
@@ -153,40 +149,40 @@ def test_retrieve_with_equals_filter(context):
 
 @scenario([prepare_real_model], [delete_modelo_objects])
 def test_retrieve_with_invalid_filters(context):
-    "Retrieval with invalid filters should raise RestroomInvalidFieldError"
+    "Retrieval with invalid filters should raise RestroomValidationError"
     resource = RestroomResource(Modelo,
                                 {'fields': ['text', 'slug', 'awesome']})
     filters = [
         {'field': 'crazy', 'operator': 'lt', 'value': 2},
     ]
     (resource.retrieve.when.called_with(filters=filters)
-     .should.throw(RestroomInvalidFieldError,
+     .should.throw(RestroomValidationError,
                 "Cannot resolve the following field names: crazy"))
 
 
 @scenario([prepare_real_model], [delete_modelo_objects])
 def test_retrieve_with_invalid_operators(context):
-    "Retrieval with invalid operators raises RestroomInvalidOperatorError"
+    "Retrieval with invalid operators raises RestroomValidationError"
     resource = RestroomResource(Modelo,
                                 {'fields': ['text', 'slug', 'awesome']})
     filters = [
         {'field': 'id', 'operator': 'blah', 'value': 2},
     ]
     (resource.retrieve.when.called_with(filters=filters)
-     .should.throw(RestroomInvalidOperatorError,
+     .should.throw(RestroomValidationError,
                 "The following are invalid filter operators: blah"))
 
 
 @scenario([prepare_real_model], [delete_modelo_objects])
 def test_retrieve_with_malformed_filters_list(context):
-    "Retrieval with invalid operators raises RestroomInvalidOperatorError"
+    "Retrieval with invalid operators raises RestroomValidationError"
     resource = RestroomResource(Modelo,
                                 {'fields': ['text', 'slug', 'awesome']})
     filters = [
         {'field': 'id', 'operator': 'exact'},
     ]
     (resource.retrieve.when.called_with(filters=filters)
-     .should.throw(RestroomMalformedFilterError,
+     .should.throw(RestroomValidationError,
                    "Received a malformed filter"))
 
 
@@ -249,7 +245,7 @@ def test_create_with_invalid_fields(context):
 
     (resource.create.when.called_with(
             {'blah': 'Awesome text', 'slug': 'awesome-slug', 'awesome': True})
-     .should.throw(RestroomInvalidFieldError,
+     .should.throw(RestroomValidationError,
                    "Cannot resolve the following field names: blah"))
 
 
@@ -309,6 +305,20 @@ def test_update_one_with_changed_id(context):
 
 
 @scenario([prepare_real_model], [delete_modelo_objects])
+def test_update_one_with_invalid_change_field(context):
+    "Update_one with invalid changed field should return error JSON"
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome']})
+
+    expect(resource.update_one(1,
+            {'id': 5,
+             'invalidfield': 'Baller invalidfield',
+             'slug': 'awesome-slug',
+             'awesome': True})).to.equal(
+        {'error': 'Cannot resolve the following field names: invalidfield'})
+
+
+@scenario([prepare_real_model], [delete_modelo_objects])
 def test_update_one_when_failure_at_model_level(context):
     "Update_one fails at the model level"
     resource = RestroomResource(Modelo,
@@ -344,7 +354,7 @@ def test_update(context):
 
 @scenario([prepare_real_model], [delete_modelo_objects])
 def test_update_with_invalid_field(context):
-    "Update with invalid field raises error"
+    "Update with invalid change field raises error"
     resource = RestroomResource(Modelo,
                                 {'fields': ['text', 'slug', 'awesome']})
 
@@ -352,10 +362,9 @@ def test_update_with_invalid_field(context):
         {'field': 'id', 'operator': 'in', 'value': [1, 2]},
         {'field': 'text', 'operator': 'icontains', 'value': 'text'}]
 
-    (resource.update.when.called_with(filters,
-                           {'invalidfield': 'honey badger'})
-     .should.throw(RestroomInvalidFieldError,
-                   "Cannot resolve the following field names: invalidfield"))
+    expect(resource.update(filters,
+                           {'invalidfield': 'honey badger'})).to.equal(
+        {"error": "Cannot resolve the following field names: invalidfield"})
 
 
 @scenario([prepare_real_model], [delete_modelo_objects])
@@ -366,10 +375,9 @@ def test_update_with_invalid_filters(context):
     filters = [
         {'field': 'crazy', 'operator': 'lt', 'value': 2},
     ]
-    (resource.update.when.called_with(filters,
-                                      {'text': 'cool text'})
-     .should.throw(RestroomInvalidFieldError,
-                "Cannot resolve the following field names: crazy"))
+    expect(resource.update(filters,
+                           {'text': 'cool text'})).to.equal(
+        {"error": "Cannot resolve the following field names: crazy"})
 
 
 @scenario([prepare_real_model], [delete_modelo_objects])
