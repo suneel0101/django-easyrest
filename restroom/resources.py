@@ -45,7 +45,11 @@ class RestroomResource(object):
     def retrieve(self, filters=[]):
         qs = self.model.objects.all()
         if filters:
-            self.validate_filters(filters)
+            try:
+                self.validate_filters(filters)
+            except RestroomValidationError as e:
+                return {'error': e.message}
+
             filter_dict = {
                 "{}__{}".format(
                     _filter['field'],

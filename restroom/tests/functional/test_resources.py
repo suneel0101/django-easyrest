@@ -149,41 +149,38 @@ def test_retrieve_with_equals_filter(context):
 
 @scenario([prepare_real_model], [delete_modelo_objects])
 def test_retrieve_with_invalid_filters(context):
-    "Retrieval with invalid filters should raise RestroomValidationError"
+    "Retrieval with invalid filters should return error dictionary"
     resource = RestroomResource(Modelo,
                                 {'fields': ['text', 'slug', 'awesome']})
     filters = [
         {'field': 'crazy', 'operator': 'lt', 'value': 2},
     ]
-    (resource.retrieve.when.called_with(filters=filters)
-     .should.throw(RestroomValidationError,
-                "Cannot resolve the following field names: crazy"))
+    expect(resource.retrieve(filters=filters)).to.equal(
+        {"error": "Cannot resolve the following field names: crazy"})
 
 
 @scenario([prepare_real_model], [delete_modelo_objects])
 def test_retrieve_with_invalid_operators(context):
-    "Retrieval with invalid operators raises RestroomValidationError"
+    "Retrieval with invalid operators should return error dictionary"
     resource = RestroomResource(Modelo,
                                 {'fields': ['text', 'slug', 'awesome']})
     filters = [
         {'field': 'id', 'operator': 'blah', 'value': 2},
     ]
-    (resource.retrieve.when.called_with(filters=filters)
-     .should.throw(RestroomValidationError,
-                "The following are invalid filter operators: blah"))
+    expect(resource.retrieve(filters=filters)).to.equal(
+        {"error": "The following are invalid filter operators: blah"})
 
 
 @scenario([prepare_real_model], [delete_modelo_objects])
 def test_retrieve_with_malformed_filters_list(context):
-    "Retrieval with invalid operators raises RestroomValidationError"
+    "Retrieval with malformed filters list should return error dictionary"
     resource = RestroomResource(Modelo,
                                 {'fields': ['text', 'slug', 'awesome']})
     filters = [
         {'field': 'id', 'operator': 'exact'},
     ]
-    (resource.retrieve.when.called_with(filters=filters)
-     .should.throw(RestroomValidationError,
-                   "Received a malformed filter"))
+    expect(resource.retrieve(filters=filters)).to.equal(
+        {"error": "Received a malformed filter"})
 
 
 @scenario([prepare_real_model], [delete_modelo_objects])
