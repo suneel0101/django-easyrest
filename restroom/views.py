@@ -1,18 +1,22 @@
 import json
 
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import (
+    HttpResponse,
+    HttpResponseForbidden,
+    HttpResponseBadRequest)
 from django.views.generic import View
 
 
 class BaseRestroomView(View):
     def get_response(self, data):
-        if self.http_method in self.resource.http_methods:
-            return HttpResponse(json.dumps(data), mimetype="application/json")
-        else:
-            return HttpResponseForbidden()
+        response_type = HttpResponse
+        if 'error' in data:
+            response_type = HttpResponseBadRequest
+        return response_type(json.dumps(data), mimetype='application/json')
 
     def dispatch(self, request, *args, **kwargs):
-        self.http_method = request.method
+        if request.method not in self.resource.http_methods:
+            return HttpResponseForbidden()
         return super(BaseRestroomView, self).dispatch(request, *args, **kwargs)
 
 
@@ -22,3 +26,6 @@ class RestroomListView(BaseRestroomView):
     def get(self, request, *args, **kwargs):
         filters = json.loads(request.GET.get('q', '[]'))
         return self.get_response(self.resource.retrieve(filters=filters))
+
+    def post(self, request, *args, **kwargs):
+        return self.get_response(self.resource.create(request.POST.dict()))

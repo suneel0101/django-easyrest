@@ -99,16 +99,43 @@ def test_list_view_get_with_valid_filters(context):
     expect(response.status_code).to.equal(OK)
 
 
-# @scenario(prepare_real_model)
-# def test_list_view_get_with_invalid_filters(context):
-#     "default list view GET with valid filters"
-#     request = Mock(method="GET")
-#     query = '[{"field": "id", "operator": "blah", "value": 2}]'
-#     request.GET = QueryDict('q={}'.format(query))
-#     resource = RestroomResource(Modelo,
-#                                 {'fields': ['text', 'slug', 'awesome']})
-#     response = RestroomListView.as_view(resource=resource)(request)
-#     expected_content = {"error":
-#                             "The following are invalid filter operators: blah"}
-#     expect(json.loads(response.content)).to.equal(expected_content)
-#     expect(response.status_code).to.equal(OK)
+@scenario(prepare_real_model)
+def test_list_view_get_with_invalid_filters(context):
+    "default list view GET with invalid filters returns error JSON"
+    request = Mock(method="GET")
+    query = '[{"field": "id", "operator": "blah", "value": 2}]'
+    request.GET = QueryDict('q={}'.format(query))
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome']})
+    response = RestroomListView.as_view(resource=resource)(request)
+    expected_content = {"error":
+                            "The following are invalid filter operators: blah"}
+    expect(json.loads(response.content)).to.equal(expected_content)
+    expect(response.status_code).to.equal(BAD)
+
+
+@scenario(prepare_real_model)
+def test_list_view_post(context):
+    "default list view POST with valid fields and values"
+    request = Mock(method="POST")
+    # Oddity in modifying QueryDict object
+    # Explained in Django Docs:
+    # https://docs.djangoproject.com/en/dev/ref/request-response/#querydict-objects
+    q = QueryDict('')
+    new_query_dict = q.copy()
+    new_query_dict.update({'text': 'posted text',
+               'slug': 'posted-slug',
+               'awesome': True})
+    request.POST = new_query_dict
+    resource = RestroomResource(Modelo,
+                                {
+            'fields': ['text', 'slug', 'awesome'],
+            'http_methods': ['POST']})
+    response = RestroomListView.as_view(resource=resource)(request)
+    expected_content = {
+        'id': 3,
+        'text': 'posted text',
+        'slug': 'posted-slug',
+        'awesome': True}
+    expect(json.loads(response.content)).to.equal(expected_content)
+    expect(response.status_code).to.equal(OK)
