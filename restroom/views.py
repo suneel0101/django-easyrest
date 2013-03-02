@@ -5,19 +5,18 @@ from django.http import (
     HttpResponseForbidden)
 from django.views.generic import View
 
-HTTP_TO_STATUS = {
-    'GET': 200,
-    'POST': 201,
-    'DELETE': 204,
-    'PUT': 201,
-}
+
+def get_status(method):
+    if method in ['POST', 'PUT']:
+        return 201
+    elif method == 'DELETE':
+        return 204
+    return 200
 
 
 class BaseRestroomView(View):
     def get_response(self, data):
-        status = HTTP_TO_STATUS[self.request.method]
-        if 'error' in data:
-            status = 400
+        status = 400 if 'error' in data else get_status(self.request.method)
         return HttpResponse(json.dumps(data), status=status,
                             mimetype='application/json')
 
