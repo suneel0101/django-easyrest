@@ -82,22 +82,26 @@ class RestroomResource(object):
                 raise RestroomValidationError(
                     "Received a malformed filter")
 
-    def retrieve_one(self, _id):
+    def get_object_by_id(self, _id):
         try:
-            return self.serialize(self.model.objects.get(id=_id))
+            return {'object': self.model.objects.get(id=_id)}
         except self.model.DoesNotExist:
             return {'error': 'No result matches id: {}'.format(_id)}
+
+    def retrieve_one(self, _id):
+        data = self.get_object_by_id(_id)
+        return self.serialize(data['object']) if data.get('object') else data
 
     def serialize(self, obj):
         return {name: getattr(obj, name) for name in self.field_map.keys()}
 
     def delete(self, _id):
-        try:
-            self.model.objects.get(id=_id).delete()
-        except self.model.DoesNotExist:
-            return {'error': 'No result matches id: {}'.format(_id)}
-        else:
+        object_data = self.get_object_by_id(_id)
+        if object_data.get('object'):
+            object_data['object'].delete()
             return {}
+        else:
+            return object_data
 
     def create(self, data):
         try:
@@ -118,10 +122,10 @@ class RestroomResource(object):
         except RestroomValidationError as e:
             return {'error': e.message}
 
-        try:
-            _obj = self.model.objects.get(id=_id)
-        except self.model.DoesNotExist:
-            return {'error': 'No result matches id: {}'.format(_id)}
+        object_data = self.get_object_by_id(_id)
+        if object_data.get('error'):
+            return object_data
+        _obj = object_data['object']
 
         cleaned_changes = self.clean_changes(changes)
 
