@@ -101,7 +101,11 @@ class RestroomResource(object):
             return {}
 
     def create(self, data):
-        self.validate_fields(data.keys())
+        try:
+            self.validate_fields(data.keys())
+        except RestroomValidationError as e:
+            return {'error': e.message}
+
         try:
             _obj = self.model.objects.create(**data)
         except IntegrityError as e:

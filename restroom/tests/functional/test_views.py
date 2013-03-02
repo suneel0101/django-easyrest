@@ -139,3 +139,65 @@ def test_list_view_post(context):
         'awesome': True}
     expect(json.loads(response.content)).to.equal(expected_content)
     expect(response.status_code).to.equal(OK)
+
+
+@scenario(prepare_real_model)
+def test_list_view_post_with_invalid_fields(context):
+    "default list view POST with invalid fields returns error JSON"
+    request = Mock(method="POST")
+    # Oddity in modifying QueryDict object
+    # Explained in Django Docs:
+    # https://docs.djangoproject.com/en/dev/ref/request-response/#querydict-objects
+    q = QueryDict('')
+    new_query_dict = q.copy()
+    new_query_dict.update({'strangefield': 'posted text',
+               'slug': 'posted-slug',
+               'awesome': True})
+    request.POST = new_query_dict
+    resource = RestroomResource(Modelo,
+                                {
+            'fields': ['text', 'slug', 'awesome'],
+            'http_methods': ['POST']})
+    response = RestroomListView.as_view(resource=resource)(request)
+    expected_content = {
+        'error': 'Cannot resolve the following field names: strangefield'}
+    expect(json.loads(response.content)).to.equal(expected_content)
+    expect(response.status_code).to.equal(BAD)
+
+
+@scenario(prepare_real_model)
+def test_list_view_post_with_model_level_failure(context):
+    "default list view POST with failure to create at the model level"
+    request = Mock(method="POST")
+    # Oddity in modifying QueryDict object
+    # Explained in Django Docs:
+    # https://docs.djangoproject.com/en/dev/ref/request-response/#querydict-objects
+    q = QueryDict('')
+    new_query_dict = q.copy()
+    new_query_dict.update({'text': 'posted text',
+               'slug': 'a-slug',
+               'awesome': True})
+    request.POST = new_query_dict
+    resource = RestroomResource(Modelo,
+                                {
+            'fields': ['text', 'slug', 'awesome'],
+            'http_methods': ['POST']})
+    response = RestroomListView.as_view(resource=resource)(request)
+    expected_content = {
+        'error': 'column slug is not unique'}
+    expect(json.loads(response.content)).to.equal(expected_content)
+    expect(response.status_code).to.equal(BAD)
+
+
+@scenario(prepare_real_model)
+def test_list_view_post_when_get_not_allowed(context):
+    "default list view POST when POST not allowed"
+    request = Mock(method="POST")
+    request.POST = QueryDict('')
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome'],
+                                 'http_methods': ['GET']})
+    response = RestroomListView.as_view(resource=resource)(request)
+    expected_content = ""
+    expect(response.content).to.equal(expected_content)
+    expect(response.status_code).to.equal(FORBIDDEN)

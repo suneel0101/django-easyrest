@@ -240,10 +240,11 @@ def test_create_with_invalid_fields(context):
     resource = RestroomResource(Modelo,
                                 {'fields': ['text', 'slug', 'awesome']})
 
-    (resource.create.when.called_with(
-            {'blah': 'Awesome text', 'slug': 'awesome-slug', 'awesome': True})
-     .should.throw(RestroomValidationError,
-                   "Cannot resolve the following field names: blah"))
+    expect(resource.create(
+            {'blah': 'Awesome text',
+             'slug': 'awesome-slug',
+             'awesome': True})).to.equal(
+        {"error": "Cannot resolve the following field names: blah"})
 
 
 @scenario([prepare_real_model], [delete_modelo_objects])
