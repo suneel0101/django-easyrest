@@ -32,3 +32,11 @@ class RestroomListView(BaseRestroomView):
 
     def delete(self, request, *args, **kwargs):
         return HttpResponseForbidden()
+
+    def put(self, request, *args, **kwargs):
+        request.method = 'POST'
+        filters = json.loads(request.POST.get('q', '[]'))
+        changes = {k: v
+                   for k, v in request.POST.dict().iteritems()
+                   if k != 'q'}
+        return self.get_response(self.resource.update(filters, changes))

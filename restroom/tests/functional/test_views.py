@@ -227,3 +227,87 @@ def test_list_view_delete_when_allowed(context):
     expected_content = ""
     expect(response.content).to.equal(expected_content)
     expect(response.status_code).to.equal(FORBIDDEN)
+
+
+@scenario(prepare_real_model)
+def test_put_with_valid_filters(context):
+    request = Mock(method="PUT")
+    query = ('[{"field": "id", "operator": "lt", "value": 2}'
+        ',{"field": "text", "operator": "icontains", "value": "text"}]')
+
+    q = QueryDict('q={}'.format(query))
+    new_query_dict = q.copy()
+    new_query_dict.update({'text': 'baller text'})
+    request.POST = new_query_dict
+
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome'],
+                                 'http_methods': ['PUT']},)
+    response = RestroomListView.as_view(resource=resource)(request)
+    expected_content = {"items": [{"id": 1,
+                                   "text": "baller text",
+                                   "slug": "a-slug",
+                                   "awesome": True}]}
+    expect(json.loads(response.content)).to.equal(expected_content)
+    expect(response.status_code).to.equal(OK)
+
+
+@scenario(prepare_real_model)
+def test_put_with_invalid_change_field(context):
+    request = Mock(method="PUT")
+    query = ('[{"field": "id", "operator": "in", "value": [1, 2]}'
+        ',{"field": "text", "operator": "icontains", "value": "text"}]')
+
+    q = QueryDict('q={}'.format(query))
+    new_query_dict = q.copy()
+    new_query_dict.update({'invalidfield': 'honey badger'})
+    request.POST = new_query_dict
+
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome'],
+                                 'http_methods': ['PUT']},)
+    response = RestroomListView.as_view(resource=resource)(request)
+    expected_content = {
+        "error": "Cannot resolve the following field names: invalidfield"}
+    expect(json.loads(response.content)).to.equal(expected_content)
+    expect(response.status_code).to.equal(BAD)
+
+
+@scenario(prepare_real_model)
+def test_put_with_invalid_filter(context):
+    request = Mock(method="PUT")
+    query = ('[{"field": "crazy", "operator": "lt", "value": [1, 2]}]')
+
+    q = QueryDict('q={}'.format(query))
+    new_query_dict = q.copy()
+    new_query_dict.update({'invalidfield': 'honey badger'})
+    request.POST = new_query_dict
+
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome'],
+                                 'http_methods': ['PUT']},)
+    response = RestroomListView.as_view(resource=resource)(request)
+    expected_content = {
+        "error": "Cannot resolve the following field names: crazy"}
+    expect(json.loads(response.content)).to.equal(expected_content)
+    expect(response.status_code).to.equal(BAD)
+
+
+@scenario(prepare_real_model)
+def test_put_with_failure_at_model_level(context):
+    request = Mock(method="PUT")
+    query = ('[{"field": "id", "operator": "lt", "value": 4}]')
+
+    q = QueryDict('q={}'.format(query))
+    new_query_dict = q.copy()
+    new_query_dict.update({'slug': 'a-slug'})
+    request.POST = new_query_dict
+
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome'],
+                                 'http_methods': ['PUT']},)
+    response = RestroomListView.as_view(resource=resource)(request)
+    expected_content = {
+        "error": "column slug is not unique"}
+    expect(json.loads(response.content)).to.equal(expected_content)
+    expect(response.status_code).to.equal(BAD)
