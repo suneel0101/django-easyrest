@@ -7,6 +7,8 @@ from restroom.resources import RestroomResource
 from restroom.tests.models import Modelo
 
 OK = 200
+CREATED = 201
+DELETED = 204
 FORBIDDEN = 403
 BAD = 400
 
@@ -138,7 +140,7 @@ def test_list_view_post(context):
         'slug': 'posted-slug',
         'awesome': True}
     expect(json.loads(response.content)).to.equal(expected_content)
-    expect(response.status_code).to.equal(OK)
+    expect(response.status_code).to.equal(CREATED)
 
 
 @scenario(prepare_real_model)
@@ -247,7 +249,7 @@ def test_put_with_valid_filters(context):
     response = RestroomListView.as_view(resource=resource)(request)
     expected_content = {"update_count": 1}
     expect(json.loads(response.content)).to.equal(expected_content)
-    expect(response.status_code).to.equal(OK)
+    expect(response.status_code).to.equal(CREATED)
 
 
 @scenario(prepare_real_model)

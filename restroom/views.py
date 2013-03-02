@@ -6,13 +6,21 @@ from django.http import (
     HttpResponseBadRequest)
 from django.views.generic import View
 
+HTTP_TO_STATUS = {
+    'GET': 200,
+    'POST': 201,
+    'DELETE': 204,
+    'PUT': 201,
+}
+
 
 class BaseRestroomView(View):
     def get_response(self, data):
-        response_type = HttpResponse
+        status = HTTP_TO_STATUS[self.request.method]
         if 'error' in data:
-            response_type = HttpResponseBadRequest
-        return response_type(json.dumps(data), mimetype='application/json')
+            status = 400
+        return HttpResponse(json.dumps(data), status=status,
+                            mimetype='application/json')
 
     def dispatch(self, request, *args, **kwargs):
         if request.method not in self.resource.http_methods:
