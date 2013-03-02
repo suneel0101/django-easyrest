@@ -47,17 +47,18 @@ class RestroomResource(object):
             try:
                 self.validate_filters(filters)
             except RestroomValidationError as e:
-                return {'error': e.message}
-
-            filter_dict = {
-                "{}__{}".format(
-                    _filter['field'],
-                    _filter["operator"]): _filter["value"]
-                for _filter in filters}
-            qs = qs.filter(**filter_dict)
+                return self.get_error_message(e)
+            qs = qs.filter(**self.get_filter_dict(filters))
         return {
             "items": list(qs.values(*self.field_map.keys()))
         }
+
+    def get_filter_dict(self, filters):
+        return {
+            "{}__{}".format(
+                _filter['field'],
+                _filter["operator"]): _filter["value"]
+            for _filter in filters}
 
     def validate_filters(self, filters):
             self.validate_filter_definition(filters)
@@ -106,13 +107,9 @@ class RestroomResource(object):
     def create(self, data):
         try:
             self.validate_fields(data.keys())
-        except RestroomValidationError as e:
-            return {'error': e.message}
-
-        try:
             _obj = self.model.objects.create(**data)
-        except IntegrityError as e:
-            return {'error': e.message}
+        except (RestroomValidationError, IntegrityError) as e:
+            return self.get_error_message(e)
         else:
             return self.serialize(_obj)
 
@@ -120,21 +117,19 @@ class RestroomResource(object):
         try:
             self.validate_fields(changes.keys())
         except RestroomValidationError as e:
-            return {'error': e.message}
+            return self.get_error_message(e)
 
         object_data = self.get_object_by_id(_id)
         if object_data.get('error'):
             return object_data
         _obj = object_data['object']
 
-        cleaned_changes = self.clean_changes(changes)
-
-        for changed_attr, new_value in cleaned_changes.iteritems():
+        for changed_attr, new_value in self.clean_changes(changes).iteritems():
             setattr(_obj, changed_attr, new_value)
         try:
             _obj.save()
         except IntegrityError as e:
-            return {'error': e.message}
+            return self.get_error_message(e)
         return self.serialize(_obj)
 
     def clean_changes(self, changes):
@@ -148,12 +143,14 @@ class RestroomResource(object):
             self.validate_filters(filters)
             self.validate_fields(changes.keys())
         except RestroomValidationError as e:
-            return {'error': e.message}
+            return self.get_error_message(e)
 
-        ids = map(lambda x: x['id'], self.retrieve(filters)['items'])
-        cleaned_changes = self.clean_changes(changes)
         try:
-            self.model.objects.filter(id__in=ids).update(**cleaned_changes)
+            objs = self.model.objects.filter(**self.get_filter_dict(filters))
+            update_count = objs.update(**self.clean_changes(changes))
         except IntegrityError as e:
-            return {'error': e.message}
-        return self.retrieve([{'field': 'id', 'operator': 'in', 'value': ids}])
+            return self.get_error_message(e)
+        return {'update_count': update_count}
+
+    def get_error_message(self, error):
+        return {'error': error.message}

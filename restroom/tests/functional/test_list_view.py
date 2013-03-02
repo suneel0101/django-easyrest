@@ -245,10 +245,7 @@ def test_put_with_valid_filters(context):
                                 {'fields': ['text', 'slug', 'awesome'],
                                  'http_methods': ['PUT']},)
     response = RestroomListView.as_view(resource=resource)(request)
-    expected_content = {"items": [{"id": 1,
-                                   "text": "baller text",
-                                   "slug": "a-slug",
-                                   "awesome": True}]}
+    expected_content = {"update_count": 1}
     expect(json.loads(response.content)).to.equal(expected_content)
     expect(response.status_code).to.equal(OK)
 

@@ -340,14 +340,7 @@ def test_update(context):
         {'field': 'text', 'operator': 'icontains', 'value': 'text'}]
 
     expect(resource.update(filters, {'text': 'new text'})).to.equal(
-        {'items': [{'id': 1,
-                    'text': 'new text',
-                    'slug': 'a-slug',
-                    'awesome': True},
-                   {'id': 2,
-                    'text': 'new text',
-                    'slug': 'b-slug',
-                    'awesome': False}]})
+        {"update_count": 2})
 
 
 @scenario([prepare_real_model], [delete_modelo_objects])
