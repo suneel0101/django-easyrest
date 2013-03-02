@@ -231,6 +231,7 @@ def test_list_view_delete_when_allowed(context):
 
 @scenario(prepare_real_model)
 def test_put_with_valid_filters(context):
+    "PUT with valid filters"
     request = Mock(method="PUT")
     query = ('[{"field": "id", "operator": "lt", "value": 2}'
         ',{"field": "text", "operator": "icontains", "value": "text"}]')
@@ -253,7 +254,8 @@ def test_put_with_valid_filters(context):
 
 
 @scenario(prepare_real_model)
-def test_put_with_invalid_change_field(context):
+def test_put_with_invalid_change_fields(context):
+    "PUT with invalid change fields should return error JSON"
     request = Mock(method="PUT")
     query = ('[{"field": "id", "operator": "in", "value": [1, 2]}'
         ',{"field": "text", "operator": "icontains", "value": "text"}]')
@@ -275,6 +277,7 @@ def test_put_with_invalid_change_field(context):
 
 @scenario(prepare_real_model)
 def test_put_with_invalid_filter(context):
+    "PUT with invalid filters should return error JSON"
     request = Mock(method="PUT")
     query = ('[{"field": "crazy", "operator": "lt", "value": [1, 2]}]')
 
@@ -295,6 +298,7 @@ def test_put_with_invalid_filter(context):
 
 @scenario(prepare_real_model)
 def test_put_with_failure_at_model_level(context):
+    "Test PUT reseponse when failure occurs at model level"
     request = Mock(method="PUT")
     query = ('[{"field": "id", "operator": "lt", "value": 4}]')
 
@@ -311,3 +315,16 @@ def test_put_with_failure_at_model_level(context):
         "error": "column slug is not unique"}
     expect(json.loads(response.content)).to.equal(expected_content)
     expect(response.status_code).to.equal(BAD)
+
+
+@scenario(prepare_real_model)
+def test_list_view_put_when_not_allowed(context):
+    "PUT returns forbidden when not allowed"
+    request = Mock(method="PUT")
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome'],
+                                 'http_methods': ['GET', 'DELETE']})
+    response = RestroomListView.as_view(resource=resource)(request)
+    expected_content = ""
+    expect(response.content).to.equal(expected_content)
+    expect(response.status_code).to.equal(FORBIDDEN)
