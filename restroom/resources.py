@@ -1,7 +1,6 @@
 from django.db import IntegrityError
 
 from .errors import (
-    RestroomValidationError,
     RestroomValidationError)
 
 
