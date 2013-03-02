@@ -29,3 +29,6 @@ class RestroomListView(BaseRestroomView):
 
     def post(self, request, *args, **kwargs):
         return self.get_response(self.resource.create(request.POST.dict()))
+
+    def delete(self, request, *args, **kwargs):
+        return HttpResponseForbidden()

@@ -201,3 +201,29 @@ def test_list_view_post_when_get_not_allowed(context):
     expected_content = ""
     expect(response.content).to.equal(expected_content)
     expect(response.status_code).to.equal(FORBIDDEN)
+
+
+@scenario(prepare_real_model)
+def test_list_view_delete_when_not_allowed(context):
+    "default list view DELETE when DELETE not allowed"
+    request = Mock(method="DELETE")
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome'],
+                                 'http_methods': ['GET']})
+    response = RestroomListView.as_view(resource=resource)(request)
+    expected_content = ""
+    expect(response.content).to.equal(expected_content)
+    expect(response.status_code).to.equal(FORBIDDEN)
+
+
+@scenario(prepare_real_model)
+def test_list_view_delete_when_allowed(context):
+    "default list view DELETE returns forbidden even when allowed"
+    request = Mock(method="DELETE")
+    resource = RestroomResource(Modelo,
+                                {'fields': ['text', 'slug', 'awesome'],
+                                 'http_methods': ['GET', 'DELETE']})
+    response = RestroomListView.as_view(resource=resource)(request)
+    expected_content = ""
+    expect(response.content).to.equal(expected_content)
+    expect(response.status_code).to.equal(FORBIDDEN)
