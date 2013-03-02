@@ -2,8 +2,7 @@ import json
 
 from django.http import (
     HttpResponse,
-    HttpResponseForbidden,
-    HttpResponseBadRequest)
+    HttpResponseForbidden)
 from django.views.generic import View
 
 HTTP_TO_STATUS = {
