@@ -7,12 +7,7 @@ from restroom.views import (
     RestroomItemView)
 from restroom.resources import RestroomResource
 from restroom.tests.models import Modelo
-
-OK = 200
-CREATED = 201
-DELETED = 204
-FORBIDDEN = 403
-BAD = 400
+from restroom.constants import OK, CREATED, DELETED, FORBIDDEN, BAD
 
 
 def prepare_real_model(context):

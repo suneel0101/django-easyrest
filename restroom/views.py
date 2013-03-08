@@ -1,24 +1,25 @@
 import json
-
 from django.http import (
     HttpResponse,
     HttpResponseForbidden)
 from django.views.generic import View
 
+from .constants import OK, CREATED, DELETED, BAD
+
 
 def get_status(method):
     if method in ['POST', 'PUT']:
-        return 201
+        return CREATED
     elif method == 'DELETE':
-        return 204
-    return 200
+        return DELETED
+    return OK
 
 
 class BaseRestroomView(View):
     resource = None
 
     def get_response(self, data):
-        status = 400 if 'error' in data else get_status(self.request.method)
+        status = BAD if 'error' in data else get_status(self.request.method)
         return HttpResponse(json.dumps(data), status=status,
                             mimetype='application/json')
 
