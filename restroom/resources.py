@@ -1,7 +1,5 @@
 from django.db import IntegrityError
-
-from .errors import (
-    RestroomValidationError)
+from .errors import RestroomValidationError
 
 
 class RestroomResource(object):
