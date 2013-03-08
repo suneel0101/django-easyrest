@@ -15,6 +15,8 @@ def get_status(method):
 
 
 class BaseRestroomView(View):
+    resource = None
+
     def get_response(self, data):
         status = 400 if 'error' in data else get_status(self.request.method)
         return HttpResponse(json.dumps(data), status=status,
@@ -27,8 +29,6 @@ class BaseRestroomView(View):
 
 
 class RestroomListView(BaseRestroomView):
-    resource = None
-
     def get(self, request, *args, **kwargs):
         filters = json.loads(request.GET.get('q', '[]'))
         return self.get_response(self.resource.retrieve(filters=filters))
@@ -44,3 +44,19 @@ class RestroomListView(BaseRestroomView):
         filters = json.loads(request.POST.get('q', '[]'))
         changes = {k: v for k, v in request.POST.iteritems() if k != 'q'}
         return self.get_response(self.resource.update(filters, changes))
+
+
+class RestroomItemView(BaseRestroomView):
+    def get(self, request, _id, *args, **kwargs):
+        return self.get_response(self.resource.retrieve_one(_id))
+
+    def post(self, request, _id, *args, **kwargs):
+        return HttpResponseForbidden()
+
+    def delete(self, request, _id, *args, **kwargs):
+        return self.get_response(self.resource.delete(_id))
+
+    def put(self, request, _id, *args, **kwargs):
+        request.method = 'POST'
+        return self.get_response(
+            self.resource.update_one(_id, request.POST.dict()))
