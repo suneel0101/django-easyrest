@@ -1,7 +1,7 @@
 from sure import expect
 from mock import patch, Mock
 from django.conf.urls import patterns, url
-from restroom.api import API
+from restroom.core import API
 from restroom.tests.models import Modelo
 
 
@@ -18,7 +18,7 @@ def assert_patterns_are_equal(pattern_x, pattern_y):
     return True
 
 
-@patch('restroom.api.RestroomResource')
+@patch('restroom.core.RestroomResource')
 def test_register(RestroomResource):
     "API.register should add a RestroomResource-wrapped model to its resources"
     RestroomResource.return_value = "a restroom resource"
@@ -28,7 +28,7 @@ def test_register(RestroomResource):
     RestroomResource.assert_called_once_with(Modelo, {})
 
 
-@patch('restroom.api.RestroomResource')
+@patch('restroom.core.RestroomResource')
 def test_register_with_options(RestroomResource):
     "API.register with options"
     RestroomResource.return_value = "a restroom resource"
@@ -39,8 +39,8 @@ def test_register_with_options(RestroomResource):
                                              {'http_methods': ['GET', 'POST']})
 
 
-@patch('restroom.api.RestroomItemView')
-@patch('restroom.api.RestroomListView')
+@patch('restroom.core.RestroomItemView')
+@patch('restroom.core.RestroomListView')
 def test_get_urls(RestroomListView, RestroomItemView):
     "API.get_urls"
     RestroomItemView.as_view.return_value = 'item view'
