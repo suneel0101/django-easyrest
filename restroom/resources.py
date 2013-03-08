@@ -8,6 +8,7 @@ class RestroomResource(object):
         self.http_methods = self.extract_http_methods(
             options.get('http_methods', ['GET']))
         self.field_map = self.extract_fields(options.get('fields', []))
+        self.name = options.get('name', model._meta.db_table)
 
     def extract_http_methods(self, http_methods):
         invalid_http_methods = set(http_methods).difference(
