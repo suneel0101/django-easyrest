@@ -25,4 +25,4 @@ DATABASES = {
     }
 }
 
-ROOT_URLCONF = 'tests.urls'
+ROOT_URLCONF = 'restroom.tests.urls'

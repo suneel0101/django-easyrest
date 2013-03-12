@@ -132,6 +132,7 @@ def test_list_view_post(context):
             'fields': ['text', 'slug', 'awesome'],
             'http_methods': ['POST']})
     response = RestroomListView.as_view(resource=resource)(request)
+
     expected_content = {
         'id': 3,
         'text': 'posted text',
