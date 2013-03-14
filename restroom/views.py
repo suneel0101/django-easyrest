@@ -41,7 +41,10 @@ class RestroomListView(BaseRestroomView):
             data = {"error": "malformed JSON POST data"}
         else:
             creation_data = post_data.get('data', {})
-            data = self.resource.create(creation_data)
+            if not creation_data:
+                data = {"error": "invalid or empty POST data"}
+            else:
+                data = self.resource.create(creation_data)
         return self.get_response(data)
 
     def delete(self, request, *args, **kwargs):
