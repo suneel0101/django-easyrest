@@ -3,7 +3,9 @@ from sure import expect, scenario
 
 from django.test.client import Client
 from django.core.urlresolvers import reverse
-from restroom.tests.utils import prepare_real_model, prepare_real_modelb
+from restroom.tests.utils import (prepare_real_model,
+                                  prepare_real_modelb,
+                                  prepare_real_modelc)
 from restroom.constants import OK, CREATED, DELETED, FORBIDDEN, BAD
 
 client = Client()
@@ -58,6 +60,37 @@ def test_item_endpoint_post_when_allowed(context):
     response = client.post(reverse('tests_modela_item',
                                    kwargs={'_id': 1}),
                            content_type='application/json')
+    expected_content = ''
+    expect(response.content).to.equal(expected_content)
+    expect(response.status_code).to.equal(FORBIDDEN)
+
+
+@scenario(prepare_real_modelc)
+def test_item_endpoint_delete(context):
+    "DELETE item"
+    response = client.delete(reverse('tests_modelc_item', kwargs={'_id': 1}),
+                             content_type='application/json')
+    expected_content = ''
+    expect(response.content).to.equal(expected_content)
+    expect(response.status_code).to.equal(DELETED)
+
+
+@scenario(prepare_real_modelc)
+def test_item_endpoint_delete_nonexistent_id(context):
+    "DELETE nonexistent item"
+    response = client.delete(reverse('tests_modelc_item', kwargs={'_id': 7}),
+                             content_type='application/json')
+    expected_content = {u'error': u'No result matches id: 7'}
+    expect(json.loads(response.content)).to.equal(expected_content)
+    expect(response.status_code).to.equal(BAD)
+
+
+@scenario(prepare_real_model)
+def test_item_endpoint_delete_not_allowed(context):
+    "DELETE item when not allowed returns forbidden"
+    response = client.delete(reverse('tests_modela_item',
+                                     kwargs={'_id': 1}),
+                             content_type='application/json')
     expected_content = ''
     expect(response.content).to.equal(expected_content)
     expect(response.status_code).to.equal(FORBIDDEN)

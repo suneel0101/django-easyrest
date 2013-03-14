@@ -1,5 +1,5 @@
 import datetime
-from restroom.tests.models import Modelo, Modelb
+from restroom.tests.models import Modelo, Modelb, Modelc
 
 
 def assert_patterns_are_equal(pattern_x, pattern_y):
@@ -42,6 +42,21 @@ def prepare_real_model(context):
         awesome=True)
 
     Modelo.objects.create(
+        text='Some more text',
+        slug='b-slug',
+        awesome=False)
+
+
+def prepare_real_modelc(context):
+    Modelc.objects.all().delete()
+
+    Modelc.objects.create(
+        text='Some text',
+        optional_text='Optional text',
+        slug='a-slug',
+        awesome=True)
+
+    Modelc.objects.create(
         text='Some more text',
         slug='b-slug',
         awesome=False)

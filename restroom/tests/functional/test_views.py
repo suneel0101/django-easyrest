@@ -11,48 +11,6 @@ from restroom.tests.utils import prepare_real_model
 
 
 @scenario(prepare_real_model)
-def test_item_view_delete(context):
-    "default item view DELETE"
-    request = Mock(method="DELETE")
-    resource = RestroomResource(Modelo,
-                                {'fields': ['text', 'slug', 'awesome'],
-                                 'http_methods': ['DELETE']})
-    _id = 1
-    response = RestroomItemView.as_view(resource=resource)(request, _id)
-    expected_content = {}
-    expect(json.loads(response.content)).to.equal(expected_content)
-    expect(response.status_code).to.equal(DELETED)
-
-
-@scenario(prepare_real_model)
-def test_item_view_delete_for_nonexistent_id(context):
-    "ItemView DELETE for nonexistent ID"
-    request = Mock(method="DELETE")
-    resource = RestroomResource(Modelo,
-                                {'fields': ['text', 'slug', 'awesome'],
-                                 'http_methods': ['DELETE']})
-    _id = 7
-    response = RestroomItemView.as_view(resource=resource)(request, _id)
-    expected_content = {u'error': u'No result matches id: 7'}
-    expect(json.loads(response.content)).to.equal(expected_content)
-    expect(response.status_code).to.equal(BAD)
-
-
-@scenario(prepare_real_model)
-def test_item_view_delete_when_not_allowed(context):
-    "ItemView DELETE when not allowed returns forbidden"
-    request = Mock(method="DELETE")
-    resource = RestroomResource(Modelo,
-                                {'fields': ['text', 'slug', 'awesome'],
-                                 'http_methods': ['GET']})
-    _id = 1
-    response = RestroomItemView.as_view(resource=resource)(request, _id)
-    expected_content = ""
-    expect(response.content).to.equal(expected_content)
-    expect(response.status_code).to.equal(FORBIDDEN)
-
-
-@scenario(prepare_real_model)
 def test_item_put_with_valid_changes(context):
     "ItemView PUT with valid changes"
     request = Mock(method="PUT")
