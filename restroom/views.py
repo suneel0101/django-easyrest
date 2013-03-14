@@ -58,7 +58,10 @@ class RestroomListView(BaseRestroomView):
         else:
             filters = post_data.get('q', [])
             changes = post_data.get('changes', {})
-            data = self.resource.update(filters, changes)
+            if not changes:
+                data = {"error": "invalid or empty POST data"}
+            else:
+                data = self.resource.update(filters, changes)
         return self.get_response(data)
 
 

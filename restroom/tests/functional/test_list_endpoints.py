@@ -112,7 +112,7 @@ def test_list_view_post(context):
 
 
 @scenario(prepare_real_model)
-def test_list_view_post_with_malformed_json(context):
+def test_list_view_post_without_data(context):
     "POST to list endpoint with no data being passed into post"
     url = reverse('tests_modelo_list')
     response = client.post(url, content_type='application/json')
@@ -122,12 +122,34 @@ def test_list_view_post_with_malformed_json(context):
 
 
 @scenario(prepare_real_model)
-def test_list_view_post_with_no_data(context):
+def test_list_view_post_with_malformed_json(context):
     "POST to list endpoint with malformed data"
     url = reverse('tests_modelo_list')
     response = client.post(url,
                            "blahblah",
                            content_type='application/json')
+    expected_content = {"error": "malformed JSON POST data"}
+    expect(json.loads(response.content)).to.equal(expected_content)
+    expect(response.status_code).to.equal(BAD)
+
+
+@scenario(prepare_real_model)
+def test_list_view_put_with_no_data(context):
+    "PUT to list endpoint with no data being passed into put"
+    url = reverse('tests_modelb_list')
+    response = client.put(url, content_type='application/json')
+    expected_content = {"error": "invalid or empty POST data"}
+    expect(json.loads(response.content)).to.equal(expected_content)
+    expect(response.status_code).to.equal(BAD)
+
+
+@scenario(prepare_real_model)
+def test_list_view_put_with_malformed_data(context):
+    "PUT to list endpoint with malformed data"
+    url = reverse('tests_modelb_list')
+    response = client.put(url,
+                          "blahblah",
+                          content_type='application/json')
     expected_content = {"error": "malformed JSON POST data"}
     expect(json.loads(response.content)).to.equal(expected_content)
     expect(response.status_code).to.equal(BAD)
