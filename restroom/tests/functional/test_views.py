@@ -3,7 +3,6 @@ from django.http import QueryDict
 from mock import Mock
 from sure import expect, scenario
 from restroom.views import (
-    RestroomListView,
     RestroomItemView)
 from restroom.resources import RestroomResource
 from restroom.tests.models import Modelo
