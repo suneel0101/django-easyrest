@@ -10,7 +10,7 @@ api.register(Modela, {'fields': ['text', 'slug', 'awesome'],
                       'http_methods': ['POST']})
 
 api.register(Modelb, {'fields': ['text', 'timestamp', 'slug', 'awesome'],
-                      'http_methods': ['PUT']})
+                      'http_methods': ['PUT', "GET"]})
 
 api.register(Modelc, {'fields': ['text', 'slug', 'awesome'],
                       'http_methods': ['DELETE']})

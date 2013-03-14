@@ -1,4 +1,4 @@
-import simplejson as json
+import json
 from django.http import (
     HttpResponse,
     HttpResponseForbidden)
@@ -35,17 +35,28 @@ class RestroomListView(BaseRestroomView):
         return self.get_response(self.resource.retrieve(filters=filters))
 
     def post(self, request, *args, **kwargs):
-        post_data = json.loads(request.POST.get('data', "{}"))
-        return self.get_response(self.resource.create(post_data))
+        try:
+            post_data = json.loads(request.raw_post_data)
+        except ValueError:
+            data = {"error": "malformed JSON POST data"}
+        else:
+            creation_data = post_data.get('data', {})
+            data = self.resource.create(creation_data)
+        return self.get_response(data)
 
     def delete(self, request, *args, **kwargs):
         return HttpResponseForbidden()
 
     def put(self, request, *args, **kwargs):
-        request.method = 'POST'
-        filters = json.loads(request.POST.get('q', '[]'))
-        changes = {k: v for k, v in request.POST.iteritems() if k != 'q'}
-        return self.get_response(self.resource.update(filters, changes))
+        try:
+            post_data = json.loads(request.raw_post_data)
+        except ValueError:
+            data = {"error": "malformed JSON POST data"}
+        else:
+            filters = post_data.get('q', [])
+            changes = post_data.get('changes', {})
+            data = self.resource.update(filters, changes)
+        return self.get_response(data)
 
 
 class RestroomItemView(BaseRestroomView):

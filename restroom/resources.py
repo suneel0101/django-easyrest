@@ -105,8 +105,6 @@ class RestroomResource(object):
             return object_data
 
     def create(self, data):
-        if not data:
-            return {"error": "no data was posted"}
         try:
             self.validate_fields(data.keys())
             _obj = self.model.objects.create(**data)
