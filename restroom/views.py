@@ -76,6 +76,15 @@ class RestroomItemView(BaseRestroomView):
         return self.get_response(self.resource.delete(_id))
 
     def put(self, request, _id, *args, **kwargs):
-        request.method = 'POST'
-        return self.get_response(
-            self.resource.update_one(_id, request.POST.dict()))
+        try:
+            post_data = json.loads(request.raw_post_data)
+        except ValueError:
+            data = {"error": "malformed JSON POST data"}
+        else:
+            changes = post_data.get('changes', {})
+            if not changes:
+                data = {"error": "invalid or empty POST data"}
+            else:
+                data = self.resource.update_one(_id, changes)
+
+        return self.get_response(data)
