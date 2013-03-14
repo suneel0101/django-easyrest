@@ -7,21 +7,7 @@ from restroom.views import (
 from restroom.resources import RestroomResource
 from restroom.tests.models import Modelo
 from restroom.constants import OK, CREATED, DELETED, FORBIDDEN, BAD
-
-
-def prepare_real_model(context):
-    Modelo.objects.all().delete()
-
-    Modelo.objects.create(
-        text='Some text',
-        optional_text='Optional text',
-        slug='a-slug',
-        awesome=True)
-
-    Modelo.objects.create(
-        text='Some more text',
-        slug='b-slug',
-        awesome=False)
+from restroom.tests.utils import prepare_real_model
 
 
 @scenario(prepare_real_model)

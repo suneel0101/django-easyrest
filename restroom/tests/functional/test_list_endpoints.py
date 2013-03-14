@@ -1,31 +1,12 @@
-import datetime
 import json
 from sure import expect, scenario
 
 from django.test.client import Client
 from django.core.urlresolvers import reverse
-from restroom.tests.models import Modelb
-from restroom.tests.functional.test_views import prepare_real_model
+from restroom.tests.utils import prepare_real_model, prepare_real_modelb
 from restroom.constants import OK, CREATED, DELETED, FORBIDDEN, BAD
 
 client = Client()
-
-
-def prepare_real_modelb(context):
-    Modelb.objects.all().delete()
-
-    Modelb.objects.create(
-        text='Some text',
-        optional_text='Optional text',
-        slug='a-slug',
-        timestamp=datetime.datetime(2013, 1, 1, 12),
-        awesome=True)
-
-    Modelb.objects.create(
-        text='Some more text',
-        timestamp=datetime.datetime(2013, 3, 1, 12),
-        slug='b-slug',
-        awesome=False)
 
 
 @scenario(prepare_real_model)
