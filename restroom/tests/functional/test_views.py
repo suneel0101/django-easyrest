@@ -26,40 +26,6 @@ def prepare_real_model(context):
 
 
 @scenario(prepare_real_model)
-def test_list_view_get_with_nondefault_fields(context):
-    "default list view GET with nondefault fields"
-    request = Mock(method="GET")
-    request.GET = QueryDict('')
-    resource = RestroomResource(Modelo,
-                                {'fields': ['text', 'slug', 'awesome']})
-    response = RestroomListView.as_view(resource=resource)(request)
-    expected_content = {"items": [{"id": 1,
-                                   "text": "Some text",
-                                   "slug": "a-slug",
-                                   "awesome": True},
-                                  {"id": 2,
-                                   "text": "Some more text",
-                                   "slug": "b-slug",
-                                   "awesome": False}]}
-    expect(json.loads(response.content)).to.equal(expected_content)
-    expect(response.status_code).to.equal(OK)
-
-
-@scenario(prepare_real_model)
-def test_list_view_get_when_get_not_allowed(context):
-    "default list view GET when GET not allowed"
-    request = Mock(method="GET")
-    request.GET = QueryDict('')
-    resource = RestroomResource(Modelo,
-                                {'fields': ['text', 'slug', 'awesome'],
-                                 'http_methods': ['POST']})
-    response = RestroomListView.as_view(resource=resource)(request)
-    expected_content = ""
-    expect(response.content).to.equal(expected_content)
-    expect(response.status_code).to.equal(FORBIDDEN)
-
-
-@scenario(prepare_real_model)
 def test_item_view_get_when_get_not_allowed(context):
     "default item view GET when GET not allowed"
     request = Mock(method="GET")

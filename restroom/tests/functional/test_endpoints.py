@@ -117,7 +117,7 @@ def test_list_view_post_with_invalid_fields(context):
 
 @scenario(prepare_real_model)
 def test_list_view_post_with_model_level_failure(context):
-    "POST to list endpoint with model leve failure"
+    "POST to list endpoint with model level failure"
     data = json.dumps({"data": {'text': 'posted text',
                        'slug': 'a-slug',
                        'awesome': True}})
@@ -136,6 +136,24 @@ def test_list_view_put_forbidden_when_not_allowed(context):
     "List PUT when not allowed is forbidden"
     url = reverse('tests_modelo_list')
     response = client.put(url, content_type='application/json')
+    expect(response.status_code).to.equal(FORBIDDEN)
+    expect(response.content).to.equal("")
+
+
+@scenario(prepare_real_model)
+def test_list_view_get_forbidden_when_not_allowed(context):
+    "List GET when not allowed is forbidden"
+    url = reverse('tests_modela_list')
+    response = client.get(url, content_type='application/json')
+    expect(response.status_code).to.equal(FORBIDDEN)
+    expect(response.content).to.equal("")
+
+
+@scenario(prepare_real_model)
+def test_list_view_post_forbidden_when_not_allowed(context):
+    "List POST when not allowed is forbidden"
+    url = reverse('tests_modelc_list')
+    response = client.post(url, content_type='application/json')
     expect(response.status_code).to.equal(FORBIDDEN)
     expect(response.content).to.equal("")
 
