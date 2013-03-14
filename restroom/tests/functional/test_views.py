@@ -11,36 +11,6 @@ from restroom.tests.utils import prepare_real_model
 
 
 @scenario(prepare_real_model)
-def test_item_view_post_when_post_not_allowed(context):
-    "ItemView POST when POST not allowed is forbidden"
-    request = Mock(method="POST")
-    request.POST = QueryDict('')
-    resource = RestroomResource(Modelo,
-                                {'fields': ['text', 'slug', 'awesome'],
-                                 'http_methods': ['PUT']})
-    _id = 1
-    response = RestroomItemView.as_view(resource=resource)(request, _id)
-    expected_content = ""
-    expect(response.content).to.equal(expected_content)
-    expect(response.status_code).to.equal(FORBIDDEN)
-
-
-@scenario(prepare_real_model)
-def test_item_view_post_when_post_allowed_still_forbidden(context):
-    "ItemView POST when POST allowed is still forbidden"
-    request = Mock(method="POST")
-    request.POST = QueryDict('')
-    resource = RestroomResource(Modelo,
-                                {'fields': ['text', 'slug', 'awesome'],
-                                 'http_methods': ['POST']})
-    _id = 1
-    response = RestroomItemView.as_view(resource=resource)(request, _id)
-    expected_content = ""
-    expect(response.content).to.equal(expected_content)
-    expect(response.status_code).to.equal(FORBIDDEN)
-
-
-@scenario(prepare_real_model)
 def test_item_view_delete(context):
     "default item view DELETE"
     request = Mock(method="DELETE")

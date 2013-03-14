@@ -39,3 +39,25 @@ def test_item_endpoint_get_when_not_allowed(context):
     expected_content = ''
     expect(response.content).to.equal(expected_content)
     expect(response.status_code).to.equal(FORBIDDEN)
+
+
+@scenario(prepare_real_model)
+def test_item_endpoint_post_when_not_allowed(context):
+    "POST item not allowed returns forbidden"
+    response = client.post(reverse('tests_modelb_item',
+                                   kwargs={'_id': 1}),
+                           content_type='application/json')
+    expected_content = ''
+    expect(response.content).to.equal(expected_content)
+    expect(response.status_code).to.equal(FORBIDDEN)
+
+
+@scenario(prepare_real_model)
+def test_item_endpoint_post_when_allowed(context):
+    "POST item even when allowed still returns forbidden"
+    response = client.post(reverse('tests_modela_item',
+                                   kwargs={'_id': 1}),
+                           content_type='application/json')
+    expected_content = ''
+    expect(response.content).to.equal(expected_content)
+    expect(response.status_code).to.equal(FORBIDDEN)
