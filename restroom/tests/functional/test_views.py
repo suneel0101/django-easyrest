@@ -11,34 +11,6 @@ from restroom.tests.utils import prepare_real_model
 
 
 @scenario(prepare_real_model)
-def test_item_view_get_when_get_not_allowed(context):
-    "default item view GET when GET not allowed"
-    request = Mock(method="GET")
-    request.GET = QueryDict('')
-    resource = RestroomResource(Modelo,
-                                {'fields': ['text', 'slug', 'awesome'],
-                                 'http_methods': ['POST']})
-    _id = 1
-    response = RestroomItemView.as_view(resource=resource)(request, _id)
-    expected_content = ""
-    expect(response.content).to.equal(expected_content)
-    expect(response.status_code).to.equal(FORBIDDEN)
-
-
-@scenario(prepare_real_model)
-def test_item_view_get_for_nonexistent_id(context):
-    "default item view GET"
-    request = Mock(method="GET")
-    request.GET = QueryDict('')
-    resource = RestroomResource(Modelo)
-    _id = 5
-    response = RestroomItemView.as_view(resource=resource)(request, _id)
-    expected_content = {u'error': u'No result matches id: 5'}
-    expect(json.loads(response.content)).to.equal(expected_content)
-    expect(response.status_code).to.equal(BAD)
-
-
-@scenario(prepare_real_model)
 def test_item_view_post_when_post_not_allowed(context):
     "ItemView POST when POST not allowed is forbidden"
     request = Mock(method="POST")
