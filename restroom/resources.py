@@ -50,7 +50,7 @@ class RestroomResource(object):
                 return self.get_error_message(e)
             qs = qs.filter(**self.get_filter_dict(filters))
         return {
-            "items": list(qs.values(*self.field_map.keys()))
+            "items": [self.serialize(obj) for obj in qs],
         }
 
     def get_filter_dict(self, filters):

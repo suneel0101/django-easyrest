@@ -1,3 +1,4 @@
+import datetime
 import json
 from sure import expect, scenario
 
@@ -17,10 +18,12 @@ def prepare_real_modelb(context):
         text='Some text',
         optional_text='Optional text',
         slug='a-slug',
+        timestamp=datetime.datetime(2013, 1, 1, 12),
         awesome=True)
 
     Modelb.objects.create(
         text='Some more text',
+        timestamp=datetime.datetime(2013, 3, 1, 12),
         slug='b-slug',
         awesome=False)
 
@@ -37,6 +40,25 @@ def test_list_endpoint_simple_get(context):
                     "awesome": True},
                    {"id": 2,
                     "text": "Some more text",
+                    "slug": "b-slug",
+                    "awesome": False}]})
+    expect(response.status_code).to.equal(OK)
+
+
+@scenario(prepare_real_modelb)
+def test_list_endpoint_simple_get_with_datetime(context):
+    "Simple GET to list endpoint with DateTime"
+    response = client.get(reverse('tests_modelb_list'),
+                          content_type='application/json')
+    expect(json.loads(response.content)).to.equal(
+        {"items": [{"id": 1,
+                    "text": "Some text",
+                    'timestamp': '2013-01-01T12:00:00',
+                    "slug": "a-slug",
+                    "awesome": True},
+                   {"id": 2,
+                    "text": "Some more text",
+                    'timestamp': '2013-03-01T12:00:00',
                     "slug": "b-slug",
                     "awesome": False}]})
     expect(response.status_code).to.equal(OK)
