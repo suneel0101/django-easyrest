@@ -52,17 +52,27 @@ def test_list_endpoint_get_with_invalid_filters(context):
     expect(response.status_code).to.equal(BAD)
 
 
-# @scenario(prepare_real_model)
-# def test_list_view_post(context):
-#     "POST to list endpoint with valid fields and values"
-#     data = {'text': 'posted text',
-#             'slug': 'posted-slug',
-#             'awesome': 'true'}
-#     response = client.post(reverse('tests_modelo_list'), data=data)
-#     expected_content = {
-#         "id": 3,
-#         "text": 'posted text',
-#         "slug": 'posted-slug',
-#         "awesome": True}
-#     expect(json.loads(response.content)).to.equal(expected_content)
-#     expect(response.status_code).to.equal(CREATED)
+@scenario(prepare_real_model)
+def test_list_view_post(context):
+    "POST to list endpoint with valid fields and values"
+    data = '{"text": "posted text", "slug": "posted-slug", "awesome": 0}'
+    url = reverse('tests_modelo_list')
+    response = client.post(url, data={'data': data})
+    expected_content = {
+        "id": 3,
+        "text": 'posted text',
+        "slug": 'posted-slug',
+        "awesome": 0}
+
+    expect(json.loads(response.content)).to.equal(expected_content)
+    expect(response.status_code).to.equal(CREATED)
+
+
+@scenario(prepare_real_model)
+def test_list_view_post_with_no_data(context):
+    "POST to list endpoint with valid fields and values"
+    url = reverse('tests_modelo_list')
+    response = client.post(url)
+    expected_content = {"error": "no data was posted"}
+    expect(json.loads(response.content)).to.equal(expected_content)
+    expect(response.status_code).to.equal(BAD)

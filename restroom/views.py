@@ -1,4 +1,4 @@
-import json
+import simplejson as json
 from django.http import (
     HttpResponse,
     HttpResponseForbidden)
@@ -35,7 +35,8 @@ class RestroomListView(BaseRestroomView):
         return self.get_response(self.resource.retrieve(filters=filters))
 
     def post(self, request, *args, **kwargs):
-        return self.get_response(self.resource.create(request.POST.dict()))
+        post_data = json.loads(request.POST.get('data', "{}"))
+        return self.get_response(self.resource.create(post_data))
 
     def delete(self, request, *args, **kwargs):
         return HttpResponseForbidden()

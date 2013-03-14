@@ -121,12 +121,11 @@ def test_list_view_post(context):
     # Oddity in modifying QueryDict object
     # Explained in Django Docs:
     # https://docs.djangoproject.com/en/dev/ref/request-response/#querydict-objects
-    q = QueryDict('')
-    new_query_dict = q.copy()
-    new_query_dict.update({'text': 'posted text',
-               'slug': 'posted-slug',
-               'awesome': True})
-    request.POST = new_query_dict
+
+    data_json = json.dumps({'text': 'posted text',
+                            'slug': 'posted-slug',
+                            'awesome': True})
+    request.POST = QueryDict('data={}'.format(data_json))
     resource = RestroomResource(Modelo,
                                 {
             'fields': ['text', 'slug', 'awesome'],
@@ -149,12 +148,10 @@ def test_list_view_post_with_invalid_fields(context):
     # Oddity in modifying QueryDict object
     # Explained in Django Docs:
     # https://docs.djangoproject.com/en/dev/ref/request-response/#querydict-objects
-    q = QueryDict('')
-    new_query_dict = q.copy()
-    new_query_dict.update({'strangefield': 'posted text',
-               'slug': 'posted-slug',
-               'awesome': True})
-    request.POST = new_query_dict
+    data_json = json.dumps({'strangefield': 'posted text',
+                            'slug': 'posted-slug',
+                            'awesome': True})
+    request.POST = QueryDict('data={}'.format(data_json))
     resource = RestroomResource(Modelo,
                                 {
             'fields': ['text', 'slug', 'awesome'],
@@ -173,12 +170,10 @@ def test_list_view_post_with_model_level_failure(context):
     # Oddity in modifying QueryDict object
     # Explained in Django Docs:
     # https://docs.djangoproject.com/en/dev/ref/request-response/#querydict-objects
-    q = QueryDict('')
-    new_query_dict = q.copy()
-    new_query_dict.update({'text': 'posted text',
+    data_json = json.dumps({'text': 'posted text',
                'slug': 'a-slug',
                'awesome': True})
-    request.POST = new_query_dict
+    request.POST = QueryDict('data={}'.format(data_json))
     resource = RestroomResource(Modelo,
                                 {
             'fields': ['text', 'slug', 'awesome'],

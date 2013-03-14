@@ -1,5 +1,6 @@
 from django.db import IntegrityError
 from .errors import RestroomValidationError
+from .utils import get_val
 
 
 class RestroomResource(object):
@@ -93,7 +94,7 @@ class RestroomResource(object):
         return self.serialize(data['object']) if data.get('object') else data
 
     def serialize(self, obj):
-        return {name: getattr(obj, name) for name in self.field_map.keys()}
+        return {name: get_val(obj, name) for name in self.field_map.keys()}
 
     def delete(self, _id):
         object_data = self.get_object_by_id(_id)
@@ -104,6 +105,8 @@ class RestroomResource(object):
             return object_data
 
     def create(self, data):
+        if not data:
+            return {"error": "no data was posted"}
         try:
             self.validate_fields(data.keys())
             _obj = self.model.objects.create(**data)
