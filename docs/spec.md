@@ -51,29 +51,53 @@ class RestroomResource(object):
     def key(self):
         pass
 
-class RestroomListView(View):
-    resource = None
+response_type = lambda data: HttpResponseBadRequest if data.get('error') else HttpResponse
+response = lambda data: response_type(data)(json.dumps(data), mimetype='application/json')
 
-    def get(self, request, *args, **kwargs):
-        if 'GET' in self.resource.allowed_methods:
-            retrieval_kwargs = {}
-            filters = request.GET.get('filters')
-            page = request.GET.get('page')
-            if filters:
-                filters = json.loads(filters)
-                retrieval_kwargs['filters'] = filters
-            if page:
-                try:
-                    retrieval_kwargs['page'] = int(page)
-                except ValueError:
-                    pass
-            data = self.resource.retrieve(**retrieval_kwargs)
-            return HttpResponse(
-                json.dumps(data),
-                mimetype='application/json')
-        else:
+
+class RestroomBaseView(View):
+    def dispatch(self, request, *args, **kwargs):
+        self.auth_key = request.META['HTTP_X_
+        if self.protected and not self.resource.authorize(request, kwargs.get('auth_key')):
             return HttpResponseForbidden()
+        return super(RestroomBaseView, self).dispatch(request, *args, **kwargs)
 
+class RestroomListView(RestroomBaseView):
+    def get(self, request, *args, **kwargs):
+        if 'GET' in self.allowed_methods:
+            filters = request.GET.get('filters', {})
+            return response(self.resource.retrieve(filters=json.loads(filters),
+                                                   page=request.GET.get('page')))
+        return HttpResponseForbidden()
+
+    def post(self, request, *args, **kwargs):
+        if 'POST' in self.allowed_methods:
+            return response(self.resource.create(request.POST))
+        return HttpResponseForbidden()
+
+    def delete(self, request, *args, **kwargs):
+        return HttpResponseForbidden()
+
+class RestroomSingleItemView(RestroomBaseView):
+    def get(self, request, _id, *args, **kwargs):
+        if 'GET' in self.allowed_methods:
+            return response(self.resource.retrieve_one(_id))
+        return HttpResponseForbidden()
+
+    def post(self, request, *args, **kwargs):
+        return HttpResponseForbidden()
+
+    def put(self, request, _id, *args, **kwargs):
+        if 'PUT' in self.allowed_methods:
+            # Hack because Django HttpRequest doesn't handle PUT well
+            request.method = 'POST'
+            return response(self.resource.update_one(_id, request.POST))
+        return HttpResponseForbidden()
+
+    def delete(self, request, _id, *args, **kwargs):
+        if 'DELETE' in self.allowed_methods:
+            return response(self.resource.delete_record(_id))
+        return HttpResponseForbidden()
 
 ```
 

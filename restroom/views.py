@@ -1,101 +1,90 @@
 import json
-
 from django.http import (
     HttpResponse,
-    HttpResponseForbidden,
-    HttpResponseBadRequest)
-from django.views.generic.base import View
+    HttpResponseForbidden)
+from django.views.generic import View
+
+from .constants import OK, CREATED, DELETED, BAD
 
 
-class RestroomListView(View):
-    allowed_methods = ['GET']
-    api = None
-    table_name = None
+def get_status(method):
+    if method in ['POST', 'PUT']:
+        return CREATED
+    elif method == 'DELETE':
+        return DELETED
+    return OK
 
-    def get(self, request, *args, **kwargs):
-        if 'GET' in self.allowed_methods:
-            retrieval_kwargs = {}
-            get_data = {k: v for k, v in request.GET.items()}
-            filters = get_data.get('filters')
-            page = get_data.get('page')
-            if filters:
-                filters = json.loads(filters)
-                retrieval_kwargs['filters'] = filters
-            if page:
-                try:
-                    retrieval_kwargs['page'] = int(page)
-                except ValueError:
-                    pass
-            data = self.api.retrieve(self.table_name, **retrieval_kwargs)
-            return HttpResponse(
-                json.dumps(data),
-                mimetype='application/json')
-        else:
+
+class BaseRestroomView(View):
+    resource = None
+
+    def get_response(self, data):
+        status = BAD if 'error' in data else get_status(self.request.method)
+        return HttpResponse(json.dumps(data), status=status,
+                            mimetype='application/json')
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.method not in self.resource.http_methods:
             return HttpResponseForbidden()
+        return super(BaseRestroomView, self).dispatch(request, *args, **kwargs)
+
+
+class RestroomListView(BaseRestroomView):
+    def get(self, request, *args, **kwargs):
+        filters = json.loads(request.GET.get('q', '[]'))
+        return self.get_response(self.resource.retrieve(filters=filters))
 
     def post(self, request, *args, **kwargs):
-        if 'POST' in self.allowed_methods:
-            post_data = {k: v for k, v in request.POST.items()}
-            data = self.api.create_record(self.table_name,
-                                          post_data)
-            return HttpResponse(
-                json.dumps(data),
-                mimetype='application/json')
+        try:
+            post_data = json.loads(request.raw_post_data)
+        except ValueError:
+            data = {"error": "malformed JSON POST data"}
         else:
-            return HttpResponseForbidden()
+            creation_data = post_data.get('data', {})
+            if not creation_data:
+                data = {"error": "invalid or empty POST data"}
+            else:
+                data = self.resource.create(creation_data)
+        return self.get_response(data)
 
     def delete(self, request, *args, **kwargs):
         return HttpResponseForbidden()
 
-
-class RestroomSingleItemView(View):
-    allowed_methods = ['GET']
-    api = None
-    table_name = None
-
-    def get(self, request, _id, *args, **kwargs):
-        if 'GET' in self.allowed_methods:
-            data = self.api.retrieve_one(self.table_name, _id)
-            if data.get('error'):
-                response_type = HttpResponseBadRequest
-            else:
-                response_type = HttpResponse
-            return response_type(
-                json.dumps(data),
-                mimetype='application/json')
+    def put(self, request, *args, **kwargs):
+        try:
+            post_data = json.loads(request.raw_post_data)
+        except ValueError:
+            data = {"error": "malformed JSON POST data"}
         else:
-            return HttpResponseForbidden()
+            filters = post_data.get('q', [])
+            changes = post_data.get('changes', {})
+            if not changes:
+                data = {"error": "invalid or empty POST data"}
+            else:
+                data = self.resource.update(filters, changes)
+        return self.get_response(data)
 
-    def post(self, request, *args, **kwargs):
+
+class RestroomItemView(BaseRestroomView):
+    def get(self, request, _id, *args, **kwargs):
+        return self.get_response(self.resource.retrieve_one(_id))
+
+    def post(self, request, _id, *args, **kwargs):
         return HttpResponseForbidden()
 
-    def put(self, request, _id, *args, **kwargs):
-        if 'PUT' in self.allowed_methods:
-            # Hack because Django HttpRequest doesn't handle
-            # PUT requests as desired
-            request.method = 'POST'
-            put_data = {k: v for k, v in request.POST.items()}
-            request.method = 'PUT'
-            data = self.api.update_one(self.table_name, _id, put_data)
-            if data.get('error'):
-                response_type = HttpResponseBadRequest
-            else:
-                response_type = HttpResponse
-            return response_type(
-                json.dumps(data),
-                mimetype='application/json')
-        else:
-            return HttpResponseForbidden()
-
     def delete(self, request, _id, *args, **kwargs):
-        if 'DELETE' in self.allowed_methods:
-            data = self.api.delete_record(self.table_name, _id)
-            if data.get('error'):
-                response_type = HttpResponseBadRequest
-            else:
-                response_type = HttpResponse
-            return response_type(
-                json.dumps(data),
-                mimetype='application/json')
+        return self.get_response(self.resource.delete(_id))
+
+    def put(self, request, _id, *args, **kwargs):
+        try:
+            post_data = json.loads(request.raw_post_data)
+        except ValueError:
+            data = {"error": "malformed JSON POST data"}
         else:
-            return HttpResponseForbidden()
+            changes = post_data.get('changes', {})
+            if not changes:
+                data = {"error": "invalid or empty POST data"}
+            else:
+                data = self.resource.update_one(_id, changes)
+
+        return self.get_response(data)

@@ -1,6 +1,7 @@
 INSTALLED_APPS = (
     'unclebob',
-    'tests',
+    'restroom',
+    'restroom.tests',
 )
 
 TEST_RUNNER = 'unclebob.runners.Nose'
@@ -8,7 +9,9 @@ import unclebob
 unclebob.take_care_of_my_tests()
 
 UNCLEBOB_EXTRA_NOSE_ARGS = [
-    '--verbosity=2',
+    '--verbosity=3',
+    '--with-coverage',
+    '--cover-package=restroom',
 ]
 
 DATABASES = {
@@ -22,4 +25,4 @@ DATABASES = {
     }
 }
 
-ROOT_URLCONF = 'tests.urls'
+ROOT_URLCONF = 'restroom.tests.urls'
