@@ -36,3 +36,11 @@ class ModelAuthed(models.Model):
     slug = models.SlugField(unique=True)
     awesome = models.BooleanField()
     optional_text = models.CharField(max_length=300)
+
+
+class ModelfkUser(models.Model):
+    text = models.CharField(max_length=250, blank=False)
+    slug = models.SlugField(unique=True)
+    awesome = models.BooleanField()
+    optional_text = models.CharField(max_length=300)
+    owner = models.ForeignKey('auth.user')

@@ -17,3 +17,9 @@ api.register(Modelc, {'fields': ['text', 'slug', 'awesome'],
 
 api.register(ModelAuthed,
              {'fields': ['text', 'slug', 'awesome'], 'needs_auth': True})
+
+
+api.register(ModelAuthed,
+             {'fields': ['text', 'slug', 'awesome'],
+              'needs_auth': True,
+              'only_for_user': (True, 'owner')})
