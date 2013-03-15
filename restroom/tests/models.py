@@ -38,9 +38,25 @@ class ModelAuthed(models.Model):
     optional_text = models.CharField(max_length=300)
 
 
-class ModelfkUser(models.Model):
+class ModelFK(models.Model):
     text = models.CharField(max_length=250, blank=False)
     slug = models.SlugField(unique=True)
     awesome = models.BooleanField()
     optional_text = models.CharField(max_length=300)
-    owner = models.ForeignKey('auth.user')
+    foreign = models.ForeignKey('tests.modelc')
+
+
+class ModelFKID(models.Model):
+    text = models.CharField(max_length=250, blank=False)
+    slug = models.SlugField(unique=True)
+    awesome = models.BooleanField()
+    optional_text = models.CharField(max_length=300)
+    foreign = models.ForeignKey('tests.modelc')
+
+
+# class ModelfkUser(models.Model):
+#     text = models.CharField(max_length=250, blank=False)
+#     slug = models.SlugField(unique=True)
+#     awesome = models.BooleanField()
+#     optional_text = models.CharField(max_length=300)
+#     owner = models.ForeignKey('auth.user')

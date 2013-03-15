@@ -4,8 +4,13 @@ from sure import expect, scenario
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.test.client import Client
-from restroom.tests.utils import prepare_real_model, prepare_real_modelb, prepare_real_model_authed
-from restroom.constants import OK, CREATED, DELETED, FORBIDDEN, BAD
+from restroom.tests.utils import (
+    prepare_real_model,
+    prepare_real_modelb,
+    prepare_real_model_authed,
+    prepare_real_model_fk,
+    prepare_real_model_fk_id)
+from restroom.constants import OK, CREATED, FORBIDDEN, BAD
 from restroom.models import APIKey
 
 
@@ -131,6 +136,48 @@ def test_list_endpoint_simple_get(context):
                     "text": "Some more text",
                     "slug": "b-slug",
                     "awesome": False}]})
+    expect(response.status_code).to.equal(OK)
+
+
+@scenario(prepare_real_model_fk)
+def test_list_endpoint_get_with_foreign_key(context):
+    "GET to resource with foreign key returns correctly serialized data"
+    response = client.get(reverse('tests_modelfk_list'),
+                          content_type='application/json')
+    expect(json.loads(response.content)).to.equal(
+        {"items": [{"id": 1,
+                    "text": "Some text",
+                    "slug": "a-slug",
+                    "awesome": True,
+                    "foreign": 1},
+                   {"id": 2,
+                    "text": "Some more text",
+                    "slug": "b-slug",
+                    "awesome": False,
+                    "foreign": 2}]
+         })
+    expect(response.status_code).to.equal(OK)
+
+
+@scenario(prepare_real_model_fk_id)
+def test_list_endpoint_get_with_foreign_key_registered_with__id(context):
+    "GET to resource works right when fk is registered with default `.._id`"
+    response = client.get(reverse('tests_modelfkid_list'),
+                          content_type='application/json')
+    expect(json.loads(response.content)).to.equal(
+        {"items": [{"id": 1,
+                    "text": "Some text",
+                    "optional_text": "Optional text",
+                    "slug": "a-slug",
+                    "awesome": True,
+                    "foreign_id": 1},
+                   {"id": 2,
+                    "text": "Some more text",
+                    "optional_text": "",
+                    "slug": "b-slug",
+                    "awesome": False,
+                    "foreign_id": 2}]
+         })
     expect(response.status_code).to.equal(OK)
 
 

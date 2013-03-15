@@ -1,5 +1,11 @@
 import datetime
-from restroom.tests.models import Modelo, Modelb, Modelc, ModelAuthed
+from restroom.tests.models import (
+    Modelo,
+    Modelb,
+    Modelc,
+    ModelAuthed,
+    ModelFK,
+    ModelFKID)
 
 
 def assert_patterns_are_equal(pattern_x, pattern_y):
@@ -75,3 +81,61 @@ def prepare_real_model_authed(context):
         text='Some more text',
         slug='b-slug',
         awesome=False)
+
+
+def prepare_real_model_fk(context):
+    Modelc.objects.all().delete()
+
+    ModelFK.objects.all().delete()
+    c1 = Modelc.objects.create(
+        text='Some text',
+        optional_text='Optional text',
+        slug='a-slug',
+        awesome=True)
+
+    c2 = Modelc.objects.create(
+        text='Some more text',
+        slug='b-slug',
+        awesome=False)
+
+    ModelFK.objects.create(
+        text='Some text',
+        optional_text='Optional text',
+        slug='a-slug',
+        awesome=True,
+        foreign=c1)
+
+    ModelFK.objects.create(
+        text='Some more text',
+        slug='b-slug',
+        awesome=False,
+        foreign=c2)
+
+
+def prepare_real_model_fk_id(context):
+    Modelc.objects.all().delete()
+
+    ModelFKID.objects.all().delete()
+    c1 = Modelc.objects.create(
+        text='Some text',
+        optional_text='Optional text',
+        slug='a-slug',
+        awesome=True)
+
+    c2 = Modelc.objects.create(
+        text='Some more text',
+        slug='b-slug',
+        awesome=False)
+
+    ModelFKID.objects.create(
+        text='Some text',
+        optional_text='Optional text',
+        slug='a-slug',
+        awesome=True,
+        foreign=c1)
+
+    ModelFKID.objects.create(
+        text='Some more text',
+        slug='b-slug',
+        awesome=False,
+        foreign=c2)
