@@ -1,14 +1,7 @@
 INSTALLED_APPS = (
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.humanize',
-    'django.contrib.messages',
-    'django.contrib.redirects',
     'django.contrib.sessions',
-    'django.contrib.sitemaps',
-    'django.contrib.sites',
-    'django.contrib.staticfiles',
     'unclebob',
     'restroom',
     'restroom.tests',
@@ -34,5 +27,7 @@ DATABASES = {
         'PORT': '',
     }
 }
+
+DEBUG = True
 
 ROOT_URLCONF = 'restroom.tests.urls'
