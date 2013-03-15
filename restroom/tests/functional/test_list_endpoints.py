@@ -15,7 +15,6 @@ client = Client()
 @scenario(prepare_real_model_authed)
 def test_list_endpoint_authed_get_forbidden(context):
     "GET to authed by unauthed is Forbidden"
-    import pdb; pdb.set_trace()
     response = client.get(reverse('tests_modelauthed_list'),
                           content_type='application/json')
     expect(response.content).to.equal('')
