@@ -200,6 +200,7 @@ class APIKeyResource(RestroomResource):
             username = auth_data.get('username')
             password = auth_data.get('password')
             result = {"username": username,
+                      'id': '',
                       "token": 'could not authenticate {}'.format(username)}
             if username and password:
                 user = django_authenticate(username=username,

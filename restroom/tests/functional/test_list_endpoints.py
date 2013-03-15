@@ -52,6 +52,30 @@ def test_api_key_resource(context):
 
 
 @scenario(prepare_api_key)
+def test_api_key_resource_for_unauthorized_user(context):
+    "APIKey GET for unauthorized user"
+    user = context.user
+    api_key = context.api_key
+    api_key.delete()
+    url = reverse("restroom_apikey_list")
+    user_data = [{"username": user.username, "password": context.password}]
+    user_data = json.dumps(user_data)
+    response = client.get(url,
+                          {"q": user_data}, content_type="application/json")
+    expect(response.status_code).to.equal(OK)
+    expected_content = {
+        "items": [
+            {
+                "username": user.username,
+                "id": "",
+                "token": 'could not authenticate test_user',
+            }
+        ]
+    }
+    expect(json.loads(response.content)).to.equal(expected_content)
+
+
+@scenario(prepare_api_key)
 def test_api_key_resource_repeated_login(context):
     "APIKey authentication sends new, unique token everytime user auths"
     user = context.user
