@@ -207,6 +207,10 @@ class APIKeyResource(RestroomResource):
                         result = {"username": username,
                                   "id": user.id,
                                   "token": apikey.token}
+                        # Saving apikey to generate a new token
+                        # So everytime the user authenticates
+                        # Will receive a new, unique token
+                        apikey.save()
             results.append(result)
         return {"items": results}
 

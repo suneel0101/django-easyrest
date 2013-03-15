@@ -46,6 +46,49 @@ def test_api_key_resource(context):
     expect(json.loads(response.content)).to.equal(expected_content)
 
 
+@scenario(prepare_api_key)
+def test_api_key_resource_repeated_login(context):
+    "APIKey authentication sends new, unique token everytime user auths"
+    user = context.user
+    api_key = context.api_key
+    url = reverse("restroom_apikey_list")
+    user_data = [{"username": user.username, "password": context.password}]
+    user_data = json.dumps(user_data)
+    response = client.get(url,
+                          {"q": user_data}, content_type="application/json")
+    expect(response.status_code).to.equal(OK)
+    first_token = api_key.token
+    expected_content = {
+        "items": [
+            {
+                "username": user.username,
+                "id": user.id,
+                "token": first_token
+            }
+        ]
+    }
+    expect(json.loads(response.content)).to.equal(expected_content)
+    new_token = APIKey.objects.get(user=user).token
+    # This token should be unique
+    expect(APIKey.objects.filter(token=new_token).count()).to.equal(1)
+    second_response = client.get(url,
+                          {"q": user_data}, content_type="application/json")
+
+    second_login_content = {
+        "items": [
+            {
+                "username": user.username,
+                "id": user.id,
+                "token": new_token,
+            }
+        ]
+    }
+    expect(json.loads(second_response.content)).to.equal(second_login_content)
+    (new_token).should_not.equal(first_token)
+    # This token should no longer be valid
+    expect(APIKey.objects.filter(token=new_token).count()).to.equal(0)
+
+
 @scenario(prepare_real_model_authed)
 def test_list_endpoint_authed_get_forbidden(context):
     "GET to authed by unauthed is Forbidden"
