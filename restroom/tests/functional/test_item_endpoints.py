@@ -3,12 +3,103 @@ from sure import expect, scenario
 
 from django.test.client import Client
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
+from restroom.tests.models import ModelForUser
 from restroom.tests.utils import (prepare_real_model,
                                   prepare_real_modelb,
-                                  prepare_real_modelc)
+                                  prepare_real_modelc,
+                                  prepare_api_key)
 from restroom.constants import OK, CREATED, DELETED, FORBIDDEN, BAD
 
 client = Client()
+
+
+@scenario(prepare_api_key)
+def test_get_item_endpoint_authed_only_for_user(context):
+    "Only for user GET to authed by authed user"
+    ModelForUser.objects.all().delete()
+    user = User.objects.create_user('new_user', 'abc@gmail.com', '1234')
+    ModelForUser.objects.create(text='coo',
+                                slug='coo-slug',
+                                awesome=False,
+                                owner=user)
+    ModelForUser.objects.create(text='cooler',
+                                slug='cooler-slug',
+                                awesome=True,
+                                owner=context.user)
+    api_key = context.api_key
+    response = client.get(reverse('tests_modelforuser_item',
+                                  kwargs={'_id': 2}),
+                          content_type='application/json',
+                          **{'RESTROOM_API_KEY': api_key.token})
+    expect(json.loads(response.content)).to.equal(
+        {"id": 2,
+         "text": "cooler",
+         "slug": "cooler-slug",
+         "optional_text": "",
+         "awesome": True,
+         "owner_id": context.user.id})
+    expect(response.status_code).to.equal(OK)
+    expect(context.user.is_superuser).to.equal(False)
+    ModelForUser.objects.all().delete()
+    user.delete()
+
+
+@scenario(prepare_api_key)
+def test_get_unowned_item_endpoint_authed_only_for_user(context):
+    "Only for user GET for item user doesnt own should fail"
+    ModelForUser.objects.all().delete()
+    user = User.objects.create_user('new_user', 'abc@gmail.com', '1234')
+    ModelForUser.objects.create(text='coo',
+                                slug='coo-slug',
+                                awesome=False,
+                                owner=user)
+    ModelForUser.objects.create(text='cooler',
+                                slug='cooler-slug',
+                                awesome=True,
+                                owner=context.user)
+    api_key = context.api_key
+    response = client.get(reverse('tests_modelforuser_item',
+                                  kwargs={'_id': 1}),
+                          content_type='application/json',
+                          **{'RESTROOM_API_KEY': api_key.token})
+    expect(json.loads(response.content)).to.equal(
+        {"error": "You do not have access to this data"})
+    expect(response.status_code).to.equal(BAD)
+    expect(context.user.is_superuser).to.equal(False)
+    ModelForUser.objects.all().delete()
+    user.delete()
+
+
+@scenario(prepare_api_key)
+def test_delete_item_endpoint_authed_only_for_user(context):
+    "Only for user DELETE to authed by authed user"
+    ModelForUser.objects.all().delete()
+    user = User.objects.create_user('new_user', 'abc@gmail.com', '1234')
+    ModelForUser.objects.create(text='coo',
+                                slug='coo-slug',
+                                awesome=False,
+                                owner=user)
+    ModelForUser.objects.create(text='cooler',
+                                slug='cooler-slug',
+                                awesome=True,
+                                owner=context.user)
+    api_key = context.api_key
+    response = client.get(reverse('tests_modelforuser_item',
+                                  kwargs={'_id': 2}),
+                          content_type='application/json',
+                          **{'RESTROOM_API_KEY': api_key.token})
+    expect(json.loads(response.content)).to.equal(
+        {"id": 2,
+         "text": "cooler",
+         "slug": "cooler-slug",
+         "optional_text": "",
+         "awesome": True,
+         "owner_id": context.user.id})
+    expect(response.status_code).to.equal(OK)
+    expect(context.user.is_superuser).to.equal(False)
+    ModelForUser.objects.all().delete()
+    user.delete()
 
 
 @scenario(prepare_real_model)

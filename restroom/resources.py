@@ -52,6 +52,17 @@ class RestroomResource(object):
                        .format(", ".join(invalid_field_names)))
             raise RestroomValidationError(message)
 
+    def filter_for_user(self, qs, user):
+        if user and self.only_for_user[0]:
+            qs = qs.filter(**{self.only_for_user[1]: user.id})
+        return qs
+
+    def get_for_user(self, obj, user):
+        if (self.only_for_user[0] and
+            user.id != getattr(obj, self.only_for_user[1]).id):
+            return {"error": "You do not have access to this data"}
+        return self.serialize(obj)
+
     def retrieve(self, filters=[], user=None):
         qs = self.model.objects.all()
         if filters:
@@ -60,8 +71,7 @@ class RestroomResource(object):
             except RestroomValidationError as e:
                 return self.get_error_message(e)
             qs = qs.filter(**self.get_filter_dict(filters))
-        if user and self.only_for_user[0]:
-            qs = qs.filter(**{self.only_for_user[1]: user.id})
+        qs = self.filter_for_user(qs, user)
         return {
             "items": [self.serialize(obj) for obj in qs],
         }
@@ -102,9 +112,11 @@ class RestroomResource(object):
         except self.model.DoesNotExist:
             return {'error': 'No result matches id: {}'.format(_id)}
 
-    def retrieve_one(self, _id):
+    def retrieve_one(self, _id, user=None):
         data = self.get_object_by_id(_id)
-        return self.serialize(data['object']) if data.get('object') else data
+        if data.get('object'):
+            return self.get_for_user(data['object'], user)
+        return data
 
     def serialize(self, obj):
         return {name: get_val(obj, name)
@@ -152,7 +164,7 @@ class RestroomResource(object):
             del changes['id']
         return changes
 
-    def update(self, filters, changes):
+    def update(self, filters, changes, user=None):
         try:
             self.validate_filters(filters)
             self.validate_fields(changes.keys())
@@ -161,6 +173,7 @@ class RestroomResource(object):
 
         try:
             objs = self.model.objects.filter(**self.get_filter_dict(filters))
+            objs = self.filter_for_user(objs, user)
             update_count = objs.update(**self.clean_changes(changes))
         except IntegrityError as e:
             return self.get_error_message(e)

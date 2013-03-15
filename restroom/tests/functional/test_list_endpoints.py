@@ -149,6 +149,36 @@ def test_list_endpoint_authed_only_for_user(context):
     user.delete()
 
 
+@scenario(prepare_api_key)
+def test_put_list_endpoint_authed_only_for_user(context):
+    "PUT to authed by authed user for only_for_user works"
+    ModelForUser.objects.all().delete()
+    user = User.objects.create_user('new_user', 'abc@gmail.com', '1234')
+    ModelForUser.objects.create(text='coo',
+                                slug='coo-slug',
+                                awesome=False,
+                                owner=user)
+    ModelForUser.objects.create(text='cooler',
+                                slug='cooler-slug',
+                                awesome=True,
+                                owner=context.user)
+    api_key = context.api_key
+    changes = {'text': 'baller text'}
+    data = json.dumps({"changes": changes})
+    response = client.put(reverse('tests_modelforuser_list'),
+                          data,
+                          content_type='application/json',
+                          **{'RESTROOM_API_KEY': api_key.token})
+    expect(json.loads(response.content)).to.equal(
+        {"update_count": 1})
+    model_for_context_user = ModelForUser.objects.get(id=2)
+    expect(model_for_context_user.text).to.equal('baller text')
+    expect(response.status_code).to.equal(CREATED)
+    expect(context.user.is_superuser).to.equal(False)
+    ModelForUser.objects.all().delete()
+    user.delete()
+
+
 @scenario([prepare_real_model_authed, prepare_api_key])
 def test_list_endpoint_authed_get_works(context):
     "GET to authed by authed user works"

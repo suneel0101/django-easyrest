@@ -30,7 +30,7 @@ class BaseRestroomView(View):
             request._user = authorize(request)
             if not request._user:
                 return HttpResponseForbidden()
-        elif request.method not in self.resource.http_methods:
+        if request.method not in self.resource.http_methods:
             return HttpResponseForbidden()
         return super(BaseRestroomView, self).dispatch(request, *args, **kwargs)
 
@@ -68,13 +68,16 @@ class RestroomListView(BaseRestroomView):
             if not changes:
                 data = {"error": "invalid or empty POST data"}
             else:
-                data = self.resource.update(filters, changes)
+                data = self.resource.update(filters,
+                                            changes,
+                                            user=request._user)
         return self.get_response(data)
 
 
 class RestroomItemView(BaseRestroomView):
     def get(self, request, _id, *args, **kwargs):
-        return self.get_response(self.resource.retrieve_one(_id))
+        data = self.resource.retrieve_one(_id, user=request._user)
+        return self.get_response(data)
 
     def post(self, request, _id, *args, **kwargs):
         return HttpResponseForbidden()

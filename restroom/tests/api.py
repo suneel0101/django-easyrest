@@ -33,4 +33,6 @@ api.register(ModelAuthed,
 
 api.register(ModelM2M)
 
-api.register(ModelForUser, {'only_for_user': (True, 'owner')})
+api.register(ModelForUser,
+             {'only_for_user': (True, 'owner'),
+              'http_methods': ['GET', 'POST', 'DELETE']})
