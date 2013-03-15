@@ -173,10 +173,20 @@ class APIKeyResource(RestroomResource):
         """
         With filters = [{'username': 'johndoe', 'password': '1234'},
                         {'username': 'jeremy', 'password': 'abc'}]
-        Should return list of dictionaries
-        [{'johndoe': token}, {'jeremy': token_for_jeremy}]
-        where token and token_for_jeremy are found
-        via the APIKey table
+        Should return list of dictionaries, for example:
+        {
+            "items": [
+                {
+                    "username": "johndoe",
+                    "id": 234,
+                    "token": "xkjsdk2jh3"
+                },
+                {
+                    "username": "jeremy",
+                    "id": 098234,
+                    "token": "Akbjsdf8"
+                }]
+        }
         """
         results = []
         for auth_data in filters:
