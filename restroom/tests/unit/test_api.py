@@ -3,6 +3,7 @@ from mock import patch, Mock
 from django.conf.urls import patterns, url
 from restroom.core import API
 from restroom.tests.models import Modelo
+from restroom.resources import api_key_resource
 
 
 def assert_patterns_are_equal(pattern_x, pattern_y):
@@ -24,7 +25,7 @@ def test_register(RestroomResource):
     RestroomResource.return_value = "a restroom resource"
     api = API()
     api.register(Modelo)
-    expect(api.resources).to.equal(["a restroom resource"])
+    expect(api.resources).to.equal([api_key_resource, "a restroom resource"])
     RestroomResource.assert_called_once_with(Modelo, {})
 
 
@@ -34,7 +35,7 @@ def test_register_with_options(RestroomResource):
     RestroomResource.return_value = "a restroom resource"
     api = API()
     api.register(Modelo, {'http_methods': ['GET', 'POST']})
-    expect(api.resources).to.equal(["a restroom resource"])
+    expect(api.resources).to.equal([api_key_resource, "a restroom resource"])
     RestroomResource.assert_called_once_with(Modelo,
                                              {'http_methods': ['GET', 'POST']})
 
