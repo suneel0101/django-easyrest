@@ -12,6 +12,31 @@ from restroom.models import APIKey
 client = Client()
 
 
+def prepare_api_key(context):
+    User.objects.all().delete()
+    APIKey.objects.all().delete()
+    user = User.objects.create_user('test_user', 'test@user.com', 'password')
+    context.password = 'password'
+    api_key = APIKey(user=user)
+    api_key.save()
+    context.user = user
+    context.api_key = api_key
+
+
+@scenario(prepare_api_key)
+def test_api_key_resource(context):
+    "APIKey GET"
+    user = context.user
+    api_key = context.api_key
+    url = reverse("restroom_apikey_list")
+    user_data = [{"username": user.username, "password": context.password}]
+    user_data = json.dumps(user_data)
+    response = client.get(url, {"q": user_data}, content_type="application/json")
+    expect(response.status_code).to.equal(OK)
+    expected_content = {"items": [{user.username: api_key.token}]}
+    expect(json.loads(response.content)).to.equal(expected_content)
+
+
 @scenario(prepare_real_model_authed)
 def test_list_endpoint_authed_get_forbidden(context):
     "GET to authed by unauthed is Forbidden"
@@ -21,12 +46,10 @@ def test_list_endpoint_authed_get_forbidden(context):
     expect(response.status_code).to.equal(FORBIDDEN)
 
 
-@scenario(prepare_real_model_authed)
+@scenario([prepare_real_model_authed, prepare_api_key])
 def test_list_endpoint_authed_get_works(context):
     "GET to authed by authed user works"
-    user = User.objects.create_user('test_user', 'test@user.com', 'password')
-    api_key = APIKey(user=user)
-    api_key.save()
+    api_key = context.api_key
     response = client.get(reverse('tests_modelauthed_list'),
                           content_type='application/json',
                           **{'RESTROOM_API_KEY': api_key.token})
@@ -40,8 +63,6 @@ def test_list_endpoint_authed_get_works(context):
                     "slug": "b-slug",
                     "awesome": False}]})
     expect(response.status_code).to.equal(OK)
-    api_key.delete()
-    user.delete()
 
 
 @scenario(prepare_real_model)
