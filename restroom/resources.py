@@ -25,8 +25,9 @@ class RestroomResource(object):
 
     def extract_fields(self, field_names):
         model_fields = self.model._meta.fields
-        get_field = lambda name: filter(lambda field: field.attname == name,
-                                         model_fields)[0]
+        get_field = lambda name: filter(
+            lambda field: field.attname == name,
+            model_fields)[0]
         if field_names:
             self.validate_fields(field_names)
             if 'id' not in field_names:
