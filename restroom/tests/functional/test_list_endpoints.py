@@ -1,12 +1,47 @@
 import json
 from sure import expect, scenario
 
-from django.test.client import Client
 from django.core.urlresolvers import reverse
-from restroom.tests.utils import prepare_real_model, prepare_real_modelb
+from django.contrib.auth.models import User
+from django.test.client import Client
+from restroom.tests.utils import prepare_real_model, prepare_real_modelb, prepare_real_model_authed
 from restroom.constants import OK, CREATED, DELETED, FORBIDDEN, BAD
+from restroom.models import APIKey
+
 
 client = Client()
+
+
+@scenario(prepare_real_model_authed)
+def test_list_endpoint_authed_get_forbidden(context):
+    "GET to authed by unauthed is Forbidden"
+    response = client.get(reverse('tests_modelauthed_list'),
+                          content_type='application/json')
+    expect(response.content).to.equal('')
+    expect(response.status_code).to.equal(FORBIDDEN)
+
+
+@scenario(prepare_real_model_authed)
+def test_list_endpoint_authed_get_works(context):
+    "GET to authed by authed user works"
+    user = User.objects.create_user('test_user', 'test@user.com', 'password')
+    api_key = APIKey(user=user)
+    api_key.save()
+    response = client.get(reverse('tests_modelauthed_list'),
+                          content_type='application/json',
+                          **{'RESTROOM_API_KEY': api_key.token})
+    expect(json.loads(response.content)).to.equal(
+        {"items": [{"id": 1,
+                    "text": "Some text",
+                    "slug": "a-slug",
+                    "awesome": True},
+                   {"id": 2,
+                    "text": "Some more text",
+                    "slug": "b-slug",
+                    "awesome": False}]})
+    expect(response.status_code).to.equal(OK)
+    api_key.delete()
+    user.delete()
 
 
 @scenario(prepare_real_model)

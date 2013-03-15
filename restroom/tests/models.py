@@ -29,3 +29,10 @@ class Modelc(models.Model):
     slug = models.SlugField(unique=True)
     awesome = models.BooleanField()
     optional_text = models.CharField(max_length=300)
+
+
+class ModelAuthed(models.Model):
+    text = models.CharField(max_length=250, blank=False)
+    slug = models.SlugField(unique=True)
+    awesome = models.BooleanField()
+    optional_text = models.CharField(max_length=300)

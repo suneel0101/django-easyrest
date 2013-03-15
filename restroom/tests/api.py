@@ -1,5 +1,5 @@
 from restroom.core import API
-from .models import Modelo, Modela, Modelb, Modelc
+from .models import Modelo, Modela, Modelb, Modelc, ModelAuthed
 
 
 api = API()
@@ -14,3 +14,6 @@ api.register(Modelb, {'fields': ['text', 'timestamp', 'slug', 'awesome'],
 
 api.register(Modelc, {'fields': ['text', 'slug', 'awesome'],
                       'http_methods': ['DELETE']})
+
+api.register(ModelAuthed,
+             {'fields': ['text', 'slug', 'awesome'], 'needs_auth': True})

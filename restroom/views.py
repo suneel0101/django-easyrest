@@ -5,6 +5,7 @@ from django.http import (
 from django.views.generic import View
 
 from .constants import OK, CREATED, DELETED, BAD
+from .utils import authenticate
 
 
 def get_status(method):
@@ -24,7 +25,8 @@ class BaseRestroomView(View):
                             mimetype='application/json')
 
     def dispatch(self, request, *args, **kwargs):
-        if request.method not in self.resource.http_methods:
+        if (self.resource.needs_auth and not authenticate(
+                request) or request.method not in self.resource.http_methods):
             return HttpResponseForbidden()
         return super(BaseRestroomView, self).dispatch(request, *args, **kwargs)
 

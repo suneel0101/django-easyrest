@@ -1,6 +1,16 @@
 import json
 import datetime
 from decimal import Decimal
+from .models import APIKey
+
+
+def authenticate(request):
+    if request.user.is_authenticated():
+        return True
+    token = request.META.get('RESTROOM_API_KEY')
+    if token:
+        return APIKey.objects.filter(token=token).exists()
+    return False
 
 
 def get_val(obj, name):
