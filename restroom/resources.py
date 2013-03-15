@@ -25,8 +25,9 @@ class RestroomResource(object):
 
     def extract_fields(self, field_names):
         model_fields = self.model._meta.fields
+        # Verbose name for FK fields
         get_field = lambda name: filter(
-            lambda field: field.attname == name,
+            lambda field: field.attname == name or field.verbose_name == name,
             model_fields)[0]
         if field_names:
             self.validate_fields(field_names)
@@ -37,7 +38,11 @@ class RestroomResource(object):
             return {field.attname: field for field in model_fields}
 
     def validate_fields(self, field_names):
-        model_field_names = map(lambda f: f.attname, self.model._meta.fields)
+        # Get all fields names by getting the attname as well as verbose name
+        # for related fields
+        model_field_names = list(
+            set(map(lambda f: f.attname, self.model._meta.fields)).union(
+                set(map(lambda f: f.verbose_name, self.model._meta.fields))))
         invalid_field_names = (set(field_names)
                                .difference(set(model_field_names)))
         if invalid_field_names:
@@ -98,7 +103,8 @@ class RestroomResource(object):
         return self.serialize(data['object']) if data.get('object') else data
 
     def serialize(self, obj):
-        return {name: get_val(obj, name) for name in self.field_map.keys()}
+        return {name: get_val(obj, name, field)
+                for name, field in self.field_map.iteritems()}
 
     def delete(self, _id):
         object_data = self.get_object_by_id(_id)

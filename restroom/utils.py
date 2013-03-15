@@ -1,6 +1,7 @@
 import json
 import datetime
 from decimal import Decimal
+from django.db import models
 from .models import APIKey
 
 
@@ -13,7 +14,7 @@ def authenticate(request):
     return False
 
 
-def get_val(obj, name):
+def get_val(obj, name, field):
     value = getattr(obj, name)
     if (isinstance(value,
                    datetime.datetime) or isinstance(value, datetime.date)):
@@ -22,6 +23,8 @@ def get_val(obj, name):
         return int(value)
     elif isinstance(value, Decimal):
         return float(value)
+    elif isinstance(value, models.Model):
+        return value.pk
     try:
         json.dumps(value)
     except TypeError:
