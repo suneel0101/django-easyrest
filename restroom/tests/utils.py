@@ -5,7 +5,9 @@ from restroom.tests.models import (
     Modelc,
     ModelAuthed,
     ModelFK,
-    ModelFKID)
+    ModelFKID,
+    ModelM2M,
+    DecimalModel)
 from django.contrib.auth.models import User
 from restroom.models import APIKey
 
@@ -152,3 +154,14 @@ def prepare_api_key(context):
     api_key.save()
     context.user = user
     context.api_key = api_key
+
+
+def prepare_real_model_m2m(context):
+    ModelM2M.objects.all().delete()
+    dec = DecimalModel.objects.create(value=123.24)
+    next_dec = DecimalModel.objects.create(value=3.14)
+    m2m = ModelM2M(text='awesome m2m')
+    m2m.save()
+    m2m.many.add(dec)
+    m2m.many.add(next_dec)
+    m2m.save()

@@ -9,7 +9,8 @@ from restroom.tests.utils import (
     prepare_real_model_authed,
     prepare_real_model_fk,
     prepare_real_model_fk_id,
-    prepare_api_key)
+    prepare_api_key,
+    prepare_real_model_m2m)
 from restroom.constants import OK, CREATED, FORBIDDEN, BAD
 from restroom.models import APIKey
 
@@ -169,6 +170,16 @@ def test_list_endpoint_get_with_foreign_key(context):
                     "awesome": False,
                     "foreign": 2}]
          })
+    expect(response.status_code).to.equal(OK)
+
+
+@scenario(prepare_real_model_m2m)
+def test_list_endpoint_get_with_m2m(context):
+    "GET to resource with m2m returns correctly serialized data"
+    response = client.get(reverse('tests_modelm2m_list'),
+                          content_type='application/json')
+    expect(json.loads(response.content)).to.equal(
+        {"items": [{"id": 1, "text": "awesome m2m"}]})
     expect(response.status_code).to.equal(OK)
 
 

@@ -58,6 +58,11 @@ class DecimalModel(models.Model):
     value = models.DecimalField(max_digits=10, decimal_places=2)
 
 
+class ModelM2M(models.Model):
+    text = models.CharField(max_length=120)
+    many = models.ManyToManyField(DecimalModel)
+
+
 # class ModelfkUser(models.Model):
 #     text = models.CharField(max_length=250, blank=False)
 #     slug = models.SlugField(unique=True)

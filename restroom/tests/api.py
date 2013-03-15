@@ -6,7 +6,8 @@ from .models import (
     Modelc,
     ModelAuthed,
     ModelFK,
-    ModelFKID)
+    ModelFKID,
+    ModelM2M)
 
 
 api = API()
@@ -28,3 +29,5 @@ api.register(ModelFKID)
 
 api.register(ModelAuthed,
              {'fields': ['text', 'slug', 'awesome'], 'needs_auth': True})
+
+api.register(ModelM2M)
