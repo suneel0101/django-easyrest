@@ -54,6 +54,10 @@ class ModelFKID(models.Model):
     foreign = models.ForeignKey('tests.modelc')
 
 
+class DecimalModel(models.Model):
+    value = models.DecimalField(max_digits=10, decimal_places=2)
+
+
 # class ModelfkUser(models.Model):
 #     text = models.CharField(max_length=250, blank=False)
 #     slug = models.SlugField(unique=True)

@@ -6,8 +6,8 @@ from .models import APIKey
 
 
 def authenticate(request):
-    if request.user.is_authenticated():
-        return True
+    # if request.user.is_authenticated():
+    #     return True
     token = request.META.get('RESTROOM_API_KEY')
     if token:
         return APIKey.objects.filter(token=token).exists()
@@ -18,13 +18,13 @@ def get_val(obj, name, field):
     value = getattr(obj, name)
     if (isinstance(value,
                    datetime.datetime) or isinstance(value, datetime.date)):
-        return value.isoformat()
+        value = value.isoformat()
     elif isinstance(value, bool):
-        return int(value)
+        value = int(value)
     elif isinstance(value, Decimal):
         return float(value)
     elif isinstance(value, models.Model):
-        return value.pk
+        value = value.pk
     try:
         json.dumps(value)
     except TypeError:
