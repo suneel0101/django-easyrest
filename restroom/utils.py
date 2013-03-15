@@ -14,7 +14,7 @@ def authenticate(request):
     return False
 
 
-def get_val(obj, name, field):
+def get_val(obj, name):
     value = getattr(obj, name)
     if (isinstance(value,
                    datetime.datetime) or isinstance(value, datetime.date)):

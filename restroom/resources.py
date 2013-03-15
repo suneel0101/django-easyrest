@@ -103,8 +103,8 @@ class RestroomResource(object):
         return self.serialize(data['object']) if data.get('object') else data
 
     def serialize(self, obj):
-        return {name: get_val(obj, name, field)
-                for name, field in self.field_map.iteritems()}
+        return {name: get_val(obj, name)
+                for name in self.field_map.keys()}
 
     def delete(self, _id):
         object_data = self.get_object_by_id(_id)

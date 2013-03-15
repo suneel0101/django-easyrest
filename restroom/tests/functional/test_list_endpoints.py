@@ -2,30 +2,19 @@ import json
 from sure import expect, scenario
 
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
 from django.test.client import Client
 from restroom.tests.utils import (
     prepare_real_model,
     prepare_real_modelb,
     prepare_real_model_authed,
     prepare_real_model_fk,
-    prepare_real_model_fk_id)
+    prepare_real_model_fk_id,
+    prepare_api_key)
 from restroom.constants import OK, CREATED, FORBIDDEN, BAD
 from restroom.models import APIKey
 
 
 client = Client()
-
-
-def prepare_api_key(context):
-    User.objects.all().delete()
-    APIKey.objects.all().delete()
-    user = User.objects.create_user('test_user', 'test@user.com', 'password')
-    context.password = 'password'
-    api_key = APIKey(user=user)
-    api_key.save()
-    context.user = user
-    context.api_key = api_key
 
 
 @scenario(prepare_api_key)

@@ -6,6 +6,8 @@ from restroom.tests.models import (
     ModelAuthed,
     ModelFK,
     ModelFKID)
+from django.contrib.auth.models import User
+from restroom.models import APIKey
 
 
 def assert_patterns_are_equal(pattern_x, pattern_y):
@@ -139,3 +141,14 @@ def prepare_real_model_fk_id(context):
         slug='b-slug',
         awesome=False,
         foreign=c2)
+
+
+def prepare_api_key(context):
+    User.objects.all().delete()
+    APIKey.objects.all().delete()
+    user = User.objects.create_user('test_user', 'test@user.com', 'password')
+    context.password = 'password'
+    api_key = APIKey(user=user)
+    api_key.save()
+    context.user = user
+    context.api_key = api_key
