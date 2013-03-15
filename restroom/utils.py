@@ -5,13 +5,19 @@ from django.db import models
 from .models import APIKey
 
 
-def authenticate(request):
+def authorize(request):
     # if request.user.is_authenticated():
     #     return True
+    user = None
     token = request.META.get('RESTROOM_API_KEY')
     if token:
-        return APIKey.objects.filter(token=token).exists()
-    return False
+        try:
+            api_key = APIKey.objects.get(token=token)
+        except APIKey.DoesNotExist:
+            pass
+        else:
+            user = api_key.user
+    return user
 
 
 def get_val(obj, name):

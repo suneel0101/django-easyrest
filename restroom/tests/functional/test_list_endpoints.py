@@ -1,8 +1,10 @@
 import json
 from sure import expect, scenario
 
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.client import Client
+from restroom.tests.models import ModelForUser
 from restroom.tests.utils import (
     prepare_real_model,
     prepare_real_modelb,
@@ -115,6 +117,36 @@ def test_list_endpoint_authed_get_forbidden(context):
                           content_type='application/json')
     expect(response.content).to.equal('')
     expect(response.status_code).to.equal(FORBIDDEN)
+
+
+@scenario(prepare_api_key)
+def test_list_endpoint_authed_only_for_user(context):
+    "GET to authed by authed user for only_for_user works"
+    ModelForUser.objects.all().delete()
+    user = User.objects.create_user('new_user', 'abc@gmail.com', '1234')
+    ModelForUser.objects.create(text='coo',
+                                slug='coo-slug',
+                                awesome=False,
+                                owner=user)
+    ModelForUser.objects.create(text='cooler',
+                                slug='cooler-slug',
+                                awesome=True,
+                                owner=context.user)
+    api_key = context.api_key
+    response = client.get(reverse('tests_modelforuser_list'),
+                          content_type='application/json',
+                          **{'RESTROOM_API_KEY': api_key.token})
+    expect(json.loads(response.content)).to.equal(
+        {"items": [{"id": 2,
+                    "text": "cooler",
+                    "optional_text": "",
+                    "slug": "cooler-slug",
+                    "owner_id": context.user.id,
+                    "awesome": True}]})
+    expect(response.status_code).to.equal(OK)
+    expect(context.user.is_superuser).to.equal(False)
+    ModelForUser.objects.all().delete()
+    user.delete()
 
 
 @scenario([prepare_real_model_authed, prepare_api_key])

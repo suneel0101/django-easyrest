@@ -5,7 +5,7 @@ from django.http import (
 from django.views.generic import View
 
 from .constants import OK, CREATED, DELETED, BAD
-from .utils import authenticate
+from .utils import authorize
 
 
 def get_status(method):
@@ -25,8 +25,12 @@ class BaseRestroomView(View):
                             mimetype='application/json')
 
     def dispatch(self, request, *args, **kwargs):
-        if (self.resource.needs_auth and not authenticate(
-                request) or request.method not in self.resource.http_methods):
+        request._user = None
+        if self.resource.needs_auth:
+            request._user = authorize(request)
+            if not request._user:
+                return HttpResponseForbidden()
+        elif request.method not in self.resource.http_methods:
             return HttpResponseForbidden()
         return super(BaseRestroomView, self).dispatch(request, *args, **kwargs)
 
@@ -34,7 +38,8 @@ class BaseRestroomView(View):
 class RestroomListView(BaseRestroomView):
     def get(self, request, *args, **kwargs):
         filters = json.loads(request.GET.get('q', '[]'))
-        return self.get_response(self.resource.retrieve(filters=filters))
+        data = self.resource.retrieve(filters=filters, user=request._user)
+        return self.get_response(data)
 
     def post(self, request, *args, **kwargs):
         try:

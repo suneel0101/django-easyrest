@@ -12,7 +12,9 @@ class RestroomResource(object):
             options.get('http_methods', ['GET']))
         self.field_map = self.extract_fields(options.get('fields', []))
         self.name = options.get('name', model._meta.db_table)
-        self.needs_auth = bool(options.get('needs_auth'))
+        self.only_for_user = options.get('only_for_user', (False, ''))
+        self.needs_auth = bool(options.get('needs_auth',
+                                           self.only_for_user[0]))
 
     def extract_http_methods(self, http_methods):
         invalid_http_methods = set(http_methods).difference(
@@ -50,7 +52,7 @@ class RestroomResource(object):
                        .format(", ".join(invalid_field_names)))
             raise RestroomValidationError(message)
 
-    def retrieve(self, filters=[]):
+    def retrieve(self, filters=[], user=None):
         qs = self.model.objects.all()
         if filters:
             try:
@@ -58,6 +60,8 @@ class RestroomResource(object):
             except RestroomValidationError as e:
                 return self.get_error_message(e)
             qs = qs.filter(**self.get_filter_dict(filters))
+        if user and self.only_for_user[0]:
+            qs = qs.filter(**{self.only_for_user[1]: user.id})
         return {
             "items": [self.serialize(obj) for obj in qs],
         }
@@ -176,7 +180,7 @@ class APIKeyResource(RestroomResource):
     def retrieve_one(self, *args, **kwargs):
         return {'error': 'Cannot retrieve API data from single item endpoint'}
 
-    def retrieve(self, filters):
+    def retrieve(self, filters, user):
         """
         With filters = [{'username': 'johndoe', 'password': '1234'},
                         {'username': 'jeremy', 'password': 'abc'}]

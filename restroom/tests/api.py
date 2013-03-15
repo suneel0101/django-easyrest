@@ -7,7 +7,8 @@ from .models import (
     ModelAuthed,
     ModelFK,
     ModelFKID,
-    ModelM2M)
+    ModelM2M,
+    ModelForUser)
 
 
 api = API()
@@ -31,3 +32,5 @@ api.register(ModelAuthed,
              {'fields': ['text', 'slug', 'awesome'], 'needs_auth': True})
 
 api.register(ModelM2M)
+
+api.register(ModelForUser, {'only_for_user': (True, 'owner')})
