@@ -83,7 +83,7 @@ class RestroomItemView(BaseRestroomView):
         return HttpResponseForbidden()
 
     def delete(self, request, _id, *args, **kwargs):
-        return self.get_response(self.resource.delete(_id))
+        return self.get_response(self.resource.delete(_id, user=request._user))
 
     def put(self, request, _id, *args, **kwargs):
         try:

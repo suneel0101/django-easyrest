@@ -61,7 +61,7 @@ class RestroomResource(object):
         if (self.only_for_user[0] and
             user.id != getattr(obj, self.only_for_user[1]).id):
             return {"error": "You do not have access to this data"}
-        return self.serialize(obj)
+        return {"object": obj}
 
     def retrieve(self, filters=[], user=None):
         qs = self.model.objects.all()
@@ -115,20 +115,26 @@ class RestroomResource(object):
     def retrieve_one(self, _id, user=None):
         data = self.get_object_by_id(_id)
         if data.get('object'):
-            return self.get_for_user(data['object'], user)
+            for_user_data = self.get_for_user(data['object'], user)
+            if not for_user_data.get("object"):
+                return for_user_data
+            else:
+                return self.serialize(for_user_data['object'])
         return data
 
     def serialize(self, obj):
         return {name: get_val(obj, name)
                 for name in self.field_map.keys()}
 
-    def delete(self, _id):
-        object_data = self.get_object_by_id(_id)
-        if object_data.get('object'):
-            object_data['object'].delete()
+    def delete(self, _id, user=None):
+        data = self.get_object_by_id(_id)
+        if data.get('object'):
+            for_user_data = self.get_for_user(data['object'], user)
+            if not for_user_data.get('object'):
+                return for_user_data
+            for_user_data["object"].delete()
             return {}
-        else:
-            return object_data
+        return data
 
     def create(self, data):
         try:

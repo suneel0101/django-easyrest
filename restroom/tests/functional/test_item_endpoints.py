@@ -85,18 +85,38 @@ def test_delete_item_endpoint_authed_only_for_user(context):
                                 awesome=True,
                                 owner=context.user)
     api_key = context.api_key
-    response = client.get(reverse('tests_modelforuser_item',
+    response = client.delete(reverse('tests_modelforuser_item',
                                   kwargs={'_id': 2}),
                           content_type='application/json',
                           **{'RESTROOM_API_KEY': api_key.token})
+    expect(response.content).to.equal('')
+    expect(response.status_code).to.equal(DELETED)
+    expect(context.user.is_superuser).to.equal(False)
+    ModelForUser.objects.all().delete()
+    user.delete()
+
+
+@scenario(prepare_api_key)
+def test_delete_item_endpoint_authed_only_for_user_doesnt_own(context):
+    "Only for user DELETE object not owned by user should fail"
+    ModelForUser.objects.all().delete()
+    user = User.objects.create_user('new_user', 'abc@gmail.com', '1234')
+    ModelForUser.objects.create(text='coo',
+                                slug='coo-slug',
+                                awesome=False,
+                                owner=user)
+    ModelForUser.objects.create(text='cooler',
+                                slug='cooler-slug',
+                                awesome=True,
+                                owner=context.user)
+    api_key = context.api_key
+    response = client.delete(reverse('tests_modelforuser_item',
+                                  kwargs={'_id': 1}),
+                          content_type='application/json',
+                          **{'RESTROOM_API_KEY': api_key.token})
     expect(json.loads(response.content)).to.equal(
-        {"id": 2,
-         "text": "cooler",
-         "slug": "cooler-slug",
-         "optional_text": "",
-         "awesome": True,
-         "owner_id": context.user.id})
-    expect(response.status_code).to.equal(OK)
+        {"error": "You do not have access to this data"})
+    expect(response.status_code).to.equal(BAD)
     expect(context.user.is_superuser).to.equal(False)
     ModelForUser.objects.all().delete()
     user.delete()
