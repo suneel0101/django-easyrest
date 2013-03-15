@@ -31,9 +31,18 @@ def test_api_key_resource(context):
     url = reverse("restroom_apikey_list")
     user_data = [{"username": user.username, "password": context.password}]
     user_data = json.dumps(user_data)
-    response = client.get(url, {"q": user_data}, content_type="application/json")
+    response = client.get(url,
+                          {"q": user_data}, content_type="application/json")
     expect(response.status_code).to.equal(OK)
-    expected_content = {"items": [{user.username: api_key.token}]}
+    expected_content = {
+        "items": [
+            {
+                "username": user.username,
+                "id": user.id,
+                "token": api_key.token,
+            }
+        ]
+    }
     expect(json.loads(response.content)).to.equal(expected_content)
 
 

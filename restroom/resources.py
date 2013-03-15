@@ -182,7 +182,8 @@ class APIKeyResource(RestroomResource):
         for auth_data in filters:
             username = auth_data.get('username')
             password = auth_data.get('password')
-            result = {username: 'could not authenticate {}'.format(username)}
+            result = {"username": username,
+                      "token": 'could not authenticate {}'.format(username)}
             if username and password:
                 user = django_authenticate(username=username,
                                            password=password)
@@ -192,7 +193,9 @@ class APIKeyResource(RestroomResource):
                     except APIKey.DoesNotExist:
                         pass
                     else:
-                        result = {username: apikey.token}
+                        result = {"username": username,
+                                  "id": user.id,
+                                  "token": apikey.token}
             results.append(result)
         return {"items": results}
 
