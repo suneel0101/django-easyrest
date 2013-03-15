@@ -18,7 +18,6 @@ def test_get_val_for_decimal():
 def test_get_val_for_model_instances(context):
     "Model instances are serialized correctly (returns the id)"
     obj = APIKey.objects.get(id=context.api_key.id)
-    field = [f for f in DecimalModel._meta.fields if f.attname == 'value'][0]
     val = get_val(obj, 'user')
     expect(val).to.equal(context.user.id)
 
