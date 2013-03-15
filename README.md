@@ -83,5 +83,3 @@ from .api import api
 ...
 urlpatterns += patterns('', url('r^api/v1/', include(api.get_urls())))
 ```
-
-```
