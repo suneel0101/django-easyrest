@@ -159,3 +159,73 @@ HTTP 200
     "timestamp": "2013-03-15T20:56:13.652681"
 }
 ```
+
+If you try to GET for an id that does not correspond to any `EmailRecord`, for example `GET /api/emailer_emailrecord/5/`, you will get:
+```
+HTTP 400
+{
+    "error": "No result found matching id: 5"
+}
+```
+
+
+### DELETE /api/emailer_emailrecord/{int: id}
+Deletes `EmailRecord` with `id: 1`, so `GET /api/emailer_emailrecord/1/` would return the following:
+
+```
+HTTP 204 No Content
+```
+
+If you try to DELETE for an id that does not correspond to any `EmailRecord`, for example `GET /api/emailer_emailrecord/5/`, you will get:
+```
+HTTP 400
+{
+    "error": "No result found matching id: 5"
+}
+```
+
+### POST /api/emailer_emailrecord/
+Creates a new `EmailRecord` with from the JSON POST data.
+
+Here is an example request:
+
+```
+POST /api/emailer_emailrecord/
+{
+    "data": {
+        "body": "New email body"
+        "timestamp": "2013-01-01T12:00:00",
+    }
+}
+```
+
+Here would be the response:
+
+```
+HTTP 201
+{
+    "id": 3,
+    "body": "New email body"
+    "timestamp": "2013-01-01T12:00:00",
+}
+```
+
+If you send in the data dictionary any fields that are not on the model, or if the the data that you are creating is not valid by some database constraints, column uniqueness for example, then you will get a 400 error with an error JSON message.
+
+For example,
+```
+POST /api/emailer_emailrecord/
+{
+    "data": {
+        "crazybody": "blahblahblah"
+        "timestamp": "2013-01-01T12:00:00",
+    }
+}
+```
+
+```
+HTTP 400
+{
+    "error": "Cannot resolves the following field names: crazybody"
+}
+```
