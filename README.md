@@ -81,26 +81,50 @@ Follow the above recommended pattern models. Then your main urls.py
 ```python
 from .api import api
 ...
-urlpatterns += patterns('', url('r^api/v1/', include(api.get_urls())))
+urlpatterns += patterns('', url('r^api/', include(api.get_urls())))
 ```
 
 ## 3. REST endpoints are created automatically
 Suppose you have registered the model `EmailRecord` from the app `emailer` with `http_methods=['GET', 'POST', 'DELETE', 'PUT']` and the `fields=['user', 'timestamp', 'body']`.
-Then you have included the urls under the prefix `/api/v1/` as above.
+Then you have included the urls under the prefix `/api/` as above.
 
 
 Then these are the REST endpoints you can request:
 
-### /api/v1/emailer_emailrecord/
+### /api/emailer_emailrecord/
 * This is a list resource.
 * GET will return a list of results which match the query.
 * PUT will modify all results that match the query.
 * POST will create a new object.
 * DELETE is always forbidden.
 
-### /api/v1/emailer_emailrecord/{int: id}/
+### /api/emailer_emailrecord/{int: id}/
 * This is an item resource.
 * GET will return the object with that id.
 * PUT will modify the object.
 * DELETE will delete the object.
 * POST is always forbidden.
+
+## 4. Format of Requests and Responses
+
+### GET /api/emailer_emailrecord/
+Responds with a list of all `EmailRecord` objects, for example:
+
+```
+HTTP 200
+{
+    "items": [
+        {"id": 1,
+         "body": "Dear sir, will you sign up for my site?",
+         "timestamp": "2013-03-15T20:56:13.652681"},
+        {"id": 2,
+         "body": "Dear miss, will you sign up for my site?",
+         "timestamp": "2013-03-16T20:33:19.952455"},
+        {"id": 3,
+         "body": "Dear friend, will you sign up for my site?",
+         "timestamp": "2013-03-18T16:14:21.322591"}
+    ]  
+}
+
+```
+
