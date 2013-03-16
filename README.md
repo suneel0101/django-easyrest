@@ -128,3 +128,23 @@ HTTP 200
 
 ```
 
+### GET /api/emailer_emailrecord/?q={{ query }}
+Responds with a list of all `EmailRecord` objects that fit the query parameters. See the Querying API for more information.
+
+`GET /api/emailer_emailrecord/?q=[{"field": "id", "operator": "in", value": [1,3]}]` would return the following:
+
+```
+HTTP 200
+{
+    "items": [
+        {"id": 1,
+         "body": "Dear sir, will you sign up for my site?",
+         "timestamp": "2013-03-15T20:56:13.652681"},
+        {"id": 3,
+         "body": "Dear friend, will you sign up for my site?",
+         "timestamp": "2013-03-18T16:14:21.322591"}
+    ]  
+}
+
+```
+
