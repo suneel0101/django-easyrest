@@ -229,3 +229,9 @@ HTTP 400
     "error": "Cannot resolves the following field names: crazybody"
 }
 ```
+
+## 5. Querying API
+## 6. Authentication
+## 7. Restricting resources by user
+## 8. Data Serialization
+## 9. Pagination
