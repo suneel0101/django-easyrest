@@ -148,3 +148,14 @@ HTTP 200
 
 ```
 
+### GET /api/emailer_emailrecord/{int: id}
+Returns `EmailRecord` with `id: 1`, so `GET /api/emailer_emailrecord/1/` would return the following:
+
+```
+HTTP 200
+{
+    "id": 1,
+    "body": "Dear sir, will you sign up for my site?",
+    "timestamp": "2013-03-15T20:56:13.652681"
+}
+```
