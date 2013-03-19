@@ -19,7 +19,7 @@
 from setuptools import setup
 
 setup(name='django-restroom',
-      version='0.0.1',
+      version='0.0.2',
       description='Super lightweight REST API framework for Django',
       author='Suneel Chakravorty',
       author_email='suneel0101@gmail.com.com',
