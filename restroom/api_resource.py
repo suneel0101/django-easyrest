@@ -2,7 +2,6 @@ class APIResource(object):
     model = None
     results_per_page = None
     filter_by_user_path = None
-
     needs_authentication = False
 
     def serialize(self, instance):
