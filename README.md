@@ -63,6 +63,8 @@ You only need to specify 3 things when subclassing APIResource:
     * Then register your resource: `api.register(MyResource)`
     * Then include `api.get_urls` in your urlconf
 
+Note that because you are registering resources with an instance of `easyrest.API`, you can conceivably have many different API instances with different resources. EasyRest is flexible in how you use it.
+
 ## Format of Requests and Responses
 Let's use the example of ItemResource above.
 The urls generated are:
