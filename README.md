@@ -4,12 +4,11 @@
 EasyRest is a lightweight framework (less than 160 lines of code!) that allows you to really quickly and flexibly create a READ-ONLY REST API for your models.
 
 ## Why would I want to use EasyRest?
-If you're building a front-end heavy website that uses Backbone or similar:
-    * All you need in the backend is a REST API to read from.
-    * With EasyRest makes this ridiculously simple.
+If you're building a front-end heavy website that uses Backbone or similar, all you need in the backend is a REST API to read from. EasyRest makes this ridiculously simple.
 
 If you need a simple and extensible read-only API for your existing product:
-    * you do the same thing.
+
+    * Use EasyRest to generate the API in just 3 simple steps.
     * EasyRest has a really simple built-in authentication system so you can give out API keys to your API consumers and you're all ready to go.
     * You can also plug in your custom API authentication system easily
 
@@ -18,7 +17,7 @@ In exchange for full-featuredness, those other frameworks are hard to setup and 
 EasyRest is really simple to use and even simpler to extend.
 
 ## What features do I get with EasyRest?
-EasyRest is meant to be a straightforward read-only api for the most common use cases. So it supports,
+EasyRest is meant to be simple and cover the most common use cases. So it supports,
 * pagination
 * authentication
 * restricting by requesting user
