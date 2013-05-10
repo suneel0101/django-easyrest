@@ -4,23 +4,14 @@ from django.http import (
     HttpResponseForbidden)
 from django.views.generic import View
 
-from .constants import OK, CREATED, DELETED, BAD
-from .utils import authorize
-
-
-def get_status(method):
-    if method in ['POST', 'PUT']:
-        return CREATED
-    elif method == 'DELETE':
-        return DELETED
-    return OK
+from .constants import OK, BAD
 
 
 class BaseRestroomView(View):
     resource = None
 
     def get_response(self, data):
-        status = BAD if 'error' in data else get_status(self.request.method)
+        status = BAD if 'error' in data else OK
         return HttpResponse(json.dumps(data), status=status,
                             mimetype='application/json')
 
@@ -28,8 +19,8 @@ class BaseRestroomView(View):
         if request.method != 'GET':
             return HttpResponseForbidden()
         request._user = None
-        if self.resource.needs_auth:
-            request._user = authorize(request)
+        if self.resource.needs_authentication:
+            request._user = self.resource.authorize(request)
             if not request._user:
                 return HttpResponseForbidden()
         return super(BaseRestroomView, self).dispatch(request, *args, **kwargs)
@@ -37,12 +28,9 @@ class BaseRestroomView(View):
 
 class RestroomListView(BaseRestroomView):
     def get(self, request, *args, **kwargs):
-        filters = json.loads(request.GET.get('q', '[]'))
-        data = self.resource.retrieve(filters=filters, user=request._user)
-        return self.get_response(data)
+        return self.get_response(self.resource.get_list(user=request._user))
 
 
 class RestroomItemView(BaseRestroomView):
     def get(self, request, _id, *args, **kwargs):
-        data = self.resource.retrieve_one(_id, user=request._user)
-        return self.get_response(data)
+        return self.get_response(self.resource.get_one(_id, request._user))

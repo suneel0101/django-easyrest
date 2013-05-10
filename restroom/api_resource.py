@@ -7,6 +7,9 @@ class APIResource(object):
     def serialize(self, instance):
         raise NotImplementedError
 
+    def authorize(self, request):
+        pass
+
     def get_queryset(self):
         return self.model.objects.all()
 
@@ -15,13 +18,13 @@ class APIResource(object):
             qs = qs.filter(**{self.filter_by_user_field: user.id})
         return qs
 
-    def retrieve(self, user=None):
+    def get_list(self, user=None):
         qs = self.filter_for_user(self.get_queryset(), user)
         return {
             "items": [self.serialize(obj) for obj in qs.iterator()],
         }
 
-    def retrieve_one(self, _id, user=None):
+    def get_one(self, _id, user=None):
         # Try to find the object
         try:
             item = self.model.objects.get(id=_id)

@@ -36,5 +36,8 @@ class ExpenseResource(APIResource):
    def get_queryset(self):
        return Expense.objects.filter(status__gte=9, is_active=True)
 
+   def authorize(self, request):
+       pass
+
 api.register(Expense)
 
