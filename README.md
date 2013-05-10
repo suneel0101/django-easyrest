@@ -205,4 +205,6 @@ If you want to use your own way of authenticating, just write your own `authoriz
 If someone tries to access a resource without authorization, they will get a 403 Forbidden response.
 
 ## Restricting by User
+## How to Extend EasyRest
+## How to Hack on EasyRest
 ## Roadmap
