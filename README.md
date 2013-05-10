@@ -15,7 +15,7 @@ EasyRest is really simple to use and even simpler to extend.
 EasyRest is meant to be simple and cover the most common use cases. So it supports,
 * pagination
 * authentication
-* restricting by requesting user
+* restricting by owner
 * search
 
 ## How do I install it?
