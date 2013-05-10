@@ -18,9 +18,7 @@ class APIResource(object):
 
     def get_list(self, user=None):
         qs = self.filter_for_user(self.get_queryset(), user)
-        return {
-            "items": [self.serialize(obj) for obj in qs.iterator()],
-        }
+        return {"items": [self.serialize(obj) for obj in qs.iterator()]}
 
     def get_one(self, _id, user=None):
         # Try to find the object
