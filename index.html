@@ -4,7 +4,7 @@
   <head>
     <meta charset='utf-8' />
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Django-restroom : A super lightweight django REST api framework" />
+    <meta name="description" content="Django-restroom : super lightweight django read-only REST api framework" />
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
@@ -19,7 +19,7 @@
           <a id="forkme_banner" href="https://github.com/suneel0101/django-restroom">View on GitHub</a>
 
           <h1 id="project_title">Django-restroom</h1>
-          <h2 id="project_tagline">A super lightweight django REST api framework</h2>
+          <h2 id="project_tagline">super lightweight django read-only REST api framework</h2>
 
             <section id="downloads">
               <a class="zip_download_link" href="https://github.com/suneel0101/django-restroom/zipball/master">Download this project as a .zip file</a>
@@ -32,8 +32,6 @@
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
         <h1>Django-EasyRest</h1>
-
-<h2>What is EasyRest?</h2>
 
 <p>EasyRest is a lightweight framework (less than 160 lines of code!) that allows you to really quickly and flexibly create a READ-ONLY REST API for your models.</p>
 
@@ -101,16 +99,25 @@ urlpatterns = patterns('', url(r'^api/', include(api.get_urls())))
 <code>name</code>: this is the name of resource in the url: '/api/{{ name }}/'. If you don't set it, it will fallback to the Model.meta.db_table</li>
 <li>
 <code>serialize</code> method: returns a serialized version of an instance of your Model, however you want it to. You can reference properties and whatever else. You're not just limited to the model fields.</li>
-</ol><h3>You can also specify the <code>get_queryset</code> method</h3>
+</ol><p>You can also specify the <code>get_queryset</code> method, which will return the base queryset that will be used in the item-list endpoint as well as the search endpoint.
+So if you wanted to have the queryset ordered by <code>id</code> descending and <code>status &gt; 7</code>, you would add to the above <code>ItemResource</code> the following method:</p>
+
+<div class="highlight"><pre>    <span class="k">def</span> <span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Item</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">status__gt</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">'-id'</span><span class="p">)</span>
+</pre></div>
+
+<p>Use this method to customize the set of results you want returned any way you like.
+For example, you can do preprocessing as we did above with the <code>status</code> as well as specify an ordering.</p>
 
 <h2>Registering your resource to the api</h2>
 
-<pre><code>* Create an instance of `easyrest.API`
-* Then register your resource: `api.register(MyResource)`
-* Then include `api.get_urls` in your urlconf
-</code></pre>
-
-<p>Note that because you are registering resources with an instance of <code>easyrest.API</code>, you can conceivably have many different API instances with different resources. EasyRest is flexible in how you use it.</p>
+<ul>
+<li>Create an instance of <code>easyrest.API</code>
+</li>
+<li>Then register your resource: <code>api.register(MyResource)</code>
+</li>
+<li>Then include <code>api.get_urls</code> in your urlconf</li>
+</ul><p>Note that because you are registering resources with an instance of <code>easyrest.API</code>, you can conceivably have many different API instances with different resources. EasyRest is flexible in how you use it.</p>
 
 <h2>Format of Requests and Responses</h2>
 
@@ -367,9 +374,33 @@ In that case, you should subclass APIResource and define the <code>authorize</co
 
 <h2>How to Extend EasyRest</h2>
 
+<p>You may have custom needs for your api. Here's some advice on how to extend EasyRest to meet those needs.</p>
+
+<ul>
+<li>If you want to modify what the URLs look like, you should subclass <code>easyrest.API</code> and use that subclass as your API.</li>
+<li>If you want to modify how results are retrieved, subclass <code>APIResource</code> and modify the <code>get_list</code> and <code>get_one</code> methods</li>
+<li>If you want to add POST, CREATE or UPDATE funcionality, subclass the views and use those views in your <code>get_urls</code> method (to do that would have to subclass API, as mentioned above). In addition, you'll probably want to add methods to <code>APIResource</code> to deal with those CRUD operations.</li>
+<li>If you want to plug in a different authentication/authorization scheme, define the <code>authorize</code> method of the APIResource.</li>
+</ul><p>These are just a few guidelines. If you modify it in other cool ways, please let me know, I'd be excited to learn!</p>
+
+<p>The <em>main point</em> is that since there are only 160 lines of code, you can see the inner workings of this library really easily and feel free to bend it to your will!</p>
+
 <h2>How to Hack on EasyRest</h2>
 
+<ol>
+<li>git clone this repo</li>
+<li>create a virtualenv and install the requirements via <code>pip install -r requirements.txt</code>
+</li>
+<li>under /tests, run <code>python manage.py syncdb</code>
+</li>
+<li>to run the tests, in the root directory run <code>make test</code>
+</li>
+</ol><p>Happy hacking!</p>
+
 <h2>Roadmap</h2>
+
+<p>I'm thinking about whether to support the other CRUD operations.
+If you have any suggestions, please let me know.</p>
       </section>
     </div>
 
