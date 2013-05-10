@@ -28,9 +28,8 @@ class APIResource(object):
             return {'error': 'No result matches id: {}'.format(_id)}
 
         # Make sure user is authorized for to see this item
-        if (self.filter_by_user_field and
-            not (self.get_queryset()
-                 .filter_by_user(user)
+        if (self.user_path and
+            not (self.filter_by_user(self.get_queryset(), user)
                  .filter(pk=_id)
                  .exists())):
             return {"error": "You do not have access to this data"}
