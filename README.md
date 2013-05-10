@@ -155,7 +155,9 @@ from resteasy.auth import get_user_from_GET_param
 
 class MyAuthenticatedResource(APIResource):
     """
-    I subclass APIResource to implement the authorize method.
+    I subclass APIResource and implement the authorize method.
+    Many of my resources will require this authorization, so they
+    will inherit from this class.
     """
     def authorize(self, request):
         """
