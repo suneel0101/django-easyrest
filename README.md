@@ -193,10 +193,9 @@ An example request would be `GET /api/authorized_item/?apikey=kjhsdf3`
 ### Authorization helper methods
 In easyrest.auth, there are three really useful helper methods:
 
-
-    * `get_user_from_GET_param(request, param_name)`: extracts API key from the request GET parameter `param_name` and returns the user who owns that API key.
-    * `get_user_from_from_request_header`: does the same but from the request header
-    * `get_user_from_request`: returns `request.user` if the user is authenticated
+1. `get_user_from_GET_param(request, param_name)`: extracts API key from the request GET parameter `param_name` and returns the user who owns that API key.
+2. `get_user_from_from_request_header`: does the same but from the request header
+3. `get_user_from_request`: returns `request.user` if the user is authenticated
 
 These are by no means exhaustive, but they do cover a lot of the ways in which you'll want you're API consumers to authenticate.
 
