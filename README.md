@@ -7,7 +7,7 @@ EasyRest is a lightweight framework (less than 160 lines of code!) that allows y
 * You need a simple read-only REST API for your Backbone/similar app
 * You need a read-only API for others to consume. Did you know EasyRest has a simple and extensible authentication system?
 
-## What's the advantage of using EasyRest over Django-Rest, Tastypie, etc?
+## Wy use EasyRest insetad of Django-Rest, Tastypie, etc?
 In exchange for full-featuredness, those other frameworks are hard to setup and use.
 EasyRest is really simple to use and even simpler to extend.
 
