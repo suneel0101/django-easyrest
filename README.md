@@ -188,6 +188,8 @@ class AuthorizedItemResource(AuthorizedAPIResource):
         }
 ```
 
+An example request would be `GET /api/authorized_item/?apikey=kjhsdf3`
+
 ### Authorization helper methods
 In easyrest.auth, there are three really useful helper methods:
 
