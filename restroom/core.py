@@ -7,7 +7,7 @@ class API(object):
         self.resources = []
 
     def register(self, resource):
-        self.resources.append(resource)
+        self.resources.append(resource())
 
     def get_urls(self):
         urls = []

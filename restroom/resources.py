@@ -3,6 +3,7 @@ class APIResource(object):
     results_per_page = None
     user_path = None
     needs_authentication = False
+    name = None
 
     def serialize(self, instance):
         raise NotImplementedError
@@ -13,10 +14,10 @@ class APIResource(object):
     def get_queryset(self):
         return self.model.objects.all()
 
-    def get_list(self, user=None, page=0):
+    def get_list(self, user=None, page=1):
         qs = self.get_queryset()
         qs = self.filter_by_user(qs, user) if (user and self.user_path) else qs
-        qs = self.paginate(qs, page)
+        qs = self.paginate(qs, int(page))
         return {"items": [self.serialize(obj) for obj in qs.iterator()]}
 
     def get_one(self, _id, user=None):
@@ -36,11 +37,15 @@ class APIResource(object):
         return self.serialize(item)
 
     def paginate(self, qs, page):
-        if not self.results_per_page:
+        if self.results_per_page is None:
             return qs
-        start = page * self.results_per_page
-        finish = (page + 1) * self.results_per_page
+        start = (page - 1) * self.results_per_page
+        finish = page * self.results_per_page
         return qs[start:finish]
 
     def filter_by_user(self, qs, user):
         return qs.filter(**{self.user_path: user.id})
+
+    @property
+    def _name(self):
+        return self.name or self.model.meta.db_table
