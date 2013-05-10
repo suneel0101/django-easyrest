@@ -59,6 +59,53 @@ You only need to specify 3 things when subclassing APIResource:
 3. `serialize` method: returns a serialized version of an instance of your Model, however you want it to. You can reference properties and whatever else. You're not just limited to the model fields.
 
 ## Format of Requests and Responses
+Let's use the example of ItemResource above.
+The urls generated are:
+    * /api/item/ - This returns a list of Items
+    * /api/item/{int: id}/ - This returns a single serialized Item with the specified id
+
+### GET to the Item list endpoint
+```
+GET /api/item/ 200
+
+{
+   "items": [
+       {
+           "id": 1,
+           "name": "Louis CK"
+           "text": "I'm a hilarious comedian",
+           "popularity": 99,
+       },
+       {
+           "id": 2,
+           "name": "Joffrey Lannister",
+           "text": "I'm troubled.",
+           "popularity": 2,
+       }
+    ]
+}
+```
+
+### GET to the Item single-item endpoint
+```
+GET /api/item/1/ 200
+
+{
+    "id": 1,
+    "name": "Louis CK"
+    "text": "I'm a hilarious comedian",
+    "popularity": 99,
+}
+```
+
+### GET to the Item single-item endpoint for a nonexistent item
+```
+GET /api/item/9998/ 400
+
+{
+    "error": "No result found matching id: 9998"
+}
+```
 
 ## Pagination
 If you want to paginate the results, you just need to set `results_per_page`. Here's an example:
