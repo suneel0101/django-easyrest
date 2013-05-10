@@ -1,3 +1,6 @@
+from .utils import authorize
+
+
 class APIResource(object):
     model = None
     results_per_page = None
@@ -8,7 +11,7 @@ class APIResource(object):
         raise NotImplementedError
 
     def authorize(self, request):
-        pass
+        return authorize(request)
 
     def get_queryset(self):
         return self.model.objects.all()
