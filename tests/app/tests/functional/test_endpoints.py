@@ -1,5 +1,5 @@
 import json
-from sure import expect
+from sure import expect, scenario
 
 from django.core.urlresolvers import reverse
 from django.test.client import Client
@@ -9,7 +9,7 @@ from app.models import Item
 client = Client()
 
 
-def test_get_list():
+def create_items(context):
     # Delete all items
     Item.objects.all().delete()
     # Create 30 items
@@ -20,6 +20,9 @@ def test_get_list():
             is_active=x % 2,
             status=x)
 
+
+@scenario(create_items)
+def test_get_list(context):
     response = client.get(reverse('item_list'),
                           content_type='application/json')
 
@@ -34,17 +37,8 @@ def test_get_list():
     expect(response.status_code).to.equal(200)
 
 
-def test_get_list_reverse_order():
-    # Delete all items
-    Item.objects.all().delete()
-    # Create 30 items
-    for x in range(30):
-        Item.objects.create(
-            name="my name is {}".format(x),
-            text="my text is {}".format(x),
-            is_active=x % 2,
-            status=x)
-
+@scenario(create_items)
+def test_get_list_reverse_order(context):
     response = client.get(reverse('reverse_order_item_list'),
                           content_type='application/json')
 
@@ -59,17 +53,8 @@ def test_get_list_reverse_order():
     expect(response.status_code).to.equal(200)
 
 
-def test_get_list_paginated():
-    # Delete all items
-    Item.objects.all().delete()
-    # Create 30 items
-    for x in range(30):
-        Item.objects.create(
-            name="my name is {}".format(x),
-            text="my text is {}".format(x),
-            is_active=x % 2,
-            status=x)
-
+@scenario(create_items)
+def test_get_list_paginated(context):
     response = client.get(reverse('paginated_item_list'),
                           content_type='application/json')
 
