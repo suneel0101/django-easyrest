@@ -204,7 +204,64 @@ If you want to use your own way of authenticating, just write your own `authoriz
 ### What happens if an unauthorized person tries to access a protected resource?
 If someone tries to access a resource without authorization, they will get a 403 Forbidden response.
 
-## Restricting by User
+## Restricting by Owner
+A lot of the time, we want our API consumers to only access the results that they own.
+
+Imagine an API you can use to get all your Bank Transactions. You want some way of limiting the API user to only retrieving their own bank transactions, so they don't have access to everyone's bank transactions.
+
+To achieve this, you just need to do 1 thing in addition to setting up Authentication as above.
+### Set `restrict_by_user`
+When you declare your resource, you should set `restrict_by_owner` equal to the field path to the User field corresponding to the owner, the same path you would use through the Django Queryset API.
+
+If your UserItem is linked to a User through the field "user", for example:
+```python
+class UserItem(models.Model):
+    name = models.CharField(max_length=250)
+    user = models.ForeignKey('auth.User')
+    is_active = models.BooleanField(default=False)
+```
+You should set `restrict_by_user="user"` as follows:
+```python
+class AuthorizedItemResourceByUser(MyAuthenticatedResource):
+    model = UserItem
+    name = 'restrict_user_authorized_item'
+    needs_authentication = True
+    restrict_by_user = 'user'
+
+    def serialize(self, item):
+        return {
+            'name': item.name,
+            'id': item.id,
+            'user_id': item.user.id,
+        }
+
+#### A more complicated example
+```python
+class Profile(models.Model):
+    owner = models.ForeignKeyField('auth.User')
+
+class UserItem(models.Model):
+    name = models.CharField(max_length=250)
+    profile = models.ForeignKeyField(Profile)
+    is_active = models.BooleanField(default=False)
+```
+
+You should set `restrict_by_user="profile__user"` as follows:
+```python
+class AuthorizedItemResourceByUser(MyAuthenticatedResource):
+    model = UserItem
+    name = 'restrict_user_authorized_item'
+    needs_authentication = True
+    restrict_by_user = 'profile__user'
+
+    def serialize(self, item):
+        return {
+            'name': item.name,
+            'id': item.id,
+            'user_id': item.user.id,
+        }
+```
+
 ## How to Extend EasyRest
 ## How to Hack on EasyRest
 ## Roadmap
