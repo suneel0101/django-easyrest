@@ -174,6 +174,7 @@ class SearchableItemResource(APIResource):
         if get_params.get("contains"):
             filter_kwargs["text__icontains"] = get_params["contains"]
         return self.get_queryset().filter(**filter_kwargs)
+```
 
 The important thing here is you can plug in whatever search system you want. You're not even tied to SQL or the Django ORM. You can use ElasticSearch or whatever backend makes sense for your use case. You just have to define the `search` method that takes a dictionary of request GET params.
 
