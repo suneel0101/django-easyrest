@@ -139,13 +139,15 @@ EasyRest Authentication is really easy to use and extend, as you'll see below.
 ### Define an authorization scheme
 Decide whether you want your API consumer to pass in an API key through the request GET parameters or the headers or whatever else.
 
-## Define an `authorize` method for your resource
+### Set `needs_authentication = True` in your resource declaration
+
+### Define an `authorize` method for your resource
 Often you may want the same authorization method for many of your resources.
 In that case, you should subclass APIResource and define the `authorize` method, let's call it AuthorizedAPIResource.
 
 Then, all of your model resources can subclass AuthorizedAPIResource.
 
-Here's an example:
+### Here's an example:
 
 ```python
 from resteasy.resources import APIResource
@@ -185,6 +187,9 @@ In easyrest.auth, there are three really useful helper methods:
 These are by no means exhaustive, but they do cover a lot of the ways in which you'll want you're API consumers to authenticate.
 
 If you want to use your own way of authenticating, just write your own `authorize` method, and you're good.
+
+### What happens if an unauthorized person tries to access a protected resource?
+If someone tries to access a resource without authorization, they will get a 403 Forbidden response.
 
 ## Restricting by User
 ## Roadmap
