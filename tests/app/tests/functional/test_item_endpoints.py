@@ -141,3 +141,9 @@ def test_get_item_filter_by_user_without_access():
         "error": "You do not have access to this data"}
     expect(json.loads(response.content)).to.equal(expected_response_content)
     expect(response.status_code).to.equal(400)
+
+
+def test_get_item_with_non_GET_method():
+    response = client.post(reverse('item_item', kwargs={"_id": 1}),
+                          content_type='application/json')
+    expect(response.status_code).to.equal(403)
