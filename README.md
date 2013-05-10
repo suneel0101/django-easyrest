@@ -317,5 +317,26 @@ class AuthorizedItemResourceByUser(MyAuthenticatedResource):
 ```
 
 ## How to Extend EasyRest
+You may have custom needs for your api. Here's some advice on how to extend EasyRest to meet those needs.
+
+* If you want to modify what the URLs look like, you should subclass `easyrest.API` and use that subclass as your API.
+* If you want to modify how results are retrieved, subclass `APIResource` and modify the `get_list` and `get_one` methods
+* If you want to add POST, CREATE or UPDATE funcionality, subclass the views and use those views in your `get_urls` method (to do that would have to subclass API, as mentioned above). In addition, you'll probably want to add methods to `APIResource` to deal with those CRUD operations.
+* If you want to plug in a different authentication/authorization scheme, define the `authorize` method of the APIResource.
+
+These are just a few guidelines. If you modify it in other cool ways, please let me know, I'd be excited to learn!
+
+The *main point* is that since there are only 160 lines of code, you can see the inner workings of this library really easily and feel free to bend it to your will!
+
 ## How to Hack on EasyRest
+1. git clone this repo
+2. create a virtualenv and install the requirements via `pip install -r requirements.txt`
+3. under /tests, run `python manage.py syncdb`
+4. to run the tests, in the root directory run `make test`
+
+Happy hacking!
+
+
 ## Roadmap
+I'm thinking about whether to support the other CRUD operations.
+If you have any suggestions, please let me know.
