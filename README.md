@@ -211,7 +211,7 @@ Imagine an API you can use to get all your Bank Transactions. You want some way 
 
 To achieve this, you just need to do 1 thing in addition to setting up Authentication as above.
 ### Set `restrict_by_user`
-When you declare your resource, you should set `restrict_by_owner` equal to the field path to the User field corresponding to the owner, the same path you would use through the Django Queryset API.
+When you declare your resource, you should set `restrict_by_user` equal to the field path to the User field corresponding to the owner, the same path you would use through the Django Queryset API.
 
 If your UserItem is linked to a User through the field "user", for example:
 ```python
@@ -234,8 +234,10 @@ class AuthorizedItemResourceByUser(MyAuthenticatedResource):
             'id': item.id,
             'user_id': item.user.id,
         }
+```
 
 #### A more complicated example
+
 ```python
 class Profile(models.Model):
     owner = models.ForeignKeyField('auth.User')
