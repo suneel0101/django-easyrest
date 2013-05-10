@@ -59,6 +59,7 @@ You only need to specify 3 things when subclassing APIResource:
 3. `serialize` method: returns a serialized version of an instance of your Model, however you want it to. You can reference properties and whatever else. You're not just limited to the model fields.
 
 ## Registering your resource to the api
+
     * Create an instance of `easyrest.API`
     * Then register your resource: `api.register(MyResource)`
     * Then include `api.get_urls` in your urlconf
