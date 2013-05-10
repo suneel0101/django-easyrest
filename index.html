@@ -42,7 +42,7 @@
 <ul>
 <li>You need a simple read-only REST API for your Backbone/similar app</li>
 <li>You need a read-only API for others to consume. Did you know EasyRest has a simple and extensible authentication system?</li>
-</ul><h2>Wy use EasyRest insetad of Django-Rest, Tastypie, etc?</h2>
+</ul><h2>What about those other frameworks?</h2>
 
 <p>In exchange for full-featuredness, those other frameworks are hard to setup and use.
 EasyRest is really simple to use and even simpler to extend.</p>
@@ -54,7 +54,7 @@ EasyRest is really simple to use and even simpler to extend.</p>
 <ul>
 <li>pagination</li>
 <li>authentication</li>
-<li>restricting by requesting user</li>
+<li>restricting by owner</li>
 <li>search</li>
 </ul><h2>How do I install it?</h2>
 
@@ -101,7 +101,66 @@ urlpatterns = patterns('', url(r'^api/', include(api.get_urls())))
 <code>name</code>: this is the name of resource in the url: '/api/{{ name }}/'. If you don't set it, it will fallback to the Model.meta.db_table</li>
 <li>
 <code>serialize</code> method: returns a serialized version of an instance of your Model, however you want it to. You can reference properties and whatever else. You're not just limited to the model fields.</li>
-</ol><h2>Format of Requests and Responses</h2>
+</ol><h3>You can also specify the <code>get_queryset</code> method</h3>
+
+<h2>Registering your resource to the api</h2>
+
+<pre><code>* Create an instance of `easyrest.API`
+* Then register your resource: `api.register(MyResource)`
+* Then include `api.get_urls` in your urlconf
+</code></pre>
+
+<p>Note that because you are registering resources with an instance of <code>easyrest.API</code>, you can conceivably have many different API instances with different resources. EasyRest is flexible in how you use it.</p>
+
+<h2>Format of Requests and Responses</h2>
+
+<p>Let's use the example of ItemResource above.
+The urls generated are:
+    * /api/item/ - This returns a list of Items
+    * /api/item/{int: id}/ - This returns a single serialized Item with the specified id</p>
+
+<h3>GET to the Item list endpoint</h3>
+
+<pre><code>GET /api/item/ 200
+
+{
+   "items": [
+       {
+           "id": 1,
+           "name": "Louis CK"
+           "text": "I'm a hilarious comedian",
+           "popularity": 99,
+       },
+       {
+           "id": 2,
+           "name": "Joffrey Lannister",
+           "text": "I'm troubled.",
+           "popularity": 2,
+       }
+    ]
+}
+</code></pre>
+
+<h3>GET to the Item single-item endpoint</h3>
+
+<pre><code>GET /api/item/1/ 200
+
+{
+    "id": 1,
+    "name": "Louis CK"
+    "text": "I'm a hilarious comedian",
+    "popularity": 99,
+}
+</code></pre>
+
+<h3>GET to the Item single-item endpoint for a nonexistent item</h3>
+
+<pre><code>GET /api/item/9998/ 400
+
+{
+    "error": "No result found matching id: 9998"
+}
+</code></pre>
 
 <h2>Pagination</h2>
 
@@ -122,11 +181,193 @@ urlpatterns = patterns('', url(r'^api/', include(api.get_urls())))
 
 <p>If you don't set <code>results_per_page</code>, all of the items will be returned at once.</p>
 
+<h3>How do I request a paginated resource?</h3>
+
+<p>Simple.</p>
+
+<pre><code>GET /api/item/?page=2
+</code></pre>
+
 <h2>Search</h2>
+
+<p>Sometimes you might want to allow your API user to search for a result set rather than just listing the results in a certain order.
+The way to set this up in EasyRest is intentionally very barebones so you can extend it and implement the search you want for your resource, no matter how simple or complicated.</p>
+
+<h3>Define the <code>search</code> method</h3>
+
+<pre><code>class SearchableItemResource(APIResource):
+    model = Item
+    name = 'searchable_item'
+    results_per_page = 20
+
+    def serialize(self, item):
+        return {
+            'id': item.id,
+            'text': item.text,
+            'popularity': item.popularity,
+        }
+
+    def search(self, get_params):
+        """
+        Some custom search logic.
+        You always have access to the request.GET params
+        through `get_params`
+        """
+        filter_kwargs = {}
+        if get_params.get("popular"):
+            filter_kwargs["popularity__gte"] = 9
+
+        if get_params.get("contains"):
+            filter_kwargs["text__icontains"] = get_params["contains"]
+        return self.get_queryset().filter(**filter_kwargs)
+</code></pre>
+
+<p>The important thing here is you can plug in whatever search system you want. You're not even tied to SQL or the Django ORM. You can use ElasticSearch or whatever backend makes sense for your use case. You just have to define the <code>search</code> method that takes a dictionary of request GET params.</p>
+
+<h3>Make a search request</h3>
+
+<p>The URL will be "/{resource name}/search/"
+The format of the request will depend on how you implement the <code>search</code> method, but in this case, it looks like this:</p>
+
+<p><code>GET /api/searchable_item/search/?popular=1&amp;contains=fun</code></p>
 
 <h2>Authentication</h2>
 
-<h2>Restricting by User</h2>
+<p>EasyRest Authentication is really easy to use and extend, as you'll see below.</p>
+
+<h3>1. Define an authorization scheme</h3>
+
+<p>Decide whether you want your API consumer to pass in an API key through the request GET parameters or the headers or whatever else.</p>
+
+<h3>2. Set <code>needs_authentication = True</code> in your resource declaration</h3>
+
+<h3>3. Define an <code>authorize</code> method for your resource</h3>
+
+<p>Often you may want the same authorization method for many of your resources.
+In that case, you should subclass APIResource and define the <code>authorize</code> method, let's call it AuthorizedAPIResource.</p>
+
+<p>Then, all of your model resources can subclass AuthorizedAPIResource.</p>
+
+<h3>Here's an example:</h3>
+
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">resteasy.resources</span> <span class="kn">import</span> <span class="n">APIResource</span>
+<span class="kn">from</span> <span class="nn">resteasy.auth</span> <span class="kn">import</span> <span class="n">get_user_from_GET_param</span>
+
+<span class="k">class</span> <span class="nc">AuthorizedAPIResource</span><span class="p">(</span><span class="n">APIResource</span><span class="p">):</span>
+    <span class="sd">"""</span>
+<span class="sd">    I subclass APIResource and implement the authorize method.</span>
+<span class="sd">    Many of my resources will require this authorization, so they</span>
+<span class="sd">    will inherit from this class.</span>
+<span class="sd">    """</span>
+    <span class="k">def</span> <span class="nf">authorize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        I find the user based on the value of `apikey`</span>
+<span class="sd">        being passed in as a GET parameter.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">get_user_from_GET_param</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">"apikey"</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">AuthorizedItemResource</span><span class="p">(</span><span class="n">AuthorizedAPIResource</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">UserItem</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s">'authorized_item'</span>
+    <span class="n">needs_authentication</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s">'name'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s">'id'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="s">'user_id'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="p">}</span>
+</pre></div>
+
+<p>An example request would be <code>GET /api/authorized_item/?apikey=kjhsdf3</code></p>
+
+<h3>Authorization helper methods</h3>
+
+<p>In easyrest.auth, there are three really useful helper methods:</p>
+
+<ol>
+<li>
+<code>get_user_from_GET_param(request, param_name)</code>: extracts API key from the request GET parameter <code>param_name</code> and returns the user who owns that API key.</li>
+<li>
+<code>get_user_from_from_request_header</code>: does the same but from the request header</li>
+<li>
+<code>get_user_from_request</code>: returns <code>request.user</code> if the user is authenticated</li>
+</ol><p>These are by no means exhaustive, but they do cover a lot of the ways in which you'll want you're API consumers to authenticate.</p>
+
+<p>If you want to use your own way of authenticating, just write your own <code>authorize</code> method, and you're good.</p>
+
+<h3>What happens if an unauthorized person tries to access a protected resource?</h3>
+
+<p>If someone tries to access a resource without authorization, they will get a 403 Forbidden response.</p>
+
+<h2>Restricting by Owner</h2>
+
+<p>A lot of the time, we want our API consumers to only access the results that they own.</p>
+
+<p>Imagine an API you can use to get all your Bank Transactions. You want some way of limiting the API user to only retrieving their own bank transactions, so they don't have access to everyone's bank transactions.</p>
+
+<p>To achieve this, you just need to do 1 thing in addition to setting up Authentication as above.</p>
+
+<h3>Set <code>restrict_by_user</code>
+</h3>
+
+<p>When you declare your resource, you should set <code>restrict_by_user</code> equal to the field path to the User field corresponding to the owner, the same path you would use through the Django Queryset API.</p>
+
+<p>If your UserItem is linked to a User through the field "user", for example:</p>
+
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">UserItem</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s">'auth.User'</span><span class="p">)</span>
+    <span class="n">is_active</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+
+<p>You should set <code>restrict_by_user="user"</code> as follows:</p>
+
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">AuthorizedItemResourceByUser</span><span class="p">(</span><span class="n">MyAuthenticatedResource</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">UserItem</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s">'restrict_user_authorized_item'</span>
+    <span class="n">needs_authentication</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">restrict_by_user</span> <span class="o">=</span> <span class="s">'user'</span>
+
+    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s">'name'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s">'id'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="s">'user_id'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="p">}</span>
+</pre></div>
+
+<h4>A more complicated example</h4>
+
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">Profile</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">owner</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKeyField</span><span class="p">(</span><span class="s">'auth.User'</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">UserItem</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+    <span class="n">profile</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">Profile</span><span class="p">)</span>
+    <span class="n">is_active</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+
+<p>You should set <code>restrict_by_user="profile__user"</code> as follows:</p>
+
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">AuthorizedItemResourceByUser</span><span class="p">(</span><span class="n">MyAuthenticatedResource</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">UserItem</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s">'restrict_user_authorized_item'</span>
+    <span class="n">needs_authentication</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">restrict_by_user</span> <span class="o">=</span> <span class="s">'profile__user'</span>
+
+    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s">'name'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s">'id'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="s">'user_id'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="p">}</span>
+</pre></div>
+
+<h2>How to Extend EasyRest</h2>
+
+<h2>How to Hack on EasyRest</h2>
 
 <h2>Roadmap</h2>
       </section>
