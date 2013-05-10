@@ -1,7 +1,7 @@
 class APIResource(object):
     model = None
     results_per_page = None
-    filter_by_user_path = None
+    user_path = None
     needs_authentication = False
 
     def serialize(self, instance):
@@ -15,7 +15,7 @@ class APIResource(object):
 
     def get_list(self, user=None, page=0):
         qs = self.get_queryset()
-        qs = self.filter_for_user(qs, user)
+        qs = self.filter_by_user(qs, user) if (user and self.user_path) else qs
         qs = self.paginate(qs, page)
         return {"items": [self.serialize(obj) for obj in qs.iterator()]}
 
@@ -28,7 +28,10 @@ class APIResource(object):
 
         # Make sure user is authorized for to see this item
         if (self.filter_by_user_field and
-            user.id != self.get_user_id(item)):
+            not (self.get_queryset()
+                 .filter_by_user(user)
+                 .filter(pk=_id)
+                 .exists())):
             return {"error": "You do not have access to this data"}
         return self.serialize(item)
 
@@ -39,13 +42,5 @@ class APIResource(object):
         finish = (page + 1) * self.results_per_page
         return qs[start:finish]
 
-    def filter_for_user(self, qs, user):
-        if user and self.filter_by_user_path:
-            qs = qs.filter(**{self.filter_by_user_field: user.id})
-        return qs
-
-    def get_user_id(self, item):
-        sequence = self.filter_by_user_path.split("__")
-        return reduce(
-            lambda x, y: getattr(x, y),
-            [getattr(item, sequence[0])] + sequence[1:]).id
+    def filter_by_user(self, qs, user):
+        return qs.filter(**{self.user_path: user.id})
