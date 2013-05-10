@@ -78,7 +78,7 @@ class PaginatedItemResource(APIResource):
 ```
 If you don't set `results_per_page`, all of the items will be returned at once.
 
+## Search
 ## Authentication
 ## Restricting by User
-## Search
 ## Roadmap
