@@ -4,14 +4,12 @@ from django.http import (
     HttpResponseForbidden)
 from django.views.generic import View
 
-from .constants import OK, BAD
-
 
 class BaseRestroomView(View):
     resource = None
 
     def get_response(self, data):
-        status = BAD if 'error' in data else OK
+        status = 400 if 'error' in data else 200
         return HttpResponse(json.dumps(data), status=status,
                             mimetype='application/json')
 
