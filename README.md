@@ -71,9 +71,9 @@ For example, you can do preprocessing as we did above with the `status` as well 
 
 ## Registering your resource to the api
 
-    * Create an instance of `easyrest.API`
-    * Then register your resource: `api.register(MyResource)`
-    * Then include `api.get_urls` in your urlconf
+* Create an instance of `easyrest.API`
+* Then register your resource: `api.register(MyResource)`
+* Then include `api.get_urls` in your urlconf
 
 Note that because you are registering resources with an instance of `easyrest.API`, you can conceivably have many different API instances with different resources. EasyRest is flexible in how you use it.
 
