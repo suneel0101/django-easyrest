@@ -125,6 +125,13 @@ class PaginatedItemResource(APIResource):
 ```
 If you don't set `results_per_page`, all of the items will be returned at once.
 
+### How do I request a paginated resource?
+Simple.
+```
+GET /api/item/?page=2
+```
+
+
 ## Search
 ## Authentication
 ## Restricting by User
