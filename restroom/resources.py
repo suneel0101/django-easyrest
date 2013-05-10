@@ -1,4 +1,4 @@
-from .utils import authorize
+from .auth import authorize
 
 
 class APIResource(object):
