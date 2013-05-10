@@ -58,7 +58,16 @@ You only need to specify 3 things when subclassing APIResource:
 2. `name`: this is the name of resource in the url: '/api/{{ name }}/'. If you don't set it, it will fallback to the Model.meta.db_table
 3. `serialize` method: returns a serialized version of an instance of your Model, however you want it to. You can reference properties and whatever else. You're not just limited to the model fields.
 
-### You can also specify the `get_queryset` method
+You can also specify the `get_queryset` method, which will return the base queryset that will be used in the item-list endpoint as well as the search endpoint.
+So if you wanted to have the queryset ordered by `id` descending and `status > 7`, you would add to the above `ItemResource` the following method:
+
+```python
+    def get_queryset(self):
+        return Item.objects.filter(status__gt=7).order_by('-id')
+```
+
+Use this method to customize the set of results you want returned any way you like.
+For example, you can do preprocessing as we did above with the `status` as well as specify an ordering.
 
 ## Registering your resource to the api
 
