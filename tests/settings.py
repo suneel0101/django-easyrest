@@ -15,7 +15,7 @@ unclebob.take_care_of_my_tests()
 UNCLEBOB_EXTRA_NOSE_ARGS = [
     '--verbosity=3',
     '--with-coverage',
-    '--cover-package=restroom',
+    '--cover-package=restroom.resources, restroom.core, restroom.views, restroom.auth',
 ]
 
 DATABASES = {

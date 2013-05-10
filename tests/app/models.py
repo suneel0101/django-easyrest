@@ -17,9 +17,7 @@ class Item(models.Model):
         return self.status + int(self.is_active)
 
 
-class ProtectedItem(models.Model):
+class UserItem(models.Model):
     name = models.CharField(max_length=250)
-    text = models.CharField(max_length=250)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey('auth.User')
     is_active = models.BooleanField(default=False)
-    status = models.IntegerField()

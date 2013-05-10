@@ -1,4 +1,5 @@
-from .models import Item
+from .models import Item, UserItem
+from .myauth import MyAuthenticatedResource
 from restroom.resources import APIResource
 from restroom.core import API
 
@@ -44,6 +45,36 @@ class PaginatedItemResource(APIResource):
             'popularity': item.popularity,
         }
 
+
+class AuthorizedItemResource(MyAuthenticatedResource):
+    model = UserItem
+    name = 'authorized_item'
+    needs_authentication = True
+
+    def serialize(self, item):
+        return {
+            'name': item.name,
+            'id': item.id,
+            'user_id': item.user.id,
+        }
+
+
+class AuthorizedItemResourceByUser(MyAuthenticatedResource):
+    model = UserItem
+    name = 'by_user_authorized_item'
+    needs_authentication = True
+    user_path = 'user'
+
+    def serialize(self, item):
+        return {
+            'name': item.name,
+            'id': item.id,
+            'user_id': item.user.id,
+        }
+
+
 api.register(ItemResource)
 api.register(PaginatedItemResource)
 api.register(ReverseOrderItemResource)
+api.register(AuthorizedItemResource)
+api.register(AuthorizedItemResourceByUser)
