@@ -49,7 +49,7 @@ api.register(ItemResource)
 from django.conf.urls import url, patterns, include
 from .api import api
 
-urlpatterns = patterns('', url(r'^test/', include(api.get_urls())))
+urlpatterns = patterns('', url(r'^api/', include(api.get_urls())))
 ```
 ## Declaring a Resource
 You only need to specify 3 things when subclassing APIResource:
@@ -57,6 +57,8 @@ You only need to specify 3 things when subclassing APIResource:
 1. `model`: the Django model you're exposing through the API
 2. `name`: this is the name of resource in the url: '/api/{{ name }}/'. If you don't set it, it will fallback to the Model.meta.db_table
 3. `serialize` method: returns a serialized version of an instance of your Model, however you want it to. You can reference properties and whatever else. You're not just limited to the model fields.
+
+## Format of Requests and Responses
 
 ## Pagination
 If you want to paginate the results, you just need to set `results_per_page`. Here's an example:
@@ -78,5 +80,4 @@ If you don't set `results_per_page`, all of the items will be returned at once.
 
 ## Authentication
 ## Search
-## Format of Requests and Responses
 ## Roadmap
