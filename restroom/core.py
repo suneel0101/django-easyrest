@@ -1,12 +1,11 @@
 from django.conf.urls import url, patterns
 from .resources import RestroomResource
 from .views import RestroomItemView, RestroomListView
-from .resources import api_key_resource
 
 
 class API(object):
     def __init__(self):
-        self.resources = [api_key_resource]
+        self.resources = []
 
     def register(self, model, options={}):
         self.resources.append(RestroomResource(model, options))
