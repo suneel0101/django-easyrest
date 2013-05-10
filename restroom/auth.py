@@ -14,7 +14,7 @@ def get_user_from_GET_param(request, param_name):
         pass
 
 
-def get_user_from_header(request, param_name):
+def get_user_from_request_header(request, param_name):
     token = request.META.get(param_name)
     try:
         return APIKey.objects.get(token=token).user
