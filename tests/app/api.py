@@ -63,7 +63,7 @@ class AuthorizedItemResourceByUser(MyAuthenticatedResource):
     model = UserItem
     name = 'by_user_authorized_item'
     needs_authentication = True
-    user_path = 'user'
+    restrict_by_user = 'user'
 
     def serialize(self, item):
         return {
