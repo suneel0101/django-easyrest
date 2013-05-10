@@ -14,7 +14,8 @@ class APIResource(object):
         return self.model.objects.all()
 
     def get_list(self, user=None, page=0):
-        qs = self.filter_for_user(self.get_queryset(), user)
+        qs = self.get_queryset()
+        qs = self.filter_for_user(qs, user)
         qs = self.paginate(qs, page)
         return {"items": [self.serialize(obj) for obj in qs.iterator()]}
 
