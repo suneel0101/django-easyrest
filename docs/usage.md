@@ -17,11 +17,20 @@ class ExpenseResource(APIResource):
 
 api.register(ExpenseResource)
 
+class MyAPIResource(APIResource):
+   def authorize(self, request):
+       if request.user.is_authenticated():
+           return request.user
+       key = request.GET.get('apikey')
+       try:
+           return APIKey.objects.get(key=key).user
+       except APIKey.DoesNotExist:
+           return
 
-class ExpenseResource(APIResource):
+
+class ExpenseResource(MyAPIResource):
     model = Expense
     results_per_page = 20
-
     needs_authentication = True
     filter_by_user = 'user'
 
@@ -35,9 +44,6 @@ class ExpenseResource(APIResource):
 
    def get_queryset(self):
        return Expense.objects.filter(status__gte=9, is_active=True)
-
-   def authorize(self, request):
-       pass
 
 api.register(Expense)
 
