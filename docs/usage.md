@@ -45,5 +45,17 @@ class ExpenseResource(MyAPIResource):
    def get_queryset(self):
        return Expense.objects.filter(status__gte=9, is_active=True)
 
+   def search(self, params):
+       filter_dict = {}
+       if params.get("city"):
+           filter_dict["city__slug"] = params["city"]
+
+       if params.get("reimbursed"):
+           filter_dict["status"] = 10
+       qs = self.get_queryset().filter(**filter_dict)
+       if params.get("order"):
+          qs = qs.order_by(params["order"])
+       return qs
+
 api.register(Expense)
 

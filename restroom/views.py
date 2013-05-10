@@ -36,3 +36,8 @@ class RestroomListView(BaseRestroomView):
 class RestroomItemView(BaseRestroomView):
     def get(self, request, _id, *args, **kwargs):
         return self.get_response(self.resource.get_one(_id, request._user))
+
+
+class RestroomSearchView(BaseRestroomView):
+    def get(self, request, *args, **kwargs):
+        return self.get_response(self.resource.search(request.GET.dict()))

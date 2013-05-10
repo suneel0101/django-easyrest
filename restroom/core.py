@@ -1,5 +1,5 @@
 from django.conf.urls import url, patterns
-from .views import RestroomItemView, RestroomListView
+from .views import RestroomItemView, RestroomListView, RestroomSearchView
 
 
 class API(object):
@@ -12,6 +12,10 @@ class API(object):
     def get_urls(self):
         urls = []
         for resource in self.resources:
+            if hasattr(resource, 'search'):
+                urls.append(url(r"^{}/search/$".format(resource.name),
+                    RestroomSearchView.as_view(resource=resource),
+                    name="{}_search".format(resource.name)))
             urls.extend([
                 url(r"^{}/$".format(resource.name),
                     RestroomListView.as_view(resource=resource),

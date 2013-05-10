@@ -1,237 +1,64 @@
-# Django-Restroom: a super lightweight REST API framework
+# Django-EasyRest: a lightweight readonly REST API framework
 
-### Status: This project is still under development!
+# What is EasyRest?
+EasyRest is a small library (less than 160 lines of code!) that allows you to really quickly and flexibly create a READ-ONLY REST API for your models.
 
-Whether you want to create an API for your product for external consumption or you just want to expose a REST API for your own frontend application, Django-Restroom is an incredibly easy and fast way to accomplish that.
-You just register your models and include the restroom urls.
+# Why would I want to use EasyRest?
+If you're building a front-end heavy website that uses Backbone or similar:
+    * All you need in the backend is a REST API to read from.
+    * With EasyRest makes this ridiculously simple.
 
-There are also additional features such as authentication, pagination and the ability to restrict a resource to return results owned by the requesting user.
+If you need a simple and extensible read-only API for your existing product:
+    * you do the same thing.
+    * EasyRest has a really simple built-in authentication system so you can give out API keys to your API consumers and you're all ready to go.
+    * You can also plug in your custom API authentication system easily
 
-## 1. Register your models
-Basic Usage:
-```python
-from myapp.models import MyModel
-from restroom.core import API
-api = API()
-api.register(MyModel)
+# What's the advantage of using EasyRest over Django-Rest, Tastypie, etc?
+In exchange for full-featuredness, those other frameworks are hard to setup and use.
+EasyRest is really simple to use and even simpler to extend.
+
+# What features do I get with EasyRest?
+EasyRest is meant to be a straightforward read-only api for the most common use cases. So it supports,
+* pagination
+* authentication
+* restricting by requesting user
+* search
+
+# How do I install it?
+```pip install django-easyrest```
+
+# How do I use it?
+## Basic Usage
 ```
-This enables GET requests to the RESTful endpoints for the resource `MyModel`.
-GET requests will return serialized results with all of the fields of the model.
+# api.py
 
-However, `register` does take an options dictionary with the following parameters:
-
-### `http_methods`
-These are the HTTP methods of requests you want to enable for that model resource.
-You can pass in any sublist of ["GET", "POST", "DELETE", "PUT"]
-If you do not pass in anything, it will default to only allowing GET requests.
-
-Sample Usage:
-```python
-from myapp.models import MyModel
-from restroom.core import API
-api = API()
-api.register(MyModel, {"http_methods": ["GET", "POST", "PUT"]})
-```
-
-Any `DELETE` requests to the RESTful endpoints for `MyModel` will return an empty 403 response forbidden.
-
-### `fields`
-
-These are the fields of the model you want to expose to consumers of your api.
-The object's `id` will always be exposed. If you do not pass in anything, it will default to exposing all fields.
-When the REST endpoints for a model are requested by any method other than the ones you have allowed, a 403 Forbidden response will be returned.
-
-Sample usage:
-```python
-from restroom.core import api
-from django.db import models
+from easyrest import API
+from .models import Item
 
 api = API()
 
-class Book(models.Model):
-    title = models.CharField(max_length=250)
-    author = models.CharField(max_length=100)
-    date_published = models.DateTimeField()
+class ItemResource(APIResource):
+    model = Item
+    name = 'item'
 
-api.register(Book, {"fields": ["title", "author"]})
+    def serialize(self, item):
+        return {
+            'id': item.id,
+            'text': item.text,
+            'popularity': item.popularity,
+        }
+
+api.register(ItemResource)
+
+# urls.py
+from django.conf.urls import url, patterns, include
+from app.api import api
+
+urlpatterns = patterns('', url(r'^test/', include(api.get_urls())))
 ```
-The results will be serialized so that only the `id`, `title`, `author` fields are in the return JSON.
-
-There are two additional optional parameters `needs_auth` and `only_for_user` which will be discussed in the Authentication section.
-
-### Recommended pattern of registering your models
-It's easiest to the do following, although after using this library just once, you'll feel comfortable enough to register your models however and wherever you'd like.
-
-In the same level as your main urlconf, create a file `api.py`
-In `api.py`:
-```python
-from restroom.core import API
-from apps.thisapp.models import X, Y, Z
-from apps.otherapp.models import A, B, C
-...
-api = API()
-api.register(X, {"fields": ["text", "slug"]})
-api.register(Y, {"http_methods": ["GET", "POST"]})
-...
-```
-
-
-## 2. Include urls in your main urlconf
-Follow the above recommended pattern models. Then your main urls.py
-```python
-from .api import api
-...
-urlpatterns += patterns('', url('r^api/', include(api.get_urls())))
-```
-
-## 3. REST endpoints are created automatically
-Suppose you have registered the model `EmailRecord` from the app `emailer` with `http_methods=['GET', 'POST', 'DELETE', 'PUT']` and the `fields=['user', 'timestamp', 'body']`.
-Then you have included the urls under the prefix `/api/` as above.
-
-
-Then these are the REST endpoints you can request:
-
-### /api/emailer_emailrecord/
-* This is a list resource.
-* GET will return a list of results which match the query.
-* PUT will modify all results that match the query.
-* POST will create a new object.
-* DELETE is always forbidden.
-
-### /api/emailer_emailrecord/{int: id}/
-* This is an item resource.
-* GET will return the object with that id.
-* PUT will modify the object.
-* DELETE will delete the object.
-* POST is always forbidden.
-
-## 4. Format of Requests and Responses
-
-### GET /api/emailer_emailrecord/
-Responds with a list of all `EmailRecord` objects, for example:
-
-```
-HTTP 200
-{
-    "items": [
-        {"id": 1,
-         "body": "Dear sir, will you sign up for my site?",
-         "timestamp": "2013-03-15T20:56:13.652681"},
-        {"id": 2,
-         "body": "Dear miss, will you sign up for my site?",
-         "timestamp": "2013-03-16T20:33:19.952455"},
-        {"id": 3,
-         "body": "Dear friend, will you sign up for my site?",
-         "timestamp": "2013-03-18T16:14:21.322591"}
-    ]  
-}
-
-```
-
-### GET /api/emailer_emailrecord/?q={{ query }}
-Responds with a list of all `EmailRecord` objects that fit the query parameters. See the Querying API for more information.
-
-`GET /api/emailer_emailrecord/?q=[{"field": "id", "operator": "in", value": [1,3]}]` would return the following:
-
-```
-HTTP 200
-{
-    "items": [
-        {"id": 1,
-         "body": "Dear sir, will you sign up for my site?",
-         "timestamp": "2013-03-15T20:56:13.652681"},
-        {"id": 3,
-         "body": "Dear friend, will you sign up for my site?",
-         "timestamp": "2013-03-18T16:14:21.322591"}
-    ]  
-}
-
-```
-
-### GET /api/emailer_emailrecord/{int: id}
-Returns `EmailRecord` with `id: 1`, so `GET /api/emailer_emailrecord/1/` would return the following:
-
-```
-HTTP 200
-{
-    "id": 1,
-    "body": "Dear sir, will you sign up for my site?",
-    "timestamp": "2013-03-15T20:56:13.652681"
-}
-```
-
-If you try to GET for an id that does not correspond to any `EmailRecord`, for example `GET /api/emailer_emailrecord/5/`, you will get:
-```
-HTTP 400
-{
-    "error": "No result found matching id: 5"
-}
-```
-
-
-### DELETE /api/emailer_emailrecord/{int: id}
-Deletes `EmailRecord` with `id: 1`, so `GET /api/emailer_emailrecord/1/` would return the following:
-
-```
-HTTP 204 No Content
-```
-
-If you try to DELETE for an id that does not correspond to any `EmailRecord`, for example `GET /api/emailer_emailrecord/5/`, you will get:
-```
-HTTP 400
-{
-    "error": "No result found matching id: 5"
-}
-```
-
-### POST /api/emailer_emailrecord/
-Creates a new `EmailRecord` with from the JSON POST data.
-
-Here is an example request:
-
-```
-POST /api/emailer_emailrecord/
-{
-    "data": {
-        "body": "New email body"
-        "timestamp": "2013-01-01T12:00:00",
-    }
-}
-```
-
-Here would be the response:
-
-```
-HTTP 201
-{
-    "id": 3,
-    "body": "New email body"
-    "timestamp": "2013-01-01T12:00:00",
-}
-```
-
-If you send in the data dictionary any fields that are not on the model, or if the the data that you are creating is not valid by some database constraints, column uniqueness for example, then you will get a 400 error with an error JSON message.
-
-For example,
-```
-POST /api/emailer_emailrecord/
-{
-    "data": {
-        "crazybody": "blahblahblah"
-        "timestamp": "2013-01-01T12:00:00",
-    }
-}
-```
-
-```
-HTTP 400
-{
-    "error": "Cannot resolves the following field names: crazybody"
-}
-```
-
-## 5. Querying API
-## 6. Authentication
-## 7. Restricting resources by user
-## 8. Data Serialization
-## 9. Pagination
+## Declaring a Resource
+## Pagination
+## Authentication
+## Search
+## Format of Requests and Responses
+## Roadmap
