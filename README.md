@@ -58,6 +58,8 @@ You only need to specify 3 things when subclassing APIResource:
 2. `name`: this is the name of resource in the url: '/api/{{ name }}/'. If you don't set it, it will fallback to the Model.meta.db_table
 3. `serialize` method: returns a serialized version of an instance of your Model, however you want it to. You can reference properties and whatever else. You're not just limited to the model fields.
 
+### You can also specify the `get_queryset` method
+
 ## Registering your resource to the api
 
     * Create an instance of `easyrest.API`
@@ -141,6 +143,43 @@ GET /api/item/?page=2
 
 
 ## Search
+
+Sometimes you might want to allow your API user to search for a result set rather than just listing the results in a certain order.
+The way to set this up in EasyRest is intentionally very barebones so you can extend it and implement the search you want for your resource, no matter how simple or complicated.
+
+### Define the `search` method
+class SearchableItemResource(APIResource):
+    model = Item
+    name = 'searchable_item'
+    results_per_page = 20
+
+    def serialize(self, item):
+        return {
+            'id': item.id,
+            'text': item.text,
+            'popularity': item.popularity,
+        }
+
+    def search(self, get_params):
+        """
+        Some custom search logic.
+        You always have access to the request.GET params
+        through `get_params`
+        """
+        filter_kwargs = {}
+        if get_params.get("popular"):
+            filter_kwargs["popularity__gte"] = 9
+         
+        if get_params.get("contains"):
+            filter_kwargs["text__icontains"] = get_params["contains"]
+        return self.get_queryset().filter(**filter_kwargs)
+
+### Make a search request
+The URL will be "/{resource name}/search/"
+The format of the request will depend on how you implement the `search` method, but in this case, it looks like this:
+
+`GET /api/searchable_item/search/?popular=1&contains=fun`
+
 ## Authentication
 EasyRest Authentication is really easy to use and extend, as you'll see below.
 
