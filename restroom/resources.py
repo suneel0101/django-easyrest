@@ -13,8 +13,9 @@ class APIResource(object):
     def get_queryset(self):
         return self.model.objects.all()
 
-    def get_list(self, user=None):
+    def get_list(self, user=None, page=0):
         qs = self.filter_for_user(self.get_queryset(), user)
+        qs = self.paginate(qs, page)
         return {"items": [self.serialize(obj) for obj in qs.iterator()]}
 
     def get_one(self, _id, user=None):
@@ -29,6 +30,13 @@ class APIResource(object):
             user.id != self.get_user_id(item)):
             return {"error": "You do not have access to this data"}
         return self.serialize(item)
+
+    def paginate(self, qs, page):
+        if not self.results_per_page:
+            return qs
+        start = page * self.results_per_page
+        finish = (page + 1) * self.results_per_page
+        return qs[start:finish]
 
     def filter_for_user(self, qs, user):
         if user and self.filter_by_user_path:

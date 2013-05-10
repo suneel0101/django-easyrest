@@ -28,7 +28,8 @@ class BaseRestroomView(View):
 
 class RestroomListView(BaseRestroomView):
     def get(self, request, *args, **kwargs):
-        return self.get_response(self.resource.get_list(user=request._user))
+        data = self.resource.get_list(request.GET.get('page'), request._user)
+        return self.get_response(data)
 
 
 class RestroomItemView(BaseRestroomView):
