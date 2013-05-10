@@ -19,7 +19,9 @@ EasyRest is meant to be simple and cover the most common use cases. So it suppor
 * search
 
 ## How do I install it?
-```pip install django-easyrest```
+```
+pip install django-easyrest
+```
 
 ## How do I use it?
 ```
