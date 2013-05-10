@@ -136,12 +136,12 @@ GET /api/item/?page=2
 ## Authentication
 EasyRest Authentication is really easy to use and extend, as you'll see below.
 
-### Define an authorization scheme
+### 1. Define an authorization scheme
 Decide whether you want your API consumer to pass in an API key through the request GET parameters or the headers or whatever else.
 
-### Set `needs_authentication = True` in your resource declaration
+### 2. Set `needs_authentication = True` in your resource declaration
 
-### Define an `authorize` method for your resource
+### 3. Define an `authorize` method for your resource
 Often you may want the same authorization method for many of your resources.
 In that case, you should subclass APIResource and define the `authorize` method, let's call it AuthorizedAPIResource.
 
@@ -178,8 +178,9 @@ class AuthorizedItemResource(MyAuthenticatedResource):
         }
 ```
 
-You'll notice I'm using a method from resteasy.auth.
+### Authorization helper methods
 In easyrest.auth, there are three really useful helper methods:
+
     * `get_user_from_GET_param(request, param_name)`: extracts API key from the request GET parameter `param_name` and returns the user who owns that API key.
     * `get_user_from_from_request_header`: does the same but from the request header
     * `get_user_from_request`: returns `request.user` if the user is authenticated
