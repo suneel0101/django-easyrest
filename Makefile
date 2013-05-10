@@ -1,4 +1,2 @@
-func:
-	@python ./manage.py test --functional
-unit:
-	@python ./manage.py test --unit
+test:
+	@python tests/manage.py test app
