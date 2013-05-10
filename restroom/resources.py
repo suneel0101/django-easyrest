@@ -4,15 +4,17 @@ from .utils import get_val
 
 
 class RestroomResource(object):
-    def __init__(self, model, options={}):
+    def __init__(self,
+                 model,
+                 serializer,
+                 http_methods=['GET'],
+                 auth=True,
+                 only_for_user=(False, '')):
         self.model = model
-        self.http_methods = self.extract_http_methods(
-            options.get('http_methods', ['GET']))
-        self.field_map = self.extract_fields(options.get('fields', []))
-        self.name = options.get('name', model._meta.db_table)
-        self.only_for_user = options.get('only_for_user', (False, ''))
-        self.needs_auth = bool(options.get('needs_auth',
-                                           self.only_for_user[0]))
+        self.serializer = serializer
+        self.http_methods = self.extract_http_methods(http_methods)
+        self.auth = auth
+        self.only_for_user = only_for_user
 
     def extract_http_methods(self, http_methods):
         invalid_http_methods = set(http_methods).difference(
