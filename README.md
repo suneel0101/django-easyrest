@@ -153,7 +153,7 @@ Then, all of your model resources can subclass AuthorizedAPIResource.
 from resteasy.resources import APIResource
 from resteasy.auth import get_user_from_GET_param
 
-class MyAuthenticatedResource(APIResource):
+class AuthorizedAPIResource(APIResource):
     """
     I subclass APIResource and implement the authorize method.
     Many of my resources will require this authorization, so they
@@ -167,7 +167,7 @@ class MyAuthenticatedResource(APIResource):
         return get_user_from_GET_param(request, "apikey")
 
 
-class AuthorizedItemResource(MyAuthenticatedResource):
+class AuthorizedItemResource(AuthorizedAPIResource):
     model = UserItem
     name = 'authorized_item'
     needs_authentication = True
