@@ -1,8 +1,6 @@
-from django.contrib.auth import authenticate as django_authenticate
 from django.db import IntegrityError
 from .errors import RestroomValidationError
 from .utils import get_val
-from .models import APIKey
 
 
 class RestroomResource(object):
@@ -187,61 +185,3 @@ class RestroomResource(object):
 
     def get_error_message(self, error):
         return {'error': error.message}
-
-
-class APIKeyResource(RestroomResource):
-    def __init__(self):
-        self.model = APIKey
-        self.http_methods = ['GET']
-        self.name = 'restroom_apikey'
-        self.needs_auth = False
-
-    def retrieve_one(self, *args, **kwargs):
-        return {'error': 'Cannot retrieve API data from single item endpoint'}
-
-    def retrieve(self, filters, user):
-        """
-        With filters = [{'username': 'johndoe', 'password': '1234'},
-                        {'username': 'jeremy', 'password': 'abc'}]
-        Should return list of dictionaries, for example:
-        {
-            "items": [
-                {
-                    "username": "johndoe",
-                    "id": 234,
-                    "token": "xkjsdk2jh3"
-                },
-                {
-                    "username": "jeremy",
-                    "id": 098234,
-                    "token": "Akbjsdf8"
-                }]
-        }
-        """
-        results = []
-        for auth_data in filters:
-            username = auth_data.get('username')
-            password = auth_data.get('password')
-            result = {"username": username,
-                      'id': '',
-                      "token": 'could not authenticate {}'.format(username)}
-            if username and password:
-                user = django_authenticate(username=username,
-                                           password=password)
-                if user is not None:
-                    try:
-                        apikey = APIKey.objects.get(user=user)
-                    except APIKey.DoesNotExist:
-                        pass
-                    else:
-                        result = {"username": username,
-                                  "id": user.id,
-                                  "token": apikey.token}
-                        # Saving apikey to generate a new token
-                        # So everytime the user authenticates
-                        # Will receive a new, unique token
-                        apikey.save()
-            results.append(result)
-        return {"items": results}
-
-api_key_resource = APIKeyResource()
