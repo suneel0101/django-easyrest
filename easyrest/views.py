@@ -26,11 +26,9 @@ class BaseAPIView(View):
 
 class ListView(BaseAPIView):
     def get(self, request, *args, **kwargs):
-        params = {'user': request._user}
-        if request.GET.get('page'):
-            params['page'] = request.GET.get('page')
-        data = self.resource.get_list(**params)
-        return self.get_response(data)
+        return self.get_response(self.resource.get_list(
+                user=request._user,
+                page=request.GET.get('page')))
 
 
 class ItemView(BaseAPIView):

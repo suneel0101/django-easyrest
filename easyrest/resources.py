@@ -14,11 +14,11 @@ class APIResource(object):
     def get_queryset(self):
         return self.model.objects.all()
 
-    def get_list(self, user=None, page=1):
+    def get_list(self, user=None, page=None):
         qs = self.get_queryset()
         qs = (self.filter_by_user(qs, user)
               if (user and self.restrict_by_user) else qs)
-        qs = self.paginate(qs, int(page))
+        qs = self.paginate(qs, page)
         return {"items": [self.serialize(obj) for obj in qs.iterator()]}
 
     def get_one(self, _id, user=None):
@@ -37,6 +37,7 @@ class APIResource(object):
         return self.serialize(item)
 
     def paginate(self, qs, page):
+        page = int(page or 1)
         if self.results_per_page is None:
             return qs
         start = (page - 1) * self.results_per_page
