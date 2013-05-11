@@ -34,13 +34,13 @@
 
 <p>EasyRest is a lightweight framework (less than 160 lines of code!) that allows you to really quickly and flexibly create a READ-ONLY REST API for your models.</p>
 
-<h2>Table of Contents</h2>
+<h1>Table of Contents</h1>
 
 <ul>
 <li><a href="#installation">Installation</a></li>
 <li><a href="#example">Example</a></li>
-<li><a href="#when-should-i-use-easyrest">When should I use EasyRest?</a></li>
 <li><a href="#features">Features</a></li>
+<li><a href="#when-should-i-use-easyrest">When should I use EasyRest?</a></li>
 <li>
 <a href="#usage">Usage</a>
 
@@ -59,18 +59,18 @@
 <li><a href="#how-to-hack-on-easyrest">How to Hack on EasyRest</a></li>
 <li><a href="#roadmap">Roadmap</a></li>
 <li><a href="#license">License</a></li>
-</ul><h2>Installation<a name="installation"> </a>
-</h2>
+</ul><h1>Installation<a name="installation"> </a>
+</h1>
 
 <pre><code>pip install django-easyrest
 </code></pre>
 
-<h2>Example<a name="example"> </a>
-</h2>
+<h1>Example<a name="example"> </a>
+</h1>
 
 <div class="highlight"><pre><span class="c"># api.py</span>
 
-<span class="kn">from</span> <span class="nn">easyrest</span> <span class="kn">import</span> <span class="n">API</span>
+<span class="kn">from</span> <span class="nn">easyrest</span> <span class="kn">import</span> <span class="n">API</span><span class="p">,</span> <span class="n">APIResource</span>
 <span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Item</span>
 
 <span class="n">api</span> <span class="o">=</span> <span class="n">API</span><span class="p">()</span>
@@ -95,15 +95,8 @@
 <span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">''</span><span class="p">,</span> <span class="n">url</span><span class="p">(</span><span class="s">r'^api/'</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">api</span><span class="o">.</span><span class="n">get_urls</span><span class="p">())))</span>
 </pre></div>
 
-<h2>When should I use EasyRest?<a name="when-should-i-use-easyrest"> </a>
-</h2>
-
-<ul>
-<li>When you need a simple read-only REST API for your Backbone/similar app</li>
-<li>When ou need a read-only API for others to consume. Did you know EasyRest has a simple and extensible authentication system?</li>
-<li>Whenever you want!</li>
-</ul><h2>Features<a name="features"> </a>
-</h2>
+<h1>Features<a name="features"> </a>
+</h1>
 
 <p>EasyRest is meant to be simple and cover the most common use cases. So it supports,</p>
 
@@ -112,6 +105,13 @@
 <li>authentication</li>
 <li>restricting by owner</li>
 <li>search</li>
+</ul><h1>When should I use EasyRest?<a name="when-should-i-use-easyrest"> </a>
+</h1>
+
+<ul>
+<li>When you need a simple read-only REST API for your Backbone/similar app</li>
+<li>When ou need a read-only API for others to consume. Did you know EasyRest has a simple and extensible authentication system?</li>
+<li>Whenever you want!</li>
 </ul><h1>Usage<a name="usage"> </a>
 </h1>
 
@@ -408,8 +408,8 @@ Define the <code>authorize</code> method of AuthorizedAPIResource and then have 
         <span class="p">}</span>
 </pre></div>
 
-<h2>How to Customize EasyRest<a name="how-to-customize-easyrest"> </a>
-</h2>
+<h1>How to Customize EasyRest<a name="how-to-customize-easyrest"> </a>
+</h1>
 
 <p>You may have custom needs for your api. Here's some advice on how to extend EasyRest to meet those needs.</p>
 
@@ -422,8 +422,8 @@ Define the <code>authorize</code> method of AuthorizedAPIResource and then have 
 
 <p>The <em>main point</em> is that since there are only 160 lines of code, you can see the inner workings of this library really easily and feel free to bend it to your will!</p>
 
-<h2>How to Hack on EasyRest<a name="how-to-hack-on-easyrest"> </a>
-</h2>
+<h1>How to Hack on EasyRest<a name="how-to-hack-on-easyrest"> </a>
+</h1>
 
 <ol>
 <li>git clone this repo</li>
@@ -435,14 +435,14 @@ Define the <code>authorize</code> method of AuthorizedAPIResource and then have 
 </li>
 </ol><p>Happy hacking!</p>
 
-<h2>Roadmap<a name="roadmap"> </a>
-</h2>
+<h1>Roadmap<a name="roadmap"> </a>
+</h1>
 
 <p>I'm thinking about whether to support the other CRUD operations.
 If you have any suggestions, please let me know.</p>
 
-<h2>License<a name="license"> </a>
-</h2>
+<h1>License<a name="license"> </a>
+</h1>
 
 <p>(The MIT license)</p>
 
