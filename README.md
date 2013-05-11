@@ -30,7 +30,7 @@ pip install django-easyrest
 ```python
 # api.py
 
-from easyrest import API
+from easyrest import API, APIResource
 from .models import Item
 
 api = API()
