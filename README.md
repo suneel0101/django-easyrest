@@ -265,7 +265,7 @@ In that case, you should subclass APIResource.
 Let's call the new class AuthorizedAPIResource.
 Define the `authorize` method of AuthorizedAPIResource and then have your model resources inherit from AuthorizedAPIResource
 
-#### What does an example authenticated request look like?
+#### What does an example request with authorization look like?
 This will depend on authorization scheme, but in the above case where we pass in the apikey in the get request, it would look like this:
 ```python
 GET /api/authorized_item/?apikey=kjhsdf3
@@ -316,6 +316,9 @@ class AuthorizedItemResourceByUser(MyAuthenticatedResource):
             'user_id': item.user.id,
         }
 ```
+
+Now when someone makes an authorized request, the results will be limited to the results that they own, where the owner is defined by the `restrict_by_user` path.
+
 
 #### A more complicated example
 
