@@ -375,7 +375,10 @@ Happy hacking!
 
 
 # Roadmap<a name="roadmap">&nbsp;</a>
-I'm thinking about whether to support the other CRUD operations.
+
+* I'm thinking about whether to support the other CRUD operations.
+* Javascript Framework template tags so that when setting up Backbone sync for example, all you have to do is something like {% backbone mymodel %}{% endbackbone %} and your endpoints are already set up.
+
 If you have any suggestions, please let me know.
 
 
