@@ -10,6 +10,7 @@ EasyRest is an ultra-lightweight (160 LOC) read-only REST api framework for Djan
 * [Usage](#usage)
   * [Declare a Resource](#declare-a-resource)
   * [Register the Resource with the API](#register-the-resource-with-the-api)
+  * [URL Endpoints](#url-endpoints)
   * [Format of Requests and Responses](#format-of-requests-and-responses)
   * [Enable Pagination](#enable-pagination)
   * [Enable Search](#enable-search)
@@ -94,11 +95,24 @@ For example, you can do preprocessing as we did above with the `status` as well 
 
 Note that because you are registering resources with an instance of `easyrest.API`, you can conceivably have many different API instances with different resources. EasyRest is flexible in how you use it.
 
-## Format of Requests and Responses<a name="format-of-requests-and-responses">&nbsp;</a>
+## URL Endpoints<a name="url-endpoints">&nbsp;</a>
+
+
+For each resource you register, there are two URL endpoints: the list endpoint and the item endpoint.
+The list endpoint returns a list of instances.
+The item endpoint returns a single instance.
+
+
 Let's use the example of ItemResource above.
-The urls generated are:
-    * /api/item/ - This returns a list of Items
-    * /api/item/{int: id}/ - This returns a single serialized Item with the specified id
+We named the resource "item" and included the api urls behind the prefix "/api".
+So, the urls generated are:
+
+
+* `/api/item/` - This returns a list of Items
+* `/api/item/{int: id}/` - This returns a single serialized Item with the specified id
+
+
+## Format of Requests and Responses<a name="format-of-requests-and-responses">&nbsp;</a>
 
 #### GET to the Item list endpoint
 ```python
