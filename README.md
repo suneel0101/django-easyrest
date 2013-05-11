@@ -331,7 +331,7 @@ class AuthorizedItemResourceByUser(MyAuthenticatedResource):
         }
 ```
 
-## How to Customize EasyRest<a name="how-to-customize-easyrest">&nbsp;</a>
+# How to Customize EasyRest<a name="how-to-customize-easyrest">&nbsp;</a>
 You may have custom needs for your api. Here's some advice on how to extend EasyRest to meet those needs.
 
 * If you want to modify what the URLs look like, you should subclass `easyrest.API` and use that subclass as your API.
@@ -343,7 +343,7 @@ These are just a few guidelines. If you modify it in other cool ways, please let
 
 The *main point* is that since there are only 160 lines of code, you can see the inner workings of this library really easily and feel free to bend it to your will!
 
-## How to Hack on EasyRest<a name="how-to-hack-on-easyrest">&nbsp;</a>
+# How to Hack on EasyRest<a name="how-to-hack-on-easyrest">&nbsp;</a>
 1. git clone this repo
 2. create a virtualenv and install the requirements via `pip install -r requirements.txt`
 3. under /tests, run `python manage.py syncdb`
@@ -352,12 +352,12 @@ The *main point* is that since there are only 160 lines of code, you can see the
 Happy hacking!
 
 
-## Roadmap<a name="roadmap">&nbsp;</a>
+# Roadmap<a name="roadmap">&nbsp;</a>
 I'm thinking about whether to support the other CRUD operations.
 If you have any suggestions, please let me know.
 
 
-## License<a name="license">&nbsp;</a>
+# License<a name="license">&nbsp;</a>
 
 (The MIT license)
 
