@@ -276,8 +276,18 @@ GET /api/authorized_item/?apikey=kjhsdf3
 
 
 For your convenience, in `easyrest.models`, there is a simple APIKey model linked to a User.
-The `easyrest.auth` methods use this model.
-To use it, just syncdb and create APIKeys for your consumers.
+The `easyrest.auth` methods use this model. 
+
+
+Create APIKeys for your consumers is very straightforward. For example,
+
+```python
+from easyrest.models import APIKey
+from django.contrib.auth.models import User
+
+user = User.objects.create(username='tester', password='123')
+new_api_key = APIKey.objects.create(user=user)
+```
 
 ## Authorization helpers<a name="authorization-helpers">&nbsp;</a>
 In easyrest.auth, there are three really useful helper methods:
