@@ -332,10 +332,11 @@ class AuthorizedItemResourceByUser(MyAuthenticatedResource):
 ```
 
 # Bend EasyRest to Your Will<a name="bend-easyrest-to-your-will">&nbsp;</a>
+Here are some facts.
 
-#### Fact: EasyRest is 160 lines of code.
-#### Fact: You may have custom needs for your API.
-#### Fact: If you read the source code, you'll know how to extend EasyRest to suit your needs.
+* EasyRest is 160 lines of code.
+* You may have custom needs for your API.
+* If you read the source code, you'll know how to extend EasyRest to suit your needs.
 
 #### My Recommendations
 Whether you want to change the url schema, add more CRUD methods, or change the way data is retrieved,
