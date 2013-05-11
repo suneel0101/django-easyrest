@@ -28,7 +28,10 @@ class APIResource(object):
         except self.model.DoesNotExist:
             return {'error': 'No result matches id: {}'.format(_id)}
 
-        # Make sure user is authorized to see this item
+        # If this resource is restricted by user
+        # Make sure that user has access to the object with this _id
+        # So check that there is an object with this _id that is owned by
+        # `user`
         if (self.user_field_to_restrict_by and
             not (self.filter_by_user(self.get_queryset(), user)
                  .filter(pk=_id)
