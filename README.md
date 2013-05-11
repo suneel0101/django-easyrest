@@ -14,7 +14,7 @@ EasyRest is a lightweight framework (less than 160 lines of code!) that allows y
   * [Enable Search](#enable-search)
   * [Use Authentication](#use-authentication)
   * [Authorization Helpers](#authorization-helpers)
-* [Restrict Results by User](#restrict-results-by-user)
+  * [Restrict Results by User](#restrict-results-by-user)
 * [How to Customize EasyRest](#how-to-customize-easyrest)
 * [How to Hack on EasyRest](#how-to-hack-on-easyrest)
 * [Roadmap](#roadmap)
@@ -171,7 +171,7 @@ GET /api/item/?page=2
 Sometimes you might want to allow your API user to search for a result set rather than just listing the results in a certain order.
 The way to set this up in EasyRest is intentionally very barebones so you can extend it and implement the search you want for your resource, no matter how simple or complicated.
 
-#### Define the `search` method
+#### All you have to do is define the `search` method
 ```python
 class SearchableItemResource(APIResource):
     model = Item
