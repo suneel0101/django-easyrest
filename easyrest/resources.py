@@ -1,7 +1,7 @@
 class APIResource(object):
     model = None
     results_per_page = None
-    restrict_by_user = None
+    user_field_to_restrict_by = None
     needs_authentication = False
     name = None
 
@@ -17,7 +17,7 @@ class APIResource(object):
     def get_list(self, user=None, page=None):
         qs = self.get_queryset()
         qs = (self.filter_by_user(qs, user)
-              if (user and self.restrict_by_user) else qs)
+              if (user and self.user_field_to_restrict_by) else qs)
         qs = self.paginate(qs, page)
         return {"items": [self.serialize(obj) for obj in qs.iterator()]}
 
@@ -29,7 +29,7 @@ class APIResource(object):
             return {'error': 'No result matches id: {}'.format(_id)}
 
         # Make sure user is authorized for to see this item
-        if (self.restrict_by_user and
+        if (self.user_field_to_restrict_by and
             not (self.filter_by_user(self.get_queryset(), user)
                  .filter(pk=_id)
                  .exists())):
@@ -45,7 +45,7 @@ class APIResource(object):
         return qs[start:finish]
 
     def filter_by_user(self, qs, user):
-        return qs.filter(**{self.restrict_by_user: user.id})
+        return qs.filter(**{self.user_field_to_restrict_by: user.id})
 
     @property
     def _name(self):
