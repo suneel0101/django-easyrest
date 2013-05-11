@@ -55,7 +55,7 @@
 <li><a href="#restrict-results-by-user">Restrict Results by User</a></li>
 </ul>
 </li>
-<li><a href="#how-to-customize-easyrest">How to Customize EasyRest</a></li>
+<li><a href="#best-easyrest-to-your-will">Bend EasyRest to Your Will</a></li>
 <li><a href="#how-to-hack-on-easyrest">How to Hack on EasyRest</a></li>
 <li><a href="#roadmap">Roadmap</a></li>
 <li><a href="#license">License</a></li>
@@ -109,8 +109,8 @@
 </h1>
 
 <ul>
-<li>When you need a simple read-only REST API for your Backbone/Ember/Angular app</li>
-<li>When ou need a read-only API for others to consume. Did you know EasyRest has a simple and extensible authentication system?</li>
+<li>When you need a simple read-only REST API for your own Backbone/Ember/Angular app</li>
+<li>When you need a read-only API for others to consume - EasyRest has a simple and extensible authentication system.</li>
 <li>Whenever you want!</li>
 </ul><h1>Usage<a name="usage"> </a>
 </h1>
@@ -408,19 +408,21 @@ Define the <code>authorize</code> method of AuthorizedAPIResource and then have 
         <span class="p">}</span>
 </pre></div>
 
-<h1>How to Customize EasyRest<a name="how-to-customize-easyrest"> </a>
+<h1>Bend EasyRest to Your Will<a name="bend-easyrest-to-your-will"> </a>
 </h1>
 
-<p>You may have custom needs for your api. Here's some advice on how to extend EasyRest to meet those needs.</p>
+<h4>Fact: EasyRest is 160 lines of code.</h4>
 
-<ul>
-<li>If you want to modify what the URLs look like, you should subclass <code>easyrest.API</code> and use that subclass as your API.</li>
-<li>If you want to modify how results are retrieved, subclass <code>APIResource</code> and modify the <code>get_list</code> and <code>get_one</code> methods</li>
-<li>If you want to add POST, CREATE or UPDATE funcionality, subclass the views and use those views in your <code>get_urls</code> method (to do that would have to subclass API, as mentioned above). In addition, you'll probably want to add methods to <code>APIResource</code> to deal with those CRUD operations.</li>
-<li>If you want to plug in a different authentication/authorization scheme, define the <code>authorize</code> method of the APIResource.</li>
-</ul><p>These are just a few guidelines. If you modify it in other cool ways, please let me know, I'd be excited to learn!</p>
+<h4>Fact: You may have custom needs for your API.</h4>
 
-<p>The <em>main point</em> is that since there are only 160 lines of code, you can see the inner workings of this library really easily and feel free to bend it to your will!</p>
+<h4>Fact: If you read the source code, you'll know how to extend EasyRest to suit your needs.</h4>
+
+<h4>My Recommendations</h4>
+
+<p>Whether you want to change the url schema, add more CRUD methods, or change the way data is retrieved,
+always feel free to subclass <code>easyrest.API</code>, <code>easyrest.APIResource</code>, and the <code>ListView</code> and <code>ItemView</code> to your heart's desire.</p>
+
+<p>Let me know how you extend EasyRest, I'd be excited to learn and potentially get some pull requests!</p>
 
 <h1>How to Hack on EasyRest<a name="how-to-hack-on-easyrest"> </a>
 </h1>
