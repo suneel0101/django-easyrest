@@ -236,7 +236,7 @@ Decide whether you want your API consumer to pass in an API key through the requ
 Here's an example:
 
 ```python
-from resteasy.resources import APIResource
+from resteasy import APIResource
 from resteasy.auth import get_user_from_GET_param
 
 class AuthorizedItemResource(APIResource):
