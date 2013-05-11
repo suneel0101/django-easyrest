@@ -46,6 +46,34 @@ class PaginatedItemResource(APIResource):
         }
 
 
+class SearchableItemResource(APIResource):
+    model = Item
+    name = 'searchable_item'
+
+    def serialize(self, item):
+        return {
+            'id': item.id,
+            'text': item.text,
+            'popularity': item.popularity,
+        }
+
+    def search(self, get_params):
+        """
+        Some custom search logic.
+        You always have access to the request.GET params
+        through `get_params`
+        """
+        filter_kwargs = {}
+        if get_params.get("popular"):
+            filter_kwargs["status__gte"] = 9
+
+        if get_params.get("contains"):
+            filter_kwargs["text__icontains"] = get_params["contains"]
+        return {"items": [
+            self.serialize(obj)
+            for obj in self.get_queryset().filter(**filter_kwargs)]}
+
+
 class AuthorizedItemResource(MyAuthenticatedResource):
     model = UserItem
     name = 'authorized_item'
@@ -75,6 +103,7 @@ class AuthorizedItemResourceByUser(MyAuthenticatedResource):
 
 api.register(ItemResource)
 api.register(PaginatedItemResource)
+api.register(SearchableItemResource)
 api.register(ReverseOrderItemResource)
 api.register(AuthorizedItemResource)
 api.register(AuthorizedItemResourceByUser)

@@ -209,7 +209,7 @@ class SearchableItemResource(APIResource):
         """
         filter_kwargs = {}
         if get_params.get("popular"):
-            filter_kwargs["popularity__gte"] = 9
+            filter_kwargs["status__gte"] = 9
          
         if get_params.get("contains"):
             filter_kwargs["text__icontains"] = get_params["contains"]
