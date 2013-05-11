@@ -8,10 +8,10 @@ pip install django-easyrest
 
 ## Table of Contents
 
+* [Installation](#installation)
 * [Why use EasyRest?](#why-use-easyrest)
 * [EasyRest vs. other frameworks?](#easyrest-vs-other-frameworks)
 * [Features](#features)
-* [Installation](#installation)
 * [Usage](#usage)
   * [Declaring a Resource](#declaring-a-resource)
   * [Registering to the API](#registering-to-the-api)
