@@ -38,6 +38,7 @@
 
 <ul>
 <li><a href="#installation">Installation</a></li>
+<li><a href="#example">Example</a></li>
 <li><a href="#when-should-i-use-easyrest">When should I use EasyRest?</a></li>
 <li><a href="#features">Features</a></li>
 <li>
@@ -64,24 +65,7 @@
 <pre><code>pip install django-easyrest
 </code></pre>
 
-<h2>When should I use EasyRest?<a name="when-should-i-use-easyrest"> </a>
-</h2>
-
-<ul>
-<li>When you need a simple read-only REST API for your Backbone/similar app</li>
-<li>When ou need a read-only API for others to consume. Did you know EasyRest has a simple and extensible authentication system?</li>
-<li>Whenever you want!</li>
-</ul><h2>Features<a name="features"> </a>
-</h2>
-
-<p>EasyRest is meant to be simple and cover the most common use cases. So it supports,</p>
-
-<ul>
-<li>pagination</li>
-<li>authentication</li>
-<li>restricting by owner</li>
-<li>search</li>
-</ul><h2>Usage<a name="usage"> </a>
+<h2>Example<a name="example"> </a>
 </h2>
 
 <div class="highlight"><pre><span class="c"># api.py</span>
@@ -110,6 +94,26 @@
 
 <span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">''</span><span class="p">,</span> <span class="n">url</span><span class="p">(</span><span class="s">r'^api/'</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">api</span><span class="o">.</span><span class="n">get_urls</span><span class="p">())))</span>
 </pre></div>
+
+<h2>When should I use EasyRest?<a name="when-should-i-use-easyrest"> </a>
+</h2>
+
+<ul>
+<li>When you need a simple read-only REST API for your Backbone/similar app</li>
+<li>When ou need a read-only API for others to consume. Did you know EasyRest has a simple and extensible authentication system?</li>
+<li>Whenever you want!</li>
+</ul><h2>Features<a name="features"> </a>
+</h2>
+
+<p>EasyRest is meant to be simple and cover the most common use cases. So it supports,</p>
+
+<ul>
+<li>pagination</li>
+<li>authentication</li>
+<li>restricting by owner</li>
+<li>search</li>
+</ul><h1>Usage<a name="usage"> </a>
+</h1>
 
 <h2>Declare a Resource<a name="declare-a-resource"> </a>
 </h2>
