@@ -17,6 +17,7 @@ class BaseAPIView(View):
         if request.method != 'GET':
             return HttpResponseForbidden()
         request._user = None
+        # Authorization check happens here
         if self.resource.needs_authentication:
             request._user = self.resource.authorize(request)
             if not request._user:
