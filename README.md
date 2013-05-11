@@ -274,6 +274,7 @@ GET /api/authorized_item/?apikey=kjhsdf3
 
 ## Builtin APIKey Authentication System<a name="builtin-apikey-authentication-system">&nbsp;</a>
 
+
 For your convenience, in `easyrest.models`, there is a simple APIKey model linked to a User.
 The `easyrest.auth` methods use this model.
 To use it, just syncdb and create APIKeys for your consumers.
