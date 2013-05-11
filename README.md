@@ -12,9 +12,9 @@ EasyRest is an ultra-lightweight (170 LOC) read-only REST api framework for Djan
   * [Register the Resource with the API](#register-the-resource-with-the-api)
   * [URL Endpoints](#url-endpoints)
   * [Format of Requests and Responses](#format-of-requests-and-responses)
-  * [Enable Pagination](#enable-pagination)
-  * [Enable Search](#enable-search)
-  * [Use Authentication](#use-authentication)
+  * [Pagination](#pagination)
+  * [Search](#search)
+  * [Authentication](#authentication)
   * [Authorization Helpers](#authorization-helpers)
   * [Restrict Results by User](#restrict-results-by-user)
 * [Bend EasyRest to Your Will](#bend-easyrest-to-your-will)
@@ -157,7 +157,7 @@ GET /api/item/9998/ 400
 }
 ```
 
-## Enable Pagination<a name="enable-pagination">&nbsp;</a>
+## Pagination<a name="pagination">&nbsp;</a>
 If you want to paginate the results, you just need to set `results_per_page`. Here's an example:
 
 ```python
@@ -182,7 +182,7 @@ GET /api/item/?page=2
 ```
 
 
-## Enable Search<a name="enable-search">&nbsp;</a>
+## Search<a name="search">&nbsp;</a>
 
 Sometimes you might want to allow your API user to search for a result set rather than just listing the results in a certain order.
 The way to set this up in EasyRest is intentionally very barebones so you can extend it and implement the search you want for your resource, no matter how simple or complicated.
@@ -224,7 +224,7 @@ The format of the request will depend on how you implement the `search` method, 
 
 `GET /api/searchable_item/search/?popular=1&contains=fun`
 
-## Use Authentication<a name="use-authentication">&nbsp;</a>
+## Authentication<a name="authentication">&nbsp;</a>
 EasyRest Authentication is really easy to use and extend, as you'll see below.
 
 #### 1. Define an authorization scheme
