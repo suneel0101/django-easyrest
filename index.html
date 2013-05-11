@@ -1,51 +1,78 @@
 <!DOCTYPE html>
 <html>
-
   <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Django-restroom : super lightweight django read-only REST api framework" />
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
 
-    <title>Django-restroom</title>
+    <title>Django-restroom by suneel0101</title>
   </head>
 
   <body>
+    <header>
+      <div class="inner">
+        <h1>Django-restroom</h1>
+        <h2>super lightweight django read-only REST api framework</h2>
+        <a href="https://github.com/suneel0101/django-restroom" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/suneel0101/django-restroom">View on GitHub</a>
-
-          <h1 id="project_title">Django-restroom</h1>
-          <h2 id="project_tagline">super lightweight django read-only REST api framework</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/suneel0101/django-restroom/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/suneel0101/django-restroom/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h1>Django-EasyRest</h1>
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>Django-EasyRest</h1>
 
 <p>EasyRest is a lightweight framework (less than 160 lines of code!) that allows you to really quickly and flexibly create a READ-ONLY REST API for your models.</p>
 
-<h2>Why would I want to use EasyRest?</h2>
+<h2>Table of Contents</h2>
+
+<ul>
+<li><a href="#why-use-easyrest">Why use EasyRest?</a></li>
+<li><a href="#easyrest-vs-other-frameworks">EasyRest vs. other frameworks?</a></li>
+<li><a href="#features">Features</a></li>
+<li><a href="#installation">Installation</a></li>
+<li>
+<a href="#usage">Usage</a>
+
+<ul>
+<li><a href="#declaring-a-resource">Declaring a Resource</a></li>
+<li><a href="#registering-to-the-api">Registering to the API</a></li>
+<li><a href="#format-of-requests-and-responses">Format of Requests and Responses</a></li>
+<li><a href="#pagination">Pagination</a></li>
+<li><a href="#search">Search</a></li>
+<li><a href="#authentication">Authentication</a></li>
+<li><a href="#restricting-by-owner">Restricting by Owner</a></li>
+</ul>
+</li>
+<li><a href="#how-to-extend-easyrest">How to Extend EasyRest</a></li>
+<li><a href="#how-to-extend-easyrest">How to Hack on EasyRest</a></li>
+<li><a href="#roadmap">Roadmap</a></li>
+<li>
+<a href="#development">Development</a>
+
+<ul>
+<li><a href="#license">License</a></li>
+</ul>
+</li>
+</ul><h2>Why use EasyRest?</h2>
 
 <ul>
 <li>You need a simple read-only REST API for your Backbone/similar app</li>
 <li>You need a read-only API for others to consume. Did you know EasyRest has a simple and extensible authentication system?</li>
-</ul><h2>What about those other frameworks?</h2>
+</ul><h2>EasyRest vs. other frameworks?</h2>
 
 <p>In exchange for full-featuredness, those other frameworks are hard to setup and use.
 EasyRest is really simple to use and even simpler to extend.</p>
 
-<h2>What features do I get with EasyRest?</h2>
+<h2>Features</h2>
 
 <p>EasyRest is meant to be simple and cover the most common use cases. So it supports,</p>
 
@@ -54,39 +81,39 @@ EasyRest is really simple to use and even simpler to extend.</p>
 <li>authentication</li>
 <li>restricting by owner</li>
 <li>search</li>
-</ul><h2>How do I install it?</h2>
+</ul><h2>Installation</h2>
 
 <pre><code>pip install django-easyrest
 </code></pre>
 
-<h2>How do I use it?</h2>
+<h2>Usage</h2>
 
-<pre><code># api.py
+<div class="highlight"><pre><span class="c"># api.py</span>
 
-from easyrest import API
-from .models import Item
+<span class="kn">from</span> <span class="nn">easyrest</span> <span class="kn">import</span> <span class="n">API</span>
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Item</span>
 
-api = API()
+<span class="n">api</span> <span class="o">=</span> <span class="n">API</span><span class="p">()</span>
 
-class ItemResource(APIResource):
-    model = Item
-    name = 'item'
+<span class="k">class</span> <span class="nc">ItemResource</span><span class="p">(</span><span class="n">APIResource</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Item</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s">'item'</span>
 
-    def serialize(self, item):
-        return {
-            'id': item.id,
-            'text': item.text,
-            'popularity': item.popularity,
-        }
+    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s">'id'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="s">'text'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+            <span class="s">'popularity'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">popularity</span><span class="p">,</span>
+        <span class="p">}</span>
 
-api.register(ItemResource)
+<span class="n">api</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ItemResource</span><span class="p">)</span>
 
-# urls.py
-from django.conf.urls import url, patterns, include
-from .api import api
+<span class="c"># urls.py</span>
+<span class="kn">from</span> <span class="nn">django.conf.urls</span> <span class="kn">import</span> <span class="n">url</span><span class="p">,</span> <span class="n">patterns</span><span class="p">,</span> <span class="n">include</span>
+<span class="kn">from</span> <span class="nn">.api</span> <span class="kn">import</span> <span class="n">api</span>
 
-urlpatterns = patterns('', url(r'^api/', include(api.get_urls())))
-</code></pre>
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">''</span><span class="p">,</span> <span class="n">url</span><span class="p">(</span><span class="s">r'^api/'</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">api</span><span class="o">.</span><span class="n">get_urls</span><span class="p">())))</span>
+</pre></div>
 
 <h2>Declaring a Resource</h2>
 
@@ -109,7 +136,7 @@ So if you wanted to have the queryset ordered by <code>id</code> descending and 
 <p>Use this method to customize the set of results you want returned any way you like.
 For example, you can do preprocessing as we did above with the <code>status</code> as well as specify an ordering.</p>
 
-<h2>Registering your resource to the api</h2>
+<h2>Registering to the api</h2>
 
 <ul>
 <li>Create an instance of <code>easyrest.API</code>
@@ -128,46 +155,46 @@ The urls generated are:
 
 <h3>GET to the Item list endpoint</h3>
 
-<pre><code>GET /api/item/ 200
+<div class="highlight"><pre><span class="n">GET</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">item</span><span class="o">/</span> <span class="mi">200</span>
 
-{
-   "items": [
-       {
-           "id": 1,
-           "name": "Louis CK"
-           "text": "I'm a hilarious comedian",
-           "popularity": 99,
-       },
-       {
-           "id": 2,
-           "name": "Joffrey Lannister",
-           "text": "I'm troubled.",
-           "popularity": 2,
-       }
-    ]
-}
-</code></pre>
+<span class="p">{</span>
+   <span class="s">"items"</span><span class="p">:</span> <span class="p">[</span>
+       <span class="p">{</span>
+           <span class="s">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+           <span class="s">"name"</span><span class="p">:</span> <span class="s">"Louis CK"</span>
+           <span class="s">"text"</span><span class="p">:</span> <span class="s">"I'm a hilarious comedian"</span><span class="p">,</span>
+           <span class="s">"popularity"</span><span class="p">:</span> <span class="mi">99</span><span class="p">,</span>
+       <span class="p">},</span>
+       <span class="p">{</span>
+           <span class="s">"id"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+           <span class="s">"name"</span><span class="p">:</span> <span class="s">"Joffrey Lannister"</span><span class="p">,</span>
+           <span class="s">"text"</span><span class="p">:</span> <span class="s">"I'm troubled."</span><span class="p">,</span>
+           <span class="s">"popularity"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+       <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
 
 <h3>GET to the Item single-item endpoint</h3>
 
-<pre><code>GET /api/item/1/ 200
+<div class="highlight"><pre><span class="n">GET</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">item</span><span class="o">/</span><span class="mi">1</span><span class="o">/</span> <span class="mi">200</span>
 
-{
-    "id": 1,
-    "name": "Louis CK"
-    "text": "I'm a hilarious comedian",
-    "popularity": 99,
-}
-</code></pre>
+<span class="p">{</span>
+    <span class="s">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s">"name"</span><span class="p">:</span> <span class="s">"Louis CK"</span>
+    <span class="s">"text"</span><span class="p">:</span> <span class="s">"I'm a hilarious comedian"</span><span class="p">,</span>
+    <span class="s">"popularity"</span><span class="p">:</span> <span class="mi">99</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
 
 <h3>GET to the Item single-item endpoint for a nonexistent item</h3>
 
-<pre><code>GET /api/item/9998/ 400
+<div class="highlight"><pre><span class="n">GET</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">item</span><span class="o">/</span><span class="mi">9998</span><span class="o">/</span> <span class="mi">400</span>
 
-{
-    "error": "No result found matching id: 9998"
-}
-</code></pre>
+<span class="p">{</span>
+    <span class="s">"error"</span><span class="p">:</span> <span class="s">"No result found matching id: 9998"</span>
+<span class="p">}</span>
+</pre></div>
 
 <h2>Pagination</h2>
 
@@ -202,32 +229,32 @@ The way to set this up in EasyRest is intentionally very barebones so you can ex
 
 <h3>Define the <code>search</code> method</h3>
 
-<pre><code>class SearchableItemResource(APIResource):
-    model = Item
-    name = 'searchable_item'
-    results_per_page = 20
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">SearchableItemResource</span><span class="p">(</span><span class="n">APIResource</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Item</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s">'searchable_item'</span>
+    <span class="n">results_per_page</span> <span class="o">=</span> <span class="mi">20</span>
 
-    def serialize(self, item):
-        return {
-            'id': item.id,
-            'text': item.text,
-            'popularity': item.popularity,
-        }
+    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s">'id'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="s">'text'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+            <span class="s">'popularity'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">popularity</span><span class="p">,</span>
+        <span class="p">}</span>
 
-    def search(self, get_params):
-        """
-        Some custom search logic.
-        You always have access to the request.GET params
-        through `get_params`
-        """
-        filter_kwargs = {}
-        if get_params.get("popular"):
-            filter_kwargs["popularity__gte"] = 9
+    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_params</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Some custom search logic.</span>
+<span class="sd">        You always have access to the request.GET params</span>
+<span class="sd">        through `get_params`</span>
+<span class="sd">        """</span>
+        <span class="n">filter_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">get_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">"popular"</span><span class="p">):</span>
+            <span class="n">filter_kwargs</span><span class="p">[</span><span class="s">"popularity__gte"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">9</span>
 
-        if get_params.get("contains"):
-            filter_kwargs["text__icontains"] = get_params["contains"]
-        return self.get_queryset().filter(**filter_kwargs)
-</code></pre>
+        <span class="k">if</span> <span class="n">get_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">"contains"</span><span class="p">):</span>
+            <span class="n">filter_kwargs</span><span class="p">[</span><span class="s">"text__icontains"</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_params</span><span class="p">[</span><span class="s">"contains"</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">**</span><span class="n">filter_kwargs</span><span class="p">)</span>
+</pre></div>
 
 <p>The important thing here is you can plug in whatever search system you want. You're not even tied to SQL or the Django ORM. You can use ElasticSearch or whatever backend makes sense for your use case. You just have to define the <code>search</code> method that takes a dictionary of request GET params.</p>
 
@@ -401,18 +428,52 @@ In that case, you should subclass APIResource and define the <code>authorize</co
 
 <p>I'm thinking about whether to support the other CRUD operations.
 If you have any suggestions, please let me know.</p>
-      </section>
+
+<h2>Development</h2>
+
+<h3>License</h3>
+
+<p>(The MIT license)</p>
+
+<p>Copyright (c) 2013 Suneel Chakravorty <a href="mailto:suneel0101@gmail.com">suneel0101@gmail.com</a></p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/suneel0101/django-restroom/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/suneel0101/django-restroom/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/suneel0101/django-restroom"></a> is maintained by <a href="https://github.com/suneel0101">suneel0101</a>.</p>
+
+          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
     </div>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Django-restroom maintained by <a href="https://github.com/suneel0101">suneel0101</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-
-    
-
+  
   </body>
 </html>
