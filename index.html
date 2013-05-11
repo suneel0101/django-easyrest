@@ -34,33 +34,28 @@
 
 <p>EasyRest is a lightweight framework (less than 160 lines of code!) that allows you to really quickly and flexibly create a READ-ONLY REST API for your models.</p>
 
-<h2>Installation</h2>
-
-<pre><code>pip install django-easyrest
-</code></pre>
-
 <h2>Table of Contents</h2>
 
 <ul>
 <li><a href="#installation">Installation</a></li>
-<li><a href="#why-use-easyrest">Why use EasyRest?</a></li>
-<li><a href="#easyrest-vs-other-frameworks">EasyRest vs. other frameworks?</a></li>
+<li><a href="#when-should-i-use-easyrest">When should I use EasyRest?</a></li>
 <li><a href="#features">Features</a></li>
 <li>
 <a href="#usage">Usage</a>
 
 <ul>
-<li><a href="#declaring-a-resource">Declaring a Resource</a></li>
-<li><a href="#registering-to-the-api">Registering to the API</a></li>
+<li><a href="#declare-a-resource">Declare a Resource</a></li>
+<li><a href="#register-the-resource-with-the-api">Register the Resource with the API</a></li>
 <li><a href="#format-of-requests-and-responses">Format of Requests and Responses</a></li>
-<li><a href="#pagination">Pagination</a></li>
-<li><a href="#search">Search</a></li>
-<li><a href="#authentication">Authentication</a></li>
-<li><a href="#restricting-by-owner">Restricting by Owner</a></li>
+<li><a href="#enable-pagination">Enable Pagination</a></li>
+<li><a href="#enable-search">Enable Search</a></li>
+<li><a href="#use-authentication">Use Authentication</a></li>
+<li><a href="#authorization-helpers">Authorization Helpers</a></li>
 </ul>
 </li>
-<li><a href="#how-to-extend-easyrest">How to Extend EasyRest</a></li>
-<li><a href="#how-to-extend-easyrest">How to Hack on EasyRest</a></li>
+<li><a href="#restrict-results-by-user">Restrict Results by User</a></li>
+<li><a href="#how-to-customize-easyrest">How to Customize EasyRest</a></li>
+<li><a href="#how-to-hack-on-easyrest">How to Hack on EasyRest</a></li>
 <li><a href="#roadmap">Roadmap</a></li>
 <li>
 <a href="#development">Development</a>
@@ -69,18 +64,21 @@
 <li><a href="#license">License</a></li>
 </ul>
 </li>
-</ul><h2>Why use EasyRest?<a name="why-use-easyrest"> </a>
+</ul><h2>Installation<a name="installation"> </a>
+</h2>
+
+<pre><code>pip install django-easyrest
+</code></pre>
+
+<h2>When should I use EasyRest?<a name="when-should-i-use-easyrest"> </a>
 </h2>
 
 <ul>
-<li>You need a simple read-only REST API for your Backbone/similar app</li>
-<li>You need a read-only API for others to consume. Did you know EasyRest has a simple and extensible authentication system?</li>
-</ul><h2>EasyRest vs. other frameworks?</h2>
-
-<p>In exchange for full-featuredness, those other frameworks are hard to setup and use.
-EasyRest is really simple to use and even simpler to extend.</p>
-
-<h2>Features</h2>
+<li>When you need a simple read-only REST API for your Backbone/similar app</li>
+<li>When ou need a read-only API for others to consume. Did you know EasyRest has a simple and extensible authentication system?</li>
+<li>Whenever you want!</li>
+</ul><h2>Features<a name="features"> </a>
+</h2>
 
 <p>EasyRest is meant to be simple and cover the most common use cases. So it supports,</p>
 
@@ -89,7 +87,8 @@ EasyRest is really simple to use and even simpler to extend.</p>
 <li>authentication</li>
 <li>restricting by owner</li>
 <li>search</li>
-</ul><h2>Usage</h2>
+</ul><h2>Usage<a name="usage"> </a>
+</h2>
 
 <div class="highlight"><pre><span class="c"># api.py</span>
 
@@ -118,7 +117,8 @@ EasyRest is really simple to use and even simpler to extend.</p>
 <span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">''</span><span class="p">,</span> <span class="n">url</span><span class="p">(</span><span class="s">r'^api/'</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">api</span><span class="o">.</span><span class="n">get_urls</span><span class="p">())))</span>
 </pre></div>
 
-<h2>Declaring a Resource</h2>
+<h2>Declare a Resource<a name="declare-a-resource"> </a>
+</h2>
 
 <p>You only need to specify 3 things when subclassing APIResource:</p>
 
@@ -139,7 +139,8 @@ So if you wanted to have the queryset ordered by <code>id</code> descending and 
 <p>Use this method to customize the set of results you want returned any way you like.
 For example, you can do preprocessing as we did above with the <code>status</code> as well as specify an ordering.</p>
 
-<h2>Registering to the api</h2>
+<h2>Register the Resource with the API<a name="register-the-resource-with-the-api"> </a>
+</h2>
 
 <ul>
 <li>Create an instance of <code>easyrest.API</code>
@@ -149,14 +150,15 @@ For example, you can do preprocessing as we did above with the <code>status</cod
 <li>Then include <code>api.get_urls</code> in your urlconf</li>
 </ul><p>Note that because you are registering resources with an instance of <code>easyrest.API</code>, you can conceivably have many different API instances with different resources. EasyRest is flexible in how you use it.</p>
 
-<h2>Format of Requests and Responses</h2>
+<h2>Format of Requests and Responses<a name="format-of-requests-and-responses"> </a>
+</h2>
 
 <p>Let's use the example of ItemResource above.
 The urls generated are:
     * /api/item/ - This returns a list of Items
     * /api/item/{int: id}/ - This returns a single serialized Item with the specified id</p>
 
-<h3>GET to the Item list endpoint</h3>
+<h4>GET to the Item list endpoint</h4>
 
 <div class="highlight"><pre><span class="n">GET</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">item</span><span class="o">/</span> <span class="mi">200</span>
 
@@ -178,7 +180,7 @@ The urls generated are:
 <span class="p">}</span>
 </pre></div>
 
-<h3>GET to the Item single-item endpoint</h3>
+<h4>GET to the Item single-item endpoint</h4>
 
 <div class="highlight"><pre><span class="n">GET</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">item</span><span class="o">/</span><span class="mi">1</span><span class="o">/</span> <span class="mi">200</span>
 
@@ -190,7 +192,7 @@ The urls generated are:
 <span class="p">}</span>
 </pre></div>
 
-<h3>GET to the Item single-item endpoint for a nonexistent item</h3>
+<h4>GET to the Item single-item endpoint for a nonexistent item</h4>
 
 <div class="highlight"><pre><span class="n">GET</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">item</span><span class="o">/</span><span class="mi">9998</span><span class="o">/</span> <span class="mi">400</span>
 
@@ -199,7 +201,8 @@ The urls generated are:
 <span class="p">}</span>
 </pre></div>
 
-<h2>Pagination</h2>
+<h2>Enable Pagination<a name="enable-pagination"> </a>
+</h2>
 
 <p>If you want to paginate the results, you just need to set <code>results_per_page</code>. Here's an example:</p>
 
@@ -218,19 +221,20 @@ The urls generated are:
 
 <p>If you don't set <code>results_per_page</code>, all of the items will be returned at once.</p>
 
-<h3>How do I request a paginated resource?</h3>
+<h4>How do I request a paginated resource?</h4>
 
 <p>Simple.</p>
 
 <pre><code>GET /api/item/?page=2
 </code></pre>
 
-<h2>Search</h2>
+<h2>Enable Search<a name="enable-search"> </a>
+</h2>
 
 <p>Sometimes you might want to allow your API user to search for a result set rather than just listing the results in a certain order.
 The way to set this up in EasyRest is intentionally very barebones so you can extend it and implement the search you want for your resource, no matter how simple or complicated.</p>
 
-<h3>Define the <code>search</code> method</h3>
+<h4>Define the <code>search</code> method</h4>
 
 <div class="highlight"><pre><span class="k">class</span> <span class="nc">SearchableItemResource</span><span class="p">(</span><span class="n">APIResource</span><span class="p">):</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">Item</span>
@@ -261,31 +265,32 @@ The way to set this up in EasyRest is intentionally very barebones so you can ex
 
 <p>The important thing here is you can plug in whatever search system you want. You're not even tied to SQL or the Django ORM. You can use ElasticSearch or whatever backend makes sense for your use case. You just have to define the <code>search</code> method that takes a dictionary of request GET params.</p>
 
-<h3>Make a search request</h3>
+<h4>Make a search request</h4>
 
 <p>The URL will be "/{resource name}/search/"
 The format of the request will depend on how you implement the <code>search</code> method, but in this case, it looks like this:</p>
 
 <p><code>GET /api/searchable_item/search/?popular=1&amp;contains=fun</code></p>
 
-<h2>Authentication</h2>
+<h2>Use Authentication<a name="use-authentication"> </a>
+</h2>
 
 <p>EasyRest Authentication is really easy to use and extend, as you'll see below.</p>
 
-<h3>1. Define an authorization scheme</h3>
+<h4>1. Define an authorization scheme</h4>
 
 <p>Decide whether you want your API consumer to pass in an API key through the request GET parameters or the headers or whatever else.</p>
 
-<h3>2. Set <code>needs_authentication = True</code> in your resource declaration</h3>
+<h4>2. Set <code>needs_authentication = True</code> in your resource declaration</h4>
 
-<h3>3. Define an <code>authorize</code> method for your resource</h3>
+<h4>3. Define an <code>authorize</code> method for your resource</h4>
 
 <p>Often you may want the same authorization method for many of your resources.
 In that case, you should subclass APIResource and define the <code>authorize</code> method, let's call it AuthorizedAPIResource.</p>
 
 <p>Then, all of your model resources can subclass AuthorizedAPIResource.</p>
 
-<h3>Here's an example:</h3>
+<h4>Here's an example:</h4>
 
 <div class="highlight"><pre><span class="kn">from</span> <span class="nn">resteasy.resources</span> <span class="kn">import</span> <span class="n">APIResource</span>
 <span class="kn">from</span> <span class="nn">resteasy.auth</span> <span class="kn">import</span> <span class="n">get_user_from_GET_param</span>
@@ -319,7 +324,8 @@ In that case, you should subclass APIResource and define the <code>authorize</co
 
 <p>An example request would be <code>GET /api/authorized_item/?apikey=kjhsdf3</code></p>
 
-<h3>Authorization helper methods</h3>
+<h2>Authorization helpers<a name="authorization-helpers"> </a>
+</h2>
 
 <p>In easyrest.auth, there are three really useful helper methods:</p>
 
@@ -334,11 +340,12 @@ In that case, you should subclass APIResource and define the <code>authorize</co
 
 <p>If you want to use your own way of authenticating, just write your own <code>authorize</code> method, and you're good.</p>
 
-<h3>What happens if an unauthorized person tries to access a protected resource?</h3>
+<h4>What happens if an unauthorized person tries to access a protected resource?</h4>
 
 <p>If someone tries to access a resource without authorization, they will get a 403 Forbidden response.</p>
 
-<h2>Restricting by Owner</h2>
+<h2>Restrict Results by User<a name="#restrict-results-by-user"> </a>
+</h2>
 
 <p>A lot of the time, we want our API consumers to only access the results that they own.</p>
 
@@ -346,8 +353,8 @@ In that case, you should subclass APIResource and define the <code>authorize</co
 
 <p>To achieve this, you just need to do 1 thing in addition to setting up Authentication as above.</p>
 
-<h3>Set <code>restrict_by_user</code>
-</h3>
+<h4>Set <code>restrict_by_user</code>
+</h4>
 
 <p>When you declare your resource, you should set <code>restrict_by_user</code> equal to the field path to the User field corresponding to the owner, the same path you would use through the Django Queryset API.</p>
 
@@ -402,7 +409,8 @@ In that case, you should subclass APIResource and define the <code>authorize</co
         <span class="p">}</span>
 </pre></div>
 
-<h2>How to Extend EasyRest</h2>
+<h2>How to Customize EasyRest<a name="how-to-customize-easyrest"> </a>
+</h2>
 
 <p>You may have custom needs for your api. Here's some advice on how to extend EasyRest to meet those needs.</p>
 
@@ -415,7 +423,8 @@ In that case, you should subclass APIResource and define the <code>authorize</co
 
 <p>The <em>main point</em> is that since there are only 160 lines of code, you can see the inner workings of this library really easily and feel free to bend it to your will!</p>
 
-<h2>How to Hack on EasyRest</h2>
+<h2>How to Hack on EasyRest<a name="how-to-hack-on-easyrest"> </a>
+</h2>
 
 <ol>
 <li>git clone this repo</li>
@@ -427,14 +436,17 @@ In that case, you should subclass APIResource and define the <code>authorize</co
 </li>
 </ol><p>Happy hacking!</p>
 
-<h2>Roadmap</h2>
+<h2>Roadmap<a name="roadmap"> </a>
+</h2>
 
 <p>I'm thinking about whether to support the other CRUD operations.
 If you have any suggestions, please let me know.</p>
 
-<h2>Development</h2>
+<h2>Development<a name="development"> </a>
+</h2>
 
-<h3>License</h3>
+<h3>License<a name="license"> </a>
+</h3>
 
 <p>(The MIT license)</p>
 
