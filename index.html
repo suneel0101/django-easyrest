@@ -52,6 +52,7 @@
 <li><a href="#pagination">Pagination</a></li>
 <li><a href="#search">Search</a></li>
 <li><a href="#authentication">Authentication</a></li>
+<li><a href="#builtin-apikey-authentication-system">Builtin APIKey Authentication System</a></li>
 <li><a href="#authorization-helpers">Authorization Helpers</a></li>
 <li><a href="#restrict-results-by-user">Restrict Results by User</a></li>
 </ul>
@@ -333,6 +334,21 @@ Define the <code>authorize</code> method of AuthorizedAPIResource and then have 
 <p>This will depend on authorization scheme, but in the above case where we pass in the apikey in the get request, it would look like this:</p>
 
 <div class="highlight"><pre><span class="n">GET</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">authorized_item</span><span class="o">/</span><span class="err">?</span><span class="n">apikey</span><span class="o">=</span><span class="n">kjhsdf3</span>
+</pre></div>
+
+<h2>Builtin APIKey Authentication System<a name="builtin-apikey-authentication-system"> </a>
+</h2>
+
+<p>For your convenience, in <code>easyrest.models</code>, there is a simple APIKey model linked to a User.
+The <code>easyrest.auth</code> methods use this model. </p>
+
+<p>Creating APIKeys for your consumers is very straightforward. For example,</p>
+
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">easyrest.models</span> <span class="kn">import</span> <span class="n">APIKey</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+
+<span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s">'tester'</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s">'123'</span><span class="p">)</span>
+<span class="n">new_api_key</span> <span class="o">=</span> <span class="n">APIKey</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
 </pre></div>
 
 <h2>Authorization helpers<a name="authorization-helpers"> </a>
