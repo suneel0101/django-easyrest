@@ -1,5 +1,5 @@
-from restroom.resources import APIResource
-from restroom.auth import get_user_from_GET_param
+from easyrest.resources import APIResource
+from easyrest.auth import get_user_from_GET_param
 
 
 class MyAuthenticatedResource(APIResource):

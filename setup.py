@@ -18,13 +18,13 @@
 
 from setuptools import setup
 
-setup(name='django-restroom',
+setup(name='django-easyrest',
       version='0.0.2',
-      description='Super lightweight REST API framework for Django',
+      description='An ultra-lightweight read-only REST api framework for Django',
       author='Suneel Chakravorty',
       author_email='suneel0101@gmail.com.com',
       url='https://github.com/suneel0101/django-restroom',
-      packages=['restroom'],
+      packages=['easyrest'],
       install_requires=[
           "django",
       ],

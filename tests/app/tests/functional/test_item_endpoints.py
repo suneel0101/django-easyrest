@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 
-from restroom.models import APIKey
+from easyrest.models import APIKey
 from app.models import Item, UserItem
 
 client = Client()

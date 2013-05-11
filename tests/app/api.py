@@ -1,7 +1,7 @@
 from .models import Item, UserItem
 from .myauth import MyAuthenticatedResource
-from restroom.resources import APIResource
-from restroom.core import API
+from easyrest.resources import APIResource
+from easyrest.core import API
 
 api = API()
 
