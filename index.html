@@ -32,7 +32,7 @@
       <section>
         <h1>Django-EasyRest</h1>
 
-<p>EasyRest is an ultra-lightweight (160 LOC) read-only REST api framework for Django.</p>
+<p>EasyRest is an ultra-lightweight (170 LOC) read-only REST api framework for Django.</p>
 
 <h1>Table of Contents</h1>
 
@@ -49,9 +49,9 @@
 <li><a href="#register-the-resource-with-the-api">Register the Resource with the API</a></li>
 <li><a href="#url-endpoints">URL Endpoints</a></li>
 <li><a href="#format-of-requests-and-responses">Format of Requests and Responses</a></li>
-<li><a href="#enable-pagination">Enable Pagination</a></li>
-<li><a href="#enable-search">Enable Search</a></li>
-<li><a href="#use-authentication">Use Authentication</a></li>
+<li><a href="#pagination">Pagination</a></li>
+<li><a href="#search">Search</a></li>
+<li><a href="#authentication">Authentication</a></li>
 <li><a href="#authorization-helpers">Authorization Helpers</a></li>
 <li><a href="#restrict-results-by-user">Restrict Results by User</a></li>
 </ul>
@@ -211,7 +211,7 @@ So, the urls generated are:</p>
 <span class="p">}</span>
 </pre></div>
 
-<h2>Enable Pagination<a name="enable-pagination"> </a>
+<h2>Pagination<a name="pagination"> </a>
 </h2>
 
 <p>If you want to paginate the results, you just need to set <code>results_per_page</code>. Here's an example:</p>
@@ -238,7 +238,7 @@ So, the urls generated are:</p>
 <pre><code>GET /api/item/?page=2
 </code></pre>
 
-<h2>Enable Search<a name="enable-search"> </a>
+<h2>Search<a name="search"> </a>
 </h2>
 
 <p>Sometimes you might want to allow your API user to search for a result set rather than just listing the results in a certain order.
@@ -282,7 +282,7 @@ The format of the request will depend on how you implement the <code>search</cod
 
 <p><code>GET /api/searchable_item/search/?popular=1&amp;contains=fun</code></p>
 
-<h2>Use Authentication<a name="use-authentication"> </a>
+<h2>Authentication<a name="authentication"> </a>
 </h2>
 
 <p>EasyRest Authentication is really easy to use and extend, as you'll see below.</p>
@@ -355,7 +355,7 @@ Define the <code>authorize</code> method of AuthorizedAPIResource and then have 
 
 <p>If someone tries to access a resource without authorization, they will get a 403 Forbidden response.</p>
 
-<h2>Restrict Results by User<a name="#restrict-results-by-user"> </a>
+<h2>Restrict Results by User<a name="restrict-results-by-user"> </a>
 </h2>
 
 <p>A lot of the time, we want our API consumers to only access the results that they own.</p>
@@ -367,23 +367,26 @@ Define the <code>authorize</code> method of AuthorizedAPIResource and then have 
 <h4>Set <code>user_field_to_restrict_by</code>
 </h4>
 
-<p>When you declare your resource, you should set <code>user_field_to_restrict_by</code> equal to the field path to the User field corresponding to the owner, the same path you would use through the Django Queryset API.</p>
+<p>When you declare your resource, you should set <code>user_field_to_restrict_by</code> equal to the User field that owns the resource.
+This field the same path you would use through the Django Queryset API.</p>
 
-<p>If your UserItem is linked to a User through the field "user", for example:</p>
+<p>Here are two examples, one simple and one a bit more complicated.</p>
+
+<p>If your UserItem is linked to a User through the field "user",</p>
 
 <div class="highlight"><pre><span class="k">class</span> <span class="nc">UserItem</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
     <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
-    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s">'auth.User'</span><span class="p">)</span>
+    <span class="n">boss</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s">'auth.User'</span><span class="p">)</span>
     <span class="n">is_active</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 </pre></div>
 
-<p>You should set <code>user_field_to_restrict_by="user"</code> as follows:</p>
+<p>You should set <code>user_field_to_restrict_by="boss"</code> as follows:</p>
 
 <div class="highlight"><pre><span class="k">class</span> <span class="nc">AuthorizedItemResourceByUser</span><span class="p">(</span><span class="n">MyAuthenticatedResource</span><span class="p">):</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">UserItem</span>
     <span class="n">name</span> <span class="o">=</span> <span class="s">'restrict_user_authorized_item'</span>
     <span class="n">needs_authentication</span> <span class="o">=</span> <span class="bp">True</span>
-    <span class="n">user_field_to_restrict_by</span> <span class="o">=</span> <span class="s">'user'</span>
+    <span class="n">user_field_to_restrict_by</span> <span class="o">=</span> <span class="s">'boss'</span>
 
     <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span>
@@ -392,8 +395,6 @@ Define the <code>authorize</code> method of AuthorizedAPIResource and then have 
             <span class="s">'user_id'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
         <span class="p">}</span>
 </pre></div>
-
-<p>Now when someone makes an authorized request, the results will be limited to the results that they own, where the owner is defined by the <code>user_field_to_restrict_by</code> path.</p>
 
 <h4>A more complicated example</h4>
 
@@ -422,13 +423,15 @@ Define the <code>authorize</code> method of AuthorizedAPIResource and then have 
         <span class="p">}</span>
 </pre></div>
 
+<p>Now when someone makes an authorized request, the results will be limited to the results that they own.</p>
+
 <h1>Bend EasyRest to Your Will<a name="bend-easyrest-to-your-will"> </a>
 </h1>
 
 <p>Here are some facts.</p>
 
 <ul>
-<li>EasyRest is 160 lines of code.</li>
+<li>EasyRest is 170 lines of code.</li>
 <li>You may have custom needs for your API.</li>
 <li>If you read the source code, you'll know how to extend EasyRest to suit your needs.</li>
 </ul><h4>My Recommendations</h4>
@@ -454,8 +457,10 @@ always feel free to subclass <code>easyrest.API</code>, <code>easyrest.APIResour
 <h1>Roadmap<a name="roadmap"> </a>
 </h1>
 
-<p>I'm thinking about whether to support the other CRUD operations.
-If you have any suggestions, please let me know.</p>
+<ul>
+<li>I'm thinking about whether to support the other CRUD operations.</li>
+<li>Javascript Framework template tags so that when setting up Backbone sync for example, all you have to do is something like {% backbone mymodel %}{% endbackbone %} and your endpoints are already set up.</li>
+</ul><p>If you have any suggestions, please let me know.</p>
 
 <h1>License<a name="license"> </a>
 </h1>
