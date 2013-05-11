@@ -4,6 +4,7 @@ EasyRest is a lightweight framework (less than 160 lines of code!) that allows y
 ## Table of Contents
 
 * [Installation](#installation)
+* [Example](#example)
 * [When should I use EasyRest?](#when-should-i-use-easyrest)
 * [Features](#features)
 * [Usage](#usage)
@@ -25,19 +26,7 @@ EasyRest is a lightweight framework (less than 160 lines of code!) that allows y
 pip install django-easyrest
 ```
 
-## When should I use EasyRest?<a name="when-should-i-use-easyrest">&nbsp;</a>
-* When you need a simple read-only REST API for your Backbone/similar app
-* When ou need a read-only API for others to consume. Did you know EasyRest has a simple and extensible authentication system?
-* Whenever you want!
-
-## Features<a name="features">&nbsp;</a>
-EasyRest is meant to be simple and cover the most common use cases. So it supports,
-* pagination
-* authentication
-* restricting by owner
-* search
-
-## Usage<a name="usage">&nbsp;</a>
+## Example<a name="example">&nbsp;</a>
 ```python
 # api.py
 
@@ -65,6 +54,20 @@ from .api import api
 
 urlpatterns = patterns('', url(r'^api/', include(api.get_urls())))
 ```
+
+## When should I use EasyRest?<a name="when-should-i-use-easyrest">&nbsp;</a>
+* When you need a simple read-only REST API for your Backbone/similar app
+* When ou need a read-only API for others to consume. Did you know EasyRest has a simple and extensible authentication system?
+* Whenever you want!
+
+## Features<a name="features">&nbsp;</a>
+EasyRest is meant to be simple and cover the most common use cases. So it supports,
+* pagination
+* authentication
+* restricting by owner
+* search
+
+# Usage<a name="usage">&nbsp;</a>
 ## Declare a Resource<a name="declare-a-resource">&nbsp;</a>
 You only need to specify 3 things when subclassing APIResource:
 
