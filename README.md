@@ -1,7 +1,7 @@
 # Django-EasyRest
 EasyRest is a lightweight framework (less than 160 lines of code!) that allows you to really quickly and flexibly create a READ-ONLY REST API for your models.
 
-## Table of Contents
+# Table of Contents
 
 * [Installation](#installation)
 * [Example](#example)
@@ -21,12 +21,12 @@ EasyRest is a lightweight framework (less than 160 lines of code!) that allows y
 * [Roadmap](#roadmap)
 * [License](#license)
 
-## Installation<a name="installation">&nbsp;</a>
+# Installation<a name="installation">&nbsp;</a>
 ```
 pip install django-easyrest
 ```
 
-## Example<a name="example">&nbsp;</a>
+# Example<a name="example">&nbsp;</a>
 ```python
 # api.py
 
@@ -55,14 +55,14 @@ from .api import api
 urlpatterns = patterns('', url(r'^api/', include(api.get_urls())))
 ```
 
-## Features<a name="features">&nbsp;</a>
+# Features<a name="features">&nbsp;</a>
 EasyRest is meant to be simple and cover the most common use cases. So it supports,
 * pagination
 * authentication
 * restricting by owner
 * search
 
-## When should I use EasyRest?<a name="when-should-i-use-easyrest">&nbsp;</a>
+# When should I use EasyRest?<a name="when-should-i-use-easyrest">&nbsp;</a>
 * When you need a simple read-only REST API for your Backbone/similar app
 * When ou need a read-only API for others to consume. Did you know EasyRest has a simple and extensible authentication system?
 * Whenever you want!
