@@ -47,6 +47,7 @@
 <ul>
 <li><a href="#declare-a-resource">Declare a Resource</a></li>
 <li><a href="#register-the-resource-with-the-api">Register the Resource with the API</a></li>
+<li><a href="#url-endpoints">URL Endpoints</a></li>
 <li><a href="#format-of-requests-and-responses">Format of Requests and Responses</a></li>
 <li><a href="#enable-pagination">Enable Pagination</a></li>
 <li><a href="#enable-search">Enable Search</a></li>
@@ -148,13 +149,24 @@ For example, you can do preprocessing as we did above with the <code>status</cod
 <li>Then include <code>api.get_urls</code> in your urlconf</li>
 </ul><p>Note that because you are registering resources with an instance of <code>easyrest.API</code>, you can conceivably have many different API instances with different resources. EasyRest is flexible in how you use it.</p>
 
-<h2>Format of Requests and Responses<a name="format-of-requests-and-responses"> </a>
+<h2>URL Endpoints<a name="url-endpoints"> </a>
 </h2>
 
+<p>For each resource you register, there are two URL endpoints: the list endpoint and the item endpoint.
+The list endpoint returns a list of instances.
+The item endpoint returns a single instance.</p>
+
 <p>Let's use the example of ItemResource above.
-The urls generated are:
-    * /api/item/ - This returns a list of Items
-    * /api/item/{int: id}/ - This returns a single serialized Item with the specified id</p>
+We named the resource "item" and included the api urls behind the prefix "/api".
+So, the urls generated are:</p>
+
+<ul>
+<li>
+<code>/api/item/</code> - This returns a list of Items</li>
+<li>
+<code>/api/item/{int: id}/</code> - This returns a single serialized Item with the specified id</li>
+</ul><h2>Format of Requests and Responses<a name="format-of-requests-and-responses"> </a>
+</h2>
 
 <h4>GET to the Item list endpoint</h4>
 
