@@ -178,7 +178,7 @@ If you don't set `results_per_page`, all of the items will be returned at once.
 #### How do I request a paginated resource?
 Simple.
 ```
-GET /api/item/?page=2
+GET /api/paginated_item/?page=2
 ```
 
 
