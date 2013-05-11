@@ -292,22 +292,26 @@ Imagine an API you can use to get all your Bank Transactions. You want some way 
 
 To achieve this, you just need to do 1 thing in addition to setting up Authentication as above.
 #### Set `user_field_to_restrict_by`
-When you declare your resource, you should set `user_field_to_restrict_by` equal to the field path to the User field corresponding to the owner, the same path you would use through the Django Queryset API.
 
-If your UserItem is linked to a User through the field "user", for example:
+When you declare your resource, you should set `user_field_to_restrict_by` equal to the User field that owns the resource.
+This field the same path you would use through the Django Queryset API.
+
+Here are two examples, one simple and one a bit more complicated.
+
+If your UserItem is linked to a User through the field "user",
 ```python
 class UserItem(models.Model):
     name = models.CharField(max_length=250)
-    user = models.ForeignKey('auth.User')
+    boss = models.ForeignKey('auth.User')
     is_active = models.BooleanField(default=False)
 ```
-You should set `user_field_to_restrict_by="user"` as follows:
+You should set `user_field_to_restrict_by="boss"` as follows:
 ```python
 class AuthorizedItemResourceByUser(MyAuthenticatedResource):
     model = UserItem
     name = 'restrict_user_authorized_item'
     needs_authentication = True
-    user_field_to_restrict_by = 'user'
+    user_field_to_restrict_by = 'boss'
 
     def serialize(self, item):
         return {
@@ -316,9 +320,6 @@ class AuthorizedItemResourceByUser(MyAuthenticatedResource):
             'user_id': item.user.id,
         }
 ```
-
-Now when someone makes an authorized request, the results will be limited to the results that they own, where the owner is defined by the `user_field_to_restrict_by` path.
-
 
 #### A more complicated example
 
@@ -347,6 +348,9 @@ class AuthorizedItemResourceByUser(MyAuthenticatedResource):
             'user_id': item.user.id,
         }
 ```
+
+Now when someone makes an authorized request, the results will be limited to the results that they own.
+
 
 # Bend EasyRest to Your Will<a name="bend-easyrest-to-your-will">&nbsp;</a>
 Here are some facts.
