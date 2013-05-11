@@ -16,7 +16,7 @@ EasyRest is an ultra-lightweight (160 LOC) read-only REST api framework for Djan
   * [Use Authentication](#use-authentication)
   * [Authorization Helpers](#authorization-helpers)
   * [Restrict Results by User](#restrict-results-by-user)
-* [How to Customize EasyRest](#how-to-customize-easyrest)
+* [Bend EasyRest to Your Will](#best-easyrest-to-your-will)
 * [How to Hack on EasyRest](#how-to-hack-on-easyrest)
 * [Roadmap](#roadmap)
 * [License](#license)
@@ -331,17 +331,17 @@ class AuthorizedItemResourceByUser(MyAuthenticatedResource):
         }
 ```
 
-# How to Customize EasyRest<a name="how-to-customize-easyrest">&nbsp;</a>
-You may have custom needs for your api. Here's some advice on how to extend EasyRest to meet those needs.
+# Bend EasyRest to Your Will<a name="bend-easyrest-to-your-will">&nbsp;</a>
 
-* If you want to modify what the URLs look like, you should subclass `easyrest.API` and use that subclass as your API.
-* If you want to modify how results are retrieved, subclass `APIResource` and modify the `get_list` and `get_one` methods
-* If you want to add POST, CREATE or UPDATE funcionality, subclass the views and use those views in your `get_urls` method (to do that would have to subclass API, as mentioned above). In addition, you'll probably want to add methods to `APIResource` to deal with those CRUD operations.
-* If you want to plug in a different authentication/authorization scheme, define the `authorize` method of the APIResource.
+#### Fact: EasyRest is 160 lines of code.
+#### Fact: You may have custom needs for your API.
+#### Fact: If you read the source code, you'll know how to extend EasyRest to suit your needs.
 
-These are just a few guidelines. If you modify it in other cool ways, please let me know, I'd be excited to learn!
+#### My Recommendations
+Whether you want to change the url schema, add more CRUD methods, or change the way data is retrieved,
+always feel free to subclass `easyrest.API`, `easyrest.APIResource`, and the `ListView` and `ItemView` to your heart's desire.
 
-The *main point* is that since there are only 160 lines of code, you can see the inner workings of this library really easily and feel free to bend it to your will!
+Let me know how you extend EasyRest, I'd be excited to learn and potentially get some pull requests!
 
 # How to Hack on EasyRest<a name="how-to-hack-on-easyrest">&nbsp;</a>
 1. git clone this repo
