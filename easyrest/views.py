@@ -5,7 +5,7 @@ from django.http import (
 from django.views.generic import View
 
 
-class BaseRestroomView(View):
+class BaseAPIView(View):
     resource = None
 
     def get_response(self, data):
@@ -21,10 +21,10 @@ class BaseRestroomView(View):
             request._user = self.resource.authorize(request)
             if not request._user:
                 return HttpResponseForbidden()
-        return super(BaseRestroomView, self).dispatch(request, *args, **kwargs)
+        return super(BaseAPIView, self).dispatch(request, *args, **kwargs)
 
 
-class RestroomListView(BaseRestroomView):
+class ListView(BaseAPIView):
     def get(self, request, *args, **kwargs):
         params = {'user': request._user}
         if request.GET.get('page'):
@@ -33,11 +33,11 @@ class RestroomListView(BaseRestroomView):
         return self.get_response(data)
 
 
-class RestroomItemView(BaseRestroomView):
+class ItemView(BaseAPIView):
     def get(self, request, _id, *args, **kwargs):
         return self.get_response(self.resource.get_one(_id, request._user))
 
 
-class RestroomSearchView(BaseRestroomView):
+class SearchView(BaseAPIView):
     def get(self, request, *args, **kwargs):
         return self.get_response(self.resource.search(request.GET.dict()))
