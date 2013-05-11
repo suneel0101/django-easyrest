@@ -42,7 +42,7 @@ pip install django-easyrest
 ```
 
 ## Usage
-```
+```python
 # api.py
 
 from easyrest import API
@@ -102,7 +102,7 @@ The urls generated are:
     * /api/item/{int: id}/ - This returns a single serialized Item with the specified id
 
 ### GET to the Item list endpoint
-```
+```python
 GET /api/item/ 200
 
 {
@@ -124,7 +124,7 @@ GET /api/item/ 200
 ```
 
 ### GET to the Item single-item endpoint
-```
+```python
 GET /api/item/1/ 200
 
 {
@@ -136,7 +136,7 @@ GET /api/item/1/ 200
 ```
 
 ### GET to the Item single-item endpoint for a nonexistent item
-```
+```python
 GET /api/item/9998/ 400
 
 {
@@ -175,7 +175,7 @@ Sometimes you might want to allow your API user to search for a result set rathe
 The way to set this up in EasyRest is intentionally very barebones so you can extend it and implement the search you want for your resource, no matter how simple or complicated.
 
 ### Define the `search` method
-```
+```python
 class SearchableItemResource(APIResource):
     model = Item
     name = 'searchable_item'
