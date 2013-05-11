@@ -285,31 +285,12 @@ The format of the request will depend on how you implement the <code>search</cod
 
 <h4>3. Define an <code>authorize</code> method for your resource</h4>
 
-<p>Often you may want the same authorization method for many of your resources.
-In that case, you should subclass APIResource and define the <code>authorize</code> method, let's call it AuthorizedAPIResource.</p>
-
-<p>Then, all of your model resources can subclass AuthorizedAPIResource.</p>
-
-<h4>Here's an example:</h4>
+<p>Here's an example:</p>
 
 <div class="highlight"><pre><span class="kn">from</span> <span class="nn">resteasy.resources</span> <span class="kn">import</span> <span class="n">APIResource</span>
 <span class="kn">from</span> <span class="nn">resteasy.auth</span> <span class="kn">import</span> <span class="n">get_user_from_GET_param</span>
 
-<span class="k">class</span> <span class="nc">AuthorizedAPIResource</span><span class="p">(</span><span class="n">APIResource</span><span class="p">):</span>
-    <span class="sd">"""</span>
-<span class="sd">    I subclass APIResource and implement the authorize method.</span>
-<span class="sd">    Many of my resources will require this authorization, so they</span>
-<span class="sd">    will inherit from this class.</span>
-<span class="sd">    """</span>
-    <span class="k">def</span> <span class="nf">authorize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
-        <span class="sd">"""</span>
-<span class="sd">        I find the user based on the value of `apikey`</span>
-<span class="sd">        being passed in as a GET parameter.</span>
-<span class="sd">        """</span>
-        <span class="k">return</span> <span class="n">get_user_from_GET_param</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">"apikey"</span><span class="p">)</span>
-
-
-<span class="k">class</span> <span class="nc">AuthorizedItemResource</span><span class="p">(</span><span class="n">AuthorizedAPIResource</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">AuthorizedItemResource</span><span class="p">(</span><span class="n">APIResource</span><span class="p">):</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">UserItem</span>
     <span class="n">name</span> <span class="o">=</span> <span class="s">'authorized_item'</span>
     <span class="n">needs_authentication</span> <span class="o">=</span> <span class="bp">True</span>
@@ -320,9 +301,29 @@ In that case, you should subclass APIResource and define the <code>authorize</co
             <span class="s">'id'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
             <span class="s">'user_id'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
         <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">authorize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        I find the user based on the value of `apikey`</span>
+<span class="sd">        being passed in as a GET parameter.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">get_user_from_GET_param</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">"apikey"</span><span class="p">)</span>
 </pre></div>
 
-<p>An example request would be <code>GET /api/authorized_item/?apikey=kjhsdf3</code></p>
+<h4>Advice on many resources sharing same authorization scheme</h4>
+
+<p>Often you may want the same authorization method for many of your resources.
+In that case, you should subclass APIResource.</p>
+
+<p>Let's call the new class AuthorizedAPIResource.
+Define the <code>authorize</code> method of AuthorizedAPIResource and then have your model resources inherit from AuthorizedAPIResource</p>
+
+<h4>What does an example authenticated request look like?</h4>
+
+<p>This will depend on authorization scheme, but in the above case where we pass in the apikey in the get request, it would look like this:</p>
+
+<div class="highlight"><pre><span class="n">GET</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">authorized_item</span><span class="o">/</span><span class="err">?</span><span class="n">apikey</span><span class="o">=</span><span class="n">kjhsdf3</span>
+</pre></div>
 
 <h2>Authorization helpers<a name="authorization-helpers"> </a>
 </h2>
