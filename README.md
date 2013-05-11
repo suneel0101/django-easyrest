@@ -1,27 +1,47 @@
 # Django-EasyRest
 EasyRest is a lightweight framework (less than 160 lines of code!) that allows you to really quickly and flexibly create a READ-ONLY REST API for your models.
 
-## Why would I want to use EasyRest?
+## Table of Contents
+
+* [Why use EasyRest?](#why-use-easyrest)
+* [EasyRest vs. other frameworks?](#easyrest-vs-other-frameworks)
+* [Features](#features)
+* [Installation](#installation)
+* [Usage](#usage)
+  * [Declaring a Resource](#declaring-a-resource)
+  * [Registering to the API](#registering-to-the-api)
+  * [Format of Requests and Responses](#format-of-requests-and-responses)
+  * [Pagination](#pagination)
+  * [Search](#search)
+  * [Authentication](#authentication)
+  * [Restricting by Owner](#restricting-by-owner)
+* [How to Extend EasyRest](#how-to-extend-easyrest)
+* [How to Hack on EasyRest](#how-to-extend-easyrest)
+* [Roadmap](#roadmap)
+* [Development](#development)
+  * [License](#license)
+
+## Why use EasyRest?
 * You need a simple read-only REST API for your Backbone/similar app
 * You need a read-only API for others to consume. Did you know EasyRest has a simple and extensible authentication system?
 
-## What about those other frameworks?
+## EasyRest vs. other frameworks?
 In exchange for full-featuredness, those other frameworks are hard to setup and use.
 EasyRest is really simple to use and even simpler to extend.
 
-## What features do I get with EasyRest?
+## Features
 EasyRest is meant to be simple and cover the most common use cases. So it supports,
 * pagination
 * authentication
 * restricting by owner
 * search
 
-## How do I install it?
+## Installation
 ```
 pip install django-easyrest
 ```
 
-## How do I use it?
+## Usage
 ```
 # api.py
 
@@ -67,7 +87,7 @@ So if you wanted to have the queryset ordered by `id` descending and `status > 7
 Use this method to customize the set of results you want returned any way you like.
 For example, you can do preprocessing as we did above with the `status` as well as specify an ordering.
 
-## Registering your resource to the api
+## Registering to the api
 
 * Create an instance of `easyrest.API`
 * Then register your resource: `api.register(MyResource)`
@@ -338,3 +358,30 @@ Happy hacking!
 ## Roadmap
 I'm thinking about whether to support the other CRUD operations.
 If you have any suggestions, please let me know.
+
+
+## Development
+### License
+
+(The MIT license)
+
+Copyright (c) 2013 Suneel Chakravorty <suneel0101@gmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
