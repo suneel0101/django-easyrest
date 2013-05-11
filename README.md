@@ -285,7 +285,7 @@ If you want to use your own way of authenticating, just write your own `authoriz
 #### What happens if an unauthorized person tries to access a protected resource?
 If someone tries to access a resource without authorization, they will get a 403 Forbidden response.
 
-## Restrict Results by User<a name="#restrict-results-by-user">&nbsp;</a>
+## Restrict Results by User<a name="restrict-results-by-user">&nbsp;</a>
 A lot of the time, we want our API consumers to only access the results that they own.
 
 Imagine an API you can use to get all your Bank Transactions. You want some way of limiting the API user to only retrieving their own bank transactions, so they don't have access to everyone's bank transactions.
