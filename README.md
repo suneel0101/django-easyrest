@@ -217,32 +217,13 @@ Decide whether you want your API consumer to pass in an API key through the requ
 #### 2. Set `needs_authentication = True` in your resource declaration
 
 #### 3. Define an `authorize` method for your resource
-Often you may want the same authorization method for many of your resources.
-In that case, you should subclass APIResource and define the `authorize` method, let's call it AuthorizedAPIResource.
-
-Then, all of your model resources can subclass AuthorizedAPIResource.
-
-#### Here's an example:
+Here's an example:
 
 ```python
 from resteasy.resources import APIResource
 from resteasy.auth import get_user_from_GET_param
 
-class AuthorizedAPIResource(APIResource):
-    """
-    I subclass APIResource and implement the authorize method.
-    Many of my resources will require this authorization, so they
-    will inherit from this class.
-    """
-    def authorize(self, request):
-        """
-        I find the user based on the value of `apikey`
-        being passed in as a GET parameter.
-        """
-        return get_user_from_GET_param(request, "apikey")
-
-
-class AuthorizedItemResource(AuthorizedAPIResource):
+class AuthorizedItemResource(APIResource):
     model = UserItem
     name = 'authorized_item'
     needs_authentication = True
@@ -253,9 +234,26 @@ class AuthorizedItemResource(AuthorizedAPIResource):
             'id': item.id,
             'user_id': item.user.id,
         }
-```
 
-An example request would be `GET /api/authorized_item/?apikey=kjhsdf3`
+    def authorize(self, request):
+        """
+        I find the user based on the value of `apikey`
+        being passed in as a GET parameter.
+        """
+        return get_user_from_GET_param(request, "apikey")
+```
+#### Advice on many resources sharing same authorization scheme
+Often you may want the same authorization method for many of your resources.
+In that case, you should subclass APIResource.
+
+Let's call the new class AuthorizedAPIResource.
+Define the `authorize` method of AuthorizedAPIResource and then have your model resources inherit from AuthorizedAPIResource
+
+#### What does an example authenticated request look like?
+This will depend on authorization scheme, but in the above case where we pass in the apikey in the get request, it would look like this:
+```python
+GET /api/authorized_item/?apikey=kjhsdf3
+```
 
 ## Authorization helpers<a name="authorization-helpers">&nbsp;</a>
 In easyrest.auth, there are three really useful helper methods:
