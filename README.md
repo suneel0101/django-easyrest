@@ -26,7 +26,7 @@ pip install django-easyrest
 * [Development](#development)
   * [License](#license)
 
-## Why use EasyRest?
+## Why use EasyRest?<a name="why-use-easyrest">&nbsp;</a>
 * You need a simple read-only REST API for your Backbone/similar app
 * You need a read-only API for others to consume. Did you know EasyRest has a simple and extensible authentication system?
 
