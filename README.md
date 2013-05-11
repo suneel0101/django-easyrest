@@ -279,7 +279,7 @@ For your convenience, in `easyrest.models`, there is a simple APIKey model linke
 The `easyrest.auth` methods use this model. 
 
 
-Create APIKeys for your consumers is very straightforward. For example,
+Creating APIKeys for your consumers is very straightforward. For example,
 
 ```python
 from easyrest.models import APIKey
