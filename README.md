@@ -1,8 +1,10 @@
 # Django-EasyRest
 EasyRest is a lightweight framework (less than 160 lines of code!) that allows you to really quickly and flexibly create a READ-ONLY REST API for your models.
 
-* auto-gen TOC:
-{:toc}
+## Installation
+```
+pip install django-easyrest
+```
 
 ## Table of Contents
 
@@ -38,11 +40,6 @@ EasyRest is meant to be simple and cover the most common use cases. So it suppor
 * authentication
 * restricting by owner
 * search
-
-## Installation
-```
-pip install django-easyrest
-```
 
 ## Usage
 ```python
