@@ -291,8 +291,8 @@ A lot of the time, we want our API consumers to only access the results that the
 Imagine an API you can use to get all your Bank Transactions. You want some way of limiting the API user to only retrieving their own bank transactions, so they don't have access to everyone's bank transactions.
 
 To achieve this, you just need to do 1 thing in addition to setting up Authentication as above.
-#### Set `restrict_by_user`
-When you declare your resource, you should set `restrict_by_user` equal to the field path to the User field corresponding to the owner, the same path you would use through the Django Queryset API.
+#### Set `user_field_to_restrict_by`
+When you declare your resource, you should set `user_field_to_restrict_by` equal to the field path to the User field corresponding to the owner, the same path you would use through the Django Queryset API.
 
 If your UserItem is linked to a User through the field "user", for example:
 ```python
@@ -301,13 +301,13 @@ class UserItem(models.Model):
     user = models.ForeignKey('auth.User')
     is_active = models.BooleanField(default=False)
 ```
-You should set `restrict_by_user="user"` as follows:
+You should set `user_field_to_restrict_by="user"` as follows:
 ```python
 class AuthorizedItemResourceByUser(MyAuthenticatedResource):
     model = UserItem
     name = 'restrict_user_authorized_item'
     needs_authentication = True
-    restrict_by_user = 'user'
+    user_field_to_restrict_by = 'user'
 
     def serialize(self, item):
         return {
@@ -317,7 +317,7 @@ class AuthorizedItemResourceByUser(MyAuthenticatedResource):
         }
 ```
 
-Now when someone makes an authorized request, the results will be limited to the results that they own, where the owner is defined by the `restrict_by_user` path.
+Now when someone makes an authorized request, the results will be limited to the results that they own, where the owner is defined by the `user_field_to_restrict_by` path.
 
 
 #### A more complicated example
@@ -332,13 +332,13 @@ class UserItem(models.Model):
     is_active = models.BooleanField(default=False)
 ```
 
-You should set `restrict_by_user="profile__user"` as follows:
+You should set `user_field_to_restrict_by="profile__user"` as follows:
 ```python
 class AuthorizedItemResourceByUser(MyAuthenticatedResource):
     model = UserItem
     name = 'restrict_user_authorized_item'
     needs_authentication = True
-    restrict_by_user = 'profile__user'
+    user_field_to_restrict_by = 'profile__user'
 
     def serialize(self, item):
         return {
