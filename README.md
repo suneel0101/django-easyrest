@@ -63,7 +63,7 @@ EasyRest is meant to be simple and cover the most common use cases. So it suppor
 * search
 
 # When should I use EasyRest?<a name="when-should-i-use-easyrest">&nbsp;</a>
-* When you need a simple read-only REST API for your Backbone/similar app
+* When you need a simple read-only REST API for your Backbone/Ember/Angular app
 * When ou need a read-only API for others to consume. Did you know EasyRest has a simple and extensible authentication system?
 * Whenever you want!
 
