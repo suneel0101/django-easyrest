@@ -1,5 +1,5 @@
 import json
-from sure import expect, scenario
+from sure import expect
 
 from django.core.urlresolvers import reverse
 from django.test.client import Client
