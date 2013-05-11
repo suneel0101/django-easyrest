@@ -16,6 +16,7 @@ class APIResource(object):
 
     def get_list(self, user=None, page=None):
         qs = self.get_queryset()
+        # Restrict by user if `user_field_to_restrict_by` is specified
         qs = (self.filter_by_user(qs, user)
               if (user and self.user_field_to_restrict_by) else qs)
         qs = self.paginate(qs, page)
