@@ -1,5 +1,5 @@
 # Django-EasyRest
-EasyRest is an ultra-lightweight (160 LOC) read-only REST api framework.
+EasyRest is an ultra-lightweight (160 LOC) read-only REST api framework for Django.
 
 # Table of Contents
 
