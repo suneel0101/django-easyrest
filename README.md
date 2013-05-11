@@ -18,8 +18,7 @@ EasyRest is a lightweight framework (less than 160 lines of code!) that allows y
 * [How to Customize EasyRest](#how-to-customize-easyrest)
 * [How to Hack on EasyRest](#how-to-hack-on-easyrest)
 * [Roadmap](#roadmap)
-* [Development](#development)
-  * [License](#license)
+* [License](#license)
 
 ## Installation<a name="installation">&nbsp;</a>
 ```
@@ -355,8 +354,7 @@ I'm thinking about whether to support the other CRUD operations.
 If you have any suggestions, please let me know.
 
 
-## Development<a name="development">&nbsp;</a>
-### License<a name="license">&nbsp;</a>
+## License<a name="license">&nbsp;</a>
 
 (The MIT license)
 
