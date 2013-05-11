@@ -15,6 +15,7 @@ EasyRest is an ultra-lightweight (170 LOC) read-only REST api framework for Djan
   * [Pagination](#pagination)
   * [Search](#search)
   * [Authentication](#authentication)
+  * [Builtin APIKey Authentication System]("#builtin-apikey-authentication-system")
   * [Authorization Helpers](#authorization-helpers)
   * [Restrict Results by User](#restrict-results-by-user)
 * [Bend EasyRest to Your Will](#bend-easyrest-to-your-will)
@@ -270,6 +271,12 @@ This will depend on authorization scheme, but in the above case where we pass in
 ```python
 GET /api/authorized_item/?apikey=kjhsdf3
 ```
+
+## Builtin APIKey Authentication System<a name="builtin-apikey-authentication-system">&nbsp;</a>
+
+For your convenience, in `easyrest.models`, there is a simple APIKey model linked to a User.
+The `easyrest.auth` methods use this model.
+To use it, just syncdb and create APIKeys for your consumers.
 
 ## Authorization helpers<a name="authorization-helpers">&nbsp;</a>
 In easyrest.auth, there are three really useful helper methods:
