@@ -100,7 +100,9 @@ So if you wanted to have the queryset ordered by `id` descending and `status > 7
 
 ## Search: use `get_queryset`<a name="search">&nbsp;</a>
 
+
 Sometimes you might want to allow your API user to search for a result set rather than just listing the results in a certain order.
+
 The way to set this up in EasyRest is intentionally very barebones so you can extend it and implement the search you want for your resource, no matter how simple or complicated.
 
 #### All you have to do is modify the `get_queryset` method
@@ -124,6 +126,8 @@ The way to set this up in EasyRest is intentionally very barebones so you can ex
 The important thing here is you can plug in whatever search system you want. You're not even tied to SQL or the Django ORM. You can use ElasticSearch or whatever backend makes sense for your use case.
 
 #### Make a search request
+The URL endpoint for the search request is the same as in list resource request. See [Format of Requests and Responses](#format-of-requests-and-responses)
+
 The format of the request will depend on how you implement the `get_queryset` method, but in this case, it looks like this:
 
 `GET /api/searchable_item/?popular=1&contains=fun`
