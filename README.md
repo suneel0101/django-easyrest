@@ -82,7 +82,7 @@ You only need to specify 3 things when subclassing APIResource:
 3. `serialize` method: returns a serialized version of an instance of your Model, however you want it to. You can reference properties and whatever else. You're not just limited to the model fields.
 
 
-If you want to customize the list of results returned by the list endpoint, you should modify the the `get_queryset` method as shown below.
+If you want to customize the list of results returned by the list endpoint, you should modify the `get_queryset` method as shown below.
 
 ## Define `get_queryset`<a name="define-get-queryset">&nbsp;</a>
 `get_queryset` returns the base results for the resource. It defaults to the following:
