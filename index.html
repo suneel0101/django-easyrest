@@ -30,9 +30,11 @@
 
       </header>
       <section>
-        <h1>Django-EasyRest</h1>
+        <p><a href="https://travis-ci.org/suneel0101/django-easyrest"><img src="https://travis-ci.org/suneel0101/django-easyrest.png" alt="Build Status"></a></p>
 
-<p>EasyRest is an ultra-lightweight (170 LOC) read-only REST api framework for Django.</p>
+<h1>Django-EasyRest</h1>
+
+<p>EasyRest is an ultra-lightweight (160 LOC) read-only REST api framework for Django.</p>
 
 <h1>Table of Contents</h1>
 
@@ -46,13 +48,14 @@
 
 <ul>
 <li><a href="#declare-a-resource">Declare a Resource</a></li>
+<li><a href="#define-get-queryset">Define get_queryset</a></li>
+<li><a href="#search">Search</a></li>
 <li><a href="#register-the-resource-with-the-api">Register the Resource with the API</a></li>
 <li><a href="#url-endpoints">URL Endpoints</a></li>
 <li><a href="#format-of-requests-and-responses">Format of Requests and Responses</a></li>
 <li><a href="#pagination">Pagination</a></li>
-<li><a href="#search">Search</a></li>
-<li><a href="#authentication">Authentication</a></li>
-<li><a href="#builtin-apikey-authentication-system">Builtin APIKey Authentication System</a></li>
+<li><a href="#authorization">Authorization</a></li>
+<li><a href="#builtin-apikey-authorization-system">Builtin APIKey Authorization System</a></li>
 <li><a href="#authorization-helpers">Authorization Helpers</a></li>
 <li><a href="#restrict-results-by-user">Restrict Results by User</a></li>
 </ul>
@@ -78,8 +81,8 @@
 <span class="n">api</span> <span class="o">=</span> <span class="n">API</span><span class="p">()</span>
 
 <span class="k">class</span> <span class="nc">ItemResource</span><span class="p">(</span><span class="n">APIResource</span><span class="p">):</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">Item</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s">'item'</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Item</span>  <span class="c"># the model class you want to expose via the API</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s">'item'</span>  <span class="c"># name of resource in the url: '/api/{{ name }}/'.</span>
 
     <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span>
@@ -103,16 +106,16 @@
 <p>EasyRest is meant to be simple and cover the most common use cases. So it supports,</p>
 
 <ul>
+<li>search</li>
 <li>pagination</li>
 <li>authentication</li>
 <li>restricting by owner</li>
-<li>search</li>
 </ul><h1>When should I use EasyRest?<a name="when-should-i-use-easyrest"> </a>
 </h1>
 
 <ul>
 <li>When you need a simple read-only REST API for your own Backbone/Ember/Angular app</li>
-<li>When you need a read-only API for others to consume - EasyRest has a simple and extensible authentication system.</li>
+<li>When you need a read-only API for others to consume - EasyRest has a simple and extensible authorization system.</li>
 <li>Whenever you want!</li>
 </ul><h1>Usage<a name="usage"> </a>
 </h1>
@@ -129,15 +132,62 @@
 <code>name</code>: this is the name of resource in the url: '/api/{{ name }}/'. If you don't set it, it will fallback to the Model.meta.db_table</li>
 <li>
 <code>serialize</code> method: returns a serialized version of an instance of your Model, however you want it to. You can reference properties and whatever else. You're not just limited to the model fields.</li>
-</ol><p>You can also specify the <code>get_queryset</code> method, which will return the base queryset that will be used in the item-list endpoint as well as the search endpoint.
-So if you wanted to have the queryset ordered by <code>id</code> descending and <code>status &gt; 7</code>, you would add to the above <code>ItemResource</code> the following method:</p>
+</ol><h2>Define <code>get_queryset</code><a name="define-get-queryset"> </a>
+</h2>
+
+<p><code>get_queryset</code> returns the base results for the resource. It defaults to the following:</p>
+
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_params</span><span class="p">):</span>
+    <span class="c"># get_params are is request.GET.dict()</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</pre></div>
+
+<p>Modify it however you like.</p>
+
+<p>So if you wanted to have the queryset ordered by <code>id</code> descending and <code>status &gt; 7</code>, you would add to the above <code>ItemResource</code> the following method:</p>
 
 <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">Item</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">status__gt</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">'-id'</span><span class="p">)</span>
 </pre></div>
 
-<p>Use this method to customize the set of results you want returned any way you like.
-For example, you can do preprocessing as we did above with the <code>status</code> as well as specify an ordering.</p>
+<h2>Search: use <code>get_queryset</code><a name="search"> </a>
+</h2>
+
+<p>Sometimes you might want to allow your API user to search for a result set rather than just listing the results in a certain order.</p>
+
+<p>The way to set this up in EasyRest is intentionally very barebones so you can extend it and implement the search you want for your resource, no matter how simple or complicated.</p>
+
+<h4>All you have to do is modify the <code>get_queryset</code> method</h4>
+
+<div class="highlight"><pre>    <span class="k">def</span> <span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_params</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Some custom search logic.</span>
+<span class="sd">        You always have access to the request.GET params</span>
+<span class="sd">        through `get_params`</span>
+<span class="sd">        """</span>
+        <span class="n">base_queryset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">filter_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">get_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">"popular"</span><span class="p">):</span>
+            <span class="n">filter_kwargs</span><span class="p">[</span><span class="s">"status__gte"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">9</span>
+
+        <span class="k">if</span> <span class="n">get_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">"contains"</span><span class="p">):</span>
+            <span class="n">filter_kwargs</span><span class="p">[</span><span class="s">"text__icontains"</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_params</span><span class="p">[</span><span class="s">"contains"</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">base_queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">**</span><span class="n">filter_kwargs</span><span class="p">)</span>
+</pre></div>
+
+<p>The important thing here is you can plug in whatever search system you want. You're not even tied to SQL or the Django ORM. You can use ElasticSearch or whatever backend makes sense for your use case.</p>
+
+<h4>What is the URL endpoint for a search request?</h4>
+
+<p>The URL endpoint for the search request is the same as in list resource request. So if in your root urlconf, you register the api to "/api" and your resource name is "book", you would make the request to <code>/api/book/</code></p>
+
+<p>See <a href="#format-of-requests-and-responses">Format of Requests and Responses</a></p>
+
+<h4>What does a search request to the API look like?</h4>
+
+<p>The format of the request will depend on how you implement the <code>get_queryset</code> method, but in this case, it looks like this:</p>
+
+<p><code>GET /api/searchable_item/?popular=1&amp;contains=fun</code></p>
 
 <h2>Register the Resource with the API<a name="register-the-resource-with-the-api"> </a>
 </h2>
@@ -239,60 +289,16 @@ So, the urls generated are:</p>
 <pre><code>GET /api/paginated_item/?page=2
 </code></pre>
 
-<h2>Search<a name="search"> </a>
+<h2>Authorization<a name="authorization"> </a>
 </h2>
 
-<p>Sometimes you might want to allow your API user to search for a result set rather than just listing the results in a certain order.
-The way to set this up in EasyRest is intentionally very barebones so you can extend it and implement the search you want for your resource, no matter how simple or complicated.</p>
-
-<h4>All you have to do is define the <code>search</code> method</h4>
-
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">SearchableItemResource</span><span class="p">(</span><span class="n">APIResource</span><span class="p">):</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">Item</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s">'searchable_item'</span>
-    <span class="n">results_per_page</span> <span class="o">=</span> <span class="mi">20</span>
-
-    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="s">'id'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-            <span class="s">'text'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
-            <span class="s">'popularity'</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">popularity</span><span class="p">,</span>
-        <span class="p">}</span>
-
-    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_params</span><span class="p">):</span>
-        <span class="sd">"""</span>
-<span class="sd">        Some custom search logic.</span>
-<span class="sd">        You always have access to the request.GET params</span>
-<span class="sd">        through `get_params`</span>
-<span class="sd">        """</span>
-        <span class="n">filter_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">if</span> <span class="n">get_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">"popular"</span><span class="p">):</span>
-            <span class="n">filter_kwargs</span><span class="p">[</span><span class="s">"status__gte"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">9</span>
-
-        <span class="k">if</span> <span class="n">get_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">"contains"</span><span class="p">):</span>
-            <span class="n">filter_kwargs</span><span class="p">[</span><span class="s">"text__icontains"</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_params</span><span class="p">[</span><span class="s">"contains"</span><span class="p">]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">**</span><span class="n">filter_kwargs</span><span class="p">)</span>
-</pre></div>
-
-<p>The important thing here is you can plug in whatever search system you want. You're not even tied to SQL or the Django ORM. You can use ElasticSearch or whatever backend makes sense for your use case. You just have to define the <code>search</code> method that takes a dictionary of request GET params.</p>
-
-<h4>Make a search request</h4>
-
-<p>The URL will be "/{resource name}/search/"
-The format of the request will depend on how you implement the <code>search</code> method, but in this case, it looks like this:</p>
-
-<p><code>GET /api/searchable_item/search/?popular=1&amp;contains=fun</code></p>
-
-<h2>Authentication<a name="authentication"> </a>
-</h2>
-
-<p>EasyRest Authentication is really easy to use and extend, as you'll see below.</p>
+<p>EasyRest authorization is really easy to use and extend, as you'll see below.</p>
 
 <h4>1. Define an authorization scheme</h4>
 
 <p>Decide whether you want your API consumer to pass in an API key through the request GET parameters or the headers or whatever else.</p>
 
-<h4>2. Set <code>needs_authentication = True</code> in your resource declaration</h4>
+<h4>2. Set <code>needs_authorization = True</code> in your resource declaration</h4>
 
 <h4>3. Define an <code>authorize</code> method for your resource</h4>
 
@@ -304,7 +310,7 @@ The format of the request will depend on how you implement the <code>search</cod
 <span class="k">class</span> <span class="nc">AuthorizedItemResource</span><span class="p">(</span><span class="n">APIResource</span><span class="p">):</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">UserItem</span>
     <span class="n">name</span> <span class="o">=</span> <span class="s">'authorized_item'</span>
-    <span class="n">needs_authentication</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">needs_authorization</span> <span class="o">=</span> <span class="bp">True</span>
 
     <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span>
@@ -336,7 +342,7 @@ Define the <code>authorize</code> method of AuthorizedAPIResource and then have 
 <div class="highlight"><pre><span class="n">GET</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">authorized_item</span><span class="o">/</span><span class="err">?</span><span class="n">apikey</span><span class="o">=</span><span class="n">kjhsdf3</span>
 </pre></div>
 
-<h2>Builtin APIKey Authentication System<a name="builtin-apikey-authentication-system"> </a>
+<h2>Builtin APIKey Authorization System<a name="builtin-apikey-authorization-system"> </a>
 </h2>
 
 <p>For your convenience, in <code>easyrest.models</code>, there is a simple APIKey model linked to a User.
@@ -360,7 +366,7 @@ The <code>easyrest.auth</code> methods use this model. </p>
 <li>
 <code>get_user_from_GET_param(request, param_name)</code>: extracts API key from the request GET parameter <code>param_name</code> and returns the user who owns that API key.</li>
 <li>
-<code>get_user_from_from_request_header</code>: does the same but from the request header</li>
+<code>get_user_from_request_header</code>: does the same but from the request header</li>
 <li>
 <code>get_user_from_request</code>: returns <code>request.user</code> if the user is authenticated</li>
 </ol><p>These are by no means exhaustive, but they do cover a lot of the ways in which you'll want you're API consumers to authenticate.</p>
@@ -378,7 +384,7 @@ The <code>easyrest.auth</code> methods use this model. </p>
 
 <p>Imagine an API you can use to get all your Bank Transactions. You want some way of limiting the API user to only retrieving their own bank transactions, so they don't have access to everyone's bank transactions.</p>
 
-<p>To achieve this, you just need to do 1 thing in addition to setting up Authentication as above.</p>
+<p>To achieve this, you just need to do 1 thing in addition to setting up Authorization as above.</p>
 
 <h4>Set <code>user_field_to_restrict_by</code>
 </h4>
@@ -398,10 +404,10 @@ This field the same path you would use through the Django Queryset API.</p>
 
 <p>You should set <code>user_field_to_restrict_by="boss"</code> as follows:</p>
 
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">AuthorizedItemResourceByUser</span><span class="p">(</span><span class="n">MyAuthenticatedResource</span><span class="p">):</span>
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">AuthorizedItemResourceByUser</span><span class="p">(</span><span class="n">MyAuthorizedResource</span><span class="p">):</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">UserItem</span>
     <span class="n">name</span> <span class="o">=</span> <span class="s">'restrict_user_authorized_item'</span>
-    <span class="n">needs_authentication</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">needs_authorization</span> <span class="o">=</span> <span class="bp">True</span>
     <span class="n">user_field_to_restrict_by</span> <span class="o">=</span> <span class="s">'boss'</span>
 
     <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
@@ -425,10 +431,10 @@ This field the same path you would use through the Django Queryset API.</p>
 
 <p>You should set <code>user_field_to_restrict_by="profile__user"</code> as follows:</p>
 
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">AuthorizedItemResourceByUser</span><span class="p">(</span><span class="n">MyAuthenticatedResource</span><span class="p">):</span>
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">AuthorizedItemResourceByUser</span><span class="p">(</span><span class="n">MyAuthorizedResource</span><span class="p">):</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">UserItem</span>
     <span class="n">name</span> <span class="o">=</span> <span class="s">'restrict_user_authorized_item'</span>
-    <span class="n">needs_authentication</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">needs_authorization</span> <span class="o">=</span> <span class="bp">True</span>
     <span class="n">user_field_to_restrict_by</span> <span class="o">=</span> <span class="s">'profile__user'</span>
 
     <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
@@ -447,7 +453,7 @@ This field the same path you would use through the Django Queryset API.</p>
 <p>Here are some facts.</p>
 
 <ul>
-<li>EasyRest is 170 lines of code.</li>
+<li>EasyRest is 160 lines of code.</li>
 <li>You may have custom needs for your API.</li>
 <li>If you read the source code, you'll know how to extend EasyRest to suit your needs.</li>
 </ul><h4>My Recommendations</h4>
