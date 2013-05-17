@@ -16,8 +16,8 @@ EasyRest is an ultra-lightweight (170 LOC) read-only REST api framework for Djan
   * [Format of Requests and Responses](#format-of-requests-and-responses)
   * [Pagination](#pagination)
 
-  * [Authentication](#authentication)
-  * [Builtin APIKey Authentication System](#builtin-apikey-authentication-system)
+  * [Authorization](#authorization)
+  * [Builtin APIKey Authorization System](#builtin-apikey-authorization-system)
   * [Authorization Helpers](#authorization-helpers)
   * [Restrict Results by User](#restrict-results-by-user)
 * [Bend EasyRest to Your Will](#bend-easyrest-to-your-will)
@@ -69,7 +69,7 @@ EasyRest is meant to be simple and cover the most common use cases. So it suppor
 
 # When should I use EasyRest?<a name="when-should-i-use-easyrest">&nbsp;</a>
 * When you need a simple read-only REST API for your own Backbone/Ember/Angular app
-* When you need a read-only API for others to consume - EasyRest has a simple and extensible authentication system.
+* When you need a read-only API for others to consume - EasyRest has a simple and extensible authorization system.
 * Whenever you want!
 
 # Usage<a name="usage">&nbsp;</a>
@@ -223,13 +223,13 @@ Simple.
 GET /api/paginated_item/?page=2
 ```
 
-## Authentication<a name="authentication">&nbsp;</a>
-EasyRest Authentication is really easy to use and extend, as you'll see below.
+## authorization<a name="authorization">&nbsp;</a>
+EasyRest authorization is really easy to use and extend, as you'll see below.
 
 #### 1. Define an authorization scheme
 Decide whether you want your API consumer to pass in an API key through the request GET parameters or the headers or whatever else.
 
-#### 2. Set `needs_authentication = True` in your resource declaration
+#### 2. Set `needs_authorization = True` in your resource declaration
 
 #### 3. Define an `authorize` method for your resource
 Here's an example:
@@ -241,7 +241,7 @@ from resteasy.auth import get_user_from_GET_param
 class AuthorizedItemResource(APIResource):
     model = UserItem
     name = 'authorized_item'
-    needs_authentication = True
+    needs_authorization = True
 
     def serialize(self, item):
         return {
@@ -270,7 +270,7 @@ This will depend on authorization scheme, but in the above case where we pass in
 GET /api/authorized_item/?apikey=kjhsdf3
 ```
 
-## Builtin APIKey Authentication System<a name="builtin-apikey-authentication-system">&nbsp;</a>
+## Builtin APIKey Authorization System<a name="builtin-apikey-authorization-system">&nbsp;</a>
 
 
 For your convenience, in `easyrest.models`, there is a simple APIKey model linked to a User.
@@ -326,7 +326,7 @@ You should set `user_field_to_restrict_by="boss"` as follows:
 class AuthorizedItemResourceByUser(MyAuthenticatedResource):
     model = UserItem
     name = 'restrict_user_authorized_item'
-    needs_authentication = True
+    needs_authorization = True
     user_field_to_restrict_by = 'boss'
 
     def serialize(self, item):
@@ -354,7 +354,7 @@ You should set `user_field_to_restrict_by="profile__user"` as follows:
 class AuthorizedItemResourceByUser(MyAuthenticatedResource):
     model = UserItem
     name = 'restrict_user_authorized_item'
-    needs_authentication = True
+    needs_authorization = True
     user_field_to_restrict_by = 'profile__user'
 
     def serialize(self, item):

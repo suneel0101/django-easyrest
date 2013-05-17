@@ -86,14 +86,14 @@ def test_get_list_paginated(context):
     expect(response_page_2.status_code).to.equal(200)
 
 
-def test_get_list_failed_authentication_without_key():
+def test_get_list_failed_authorization_without_key():
     APIKey.objects.all().delete()
     response = client.get(reverse('authorized_item_list'),
                           content_type='application/json')
     expect(response.status_code).to.equal(403)
 
 
-def test_get_list_failed_authentication_with_wrong_key():
+def test_get_list_failed_authorization_with_wrong_key():
     APIKey.objects.all().delete()
     response = client.get(reverse('authorized_item_list'),
                           data={'key': "the-wrong-key"},
@@ -101,7 +101,7 @@ def test_get_list_failed_authentication_with_wrong_key():
     expect(response.status_code).to.equal(403)
 
 
-def test_get_list_successful_authentication():
+def test_get_list_successful_authorization():
     # Delete all items
     UserItem.objects.all().delete()
     APIKey.objects.all().delete()

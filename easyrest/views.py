@@ -18,7 +18,7 @@ class BaseAPIView(View):
             return HttpResponseForbidden()
         request._user = None
         # Authorization check happens here
-        if self.resource.needs_authentication:
+        if self.resource.needs_authorization:
             request._user = self.resource.authorize(request)
             if not request._user:
                 return HttpResponseForbidden()

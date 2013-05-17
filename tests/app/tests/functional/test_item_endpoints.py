@@ -46,14 +46,14 @@ def test_get_non_existent_item(context):
     expect(response.status_code).to.equal(400)
 
 
-def test_get_item_failed_authentication_without_key():
+def test_get_item_failed_authorization_without_key():
     APIKey.objects.all().delete()
     response = client.get(reverse('authorized_item_item', kwargs={"_id": 1}),
                           content_type='application/json')
     expect(response.status_code).to.equal(403)
 
 
-def test_get_item_failed_authentication_with_wrong_key():
+def test_get_item_failed_authorization_with_wrong_key():
     APIKey.objects.all().delete()
     response = client.get(reverse('authorized_item_item', kwargs={"_id": 1}),
                           data={'key': "the-wrong-key"},

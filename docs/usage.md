@@ -31,7 +31,7 @@ class MyAPIResource(APIResource):
 class ExpenseResource(MyAPIResource):
     model = Expense
     results_per_page = 20
-    needs_authentication = True
+    needs_authorization = True
     filter_by_user = 'user'
 
     def serialize(self, expense):

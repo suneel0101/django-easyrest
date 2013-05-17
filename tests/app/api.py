@@ -76,7 +76,7 @@ class SearchableItemResource(APIResource):
 class AuthorizedItemResource(MyAuthenticatedResource):
     model = UserItem
     name = 'authorized_item'
-    needs_authentication = True
+    needs_authorization = True
 
     def serialize(self, item):
         return {
@@ -89,7 +89,7 @@ class AuthorizedItemResource(MyAuthenticatedResource):
 class AuthorizedItemResourceByUser(MyAuthenticatedResource):
     model = UserItem
     name = 'by_user_authorized_item'
-    needs_authentication = True
+    needs_authorization = True
     user_field_to_restrict_by = 'user'
 
     def serialize(self, item):
