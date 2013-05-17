@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/suneel0101/django-easyrest.png)](https://travis-ci.org/suneel0101/django-easyrest)
 
 # Django-EasyRest
-EasyRest is an ultra-lightweight (170 LOC) read-only REST api framework for Django.
+EasyRest is an ultra-lightweight (160 LOC) read-only REST api framework for Django.
 
 # Table of Contents
 
@@ -381,7 +381,7 @@ Now when someone makes an authorized request, the results will be limited to the
 # Bend EasyRest to Your Will<a name="bend-easyrest-to-your-will">&nbsp;</a>
 Here are some facts.
 
-* EasyRest is 170 lines of code.
+* EasyRest is 160 lines of code.
 * You may have custom needs for your API.
 * If you read the source code, you'll know how to extend EasyRest to suit your needs.
 

@@ -12,12 +12,10 @@ class API(object):
     def get_urls(self):
         urls = []
         for resource in self.resources:
-            urls.extend([
-                url(r"^{}/$".format(resource.name),
-                    ListView.as_view(resource=resource),
-                    name="{}_list".format(resource.name)),
-                url(r"^{}/(?P<_id>[\d]+)/$".format(resource.name),
-                    ItemView.as_view(resource=resource),
-                    name="{}_item".format(resource.name)),
-            ])
+            urls.extend([url(r"^{}/$".format(resource.name),
+                             ListView.as_view(resource=resource),
+                             name="{}_list".format(resource.name)),
+                         url(r"^{}/(?P<_id>[\d]+)/$".format(resource.name),
+                             ItemView.as_view(resource=resource),
+                             name="{}_item".format(resource.name))])
         return patterns('', *urls)
