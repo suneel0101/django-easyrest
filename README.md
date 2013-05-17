@@ -315,7 +315,7 @@ A lot of the time, we want our API consumers to only access the results that the
 
 Imagine an API you can use to get all your Bank Transactions. You want some way of limiting the API user to only retrieving their own bank transactions, so they don't have access to everyone's bank transactions.
 
-To achieve this, you just need to do 1 thing in addition to setting up Authentication as above.
+To achieve this, you just need to do 1 thing in addition to setting up Authorization as above.
 #### Set `user_field_to_restrict_by`
 
 When you declare your resource, you should set `user_field_to_restrict_by` equal to the User field that owns the resource.
@@ -332,7 +332,7 @@ class UserItem(models.Model):
 ```
 You should set `user_field_to_restrict_by="boss"` as follows:
 ```python
-class AuthorizedItemResourceByUser(MyAuthenticatedResource):
+class AuthorizedItemResourceByUser(MyAuthorizedResource):
     model = UserItem
     name = 'restrict_user_authorized_item'
     needs_authorization = True
@@ -360,7 +360,7 @@ class UserItem(models.Model):
 
 You should set `user_field_to_restrict_by="profile__user"` as follows:
 ```python
-class AuthorizedItemResourceByUser(MyAuthenticatedResource):
+class AuthorizedItemResourceByUser(MyAuthorizedResource):
     model = UserItem
     name = 'restrict_user_authorized_item'
     needs_authorization = True
