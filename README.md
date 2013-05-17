@@ -232,7 +232,7 @@ Simple.
 GET /api/paginated_item/?page=2
 ```
 
-## authorization<a name="authorization">&nbsp;</a>
+## Authorization<a name="authorization">&nbsp;</a>
 EasyRest authorization is really easy to use and extend, as you'll see below.
 
 #### 1. Define an authorization scheme
