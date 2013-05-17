@@ -86,7 +86,7 @@ You only need to specify 3 things when subclassing APIResource:
 
 ```python
 def get_queryset(self, get_params):
-    # get_params are is request.GET.dict()
+    # get_params is request.GET.dict()
     return self.model.objects.all()
 ```
 
