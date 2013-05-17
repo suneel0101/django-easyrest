@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/suneel0101/django-easyrest.png)](https://travis-ci.org/suneel0101/django-easyrest)
+
 # Django-EasyRest
 EasyRest is an ultra-lightweight (170 LOC) read-only REST api framework for Django.
 
