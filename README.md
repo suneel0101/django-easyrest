@@ -9,11 +9,13 @@ EasyRest is an ultra-lightweight (170 LOC) read-only REST api framework for Djan
 * [When should I use EasyRest?](#when-should-i-use-easyrest)
 * [Usage](#usage)
   * [Declare a Resource](#declare-a-resource)
+  * [Define get_queryset](#define-get-queryset)
+  * [Search](#search)
   * [Register the Resource with the API](#register-the-resource-with-the-api)
   * [URL Endpoints](#url-endpoints)
   * [Format of Requests and Responses](#format-of-requests-and-responses)
   * [Pagination](#pagination)
-  * [Search](#search)
+
   * [Authentication](#authentication)
   * [Builtin APIKey Authentication System](#builtin-apikey-authentication-system)
   * [Authorization Helpers](#authorization-helpers)
@@ -38,8 +40,8 @@ from .models import Item
 api = API()
 
 class ItemResource(APIResource):
-    model = Item
-    name = 'item'
+    model = Item  # the model class you want to expose via the API
+    name = 'item'  # name of resource in the url: '/api/{{ name }}/'.
 
     def serialize(self, item):
         return {
@@ -59,10 +61,11 @@ urlpatterns = patterns('', url(r'^api/', include(api.get_urls())))
 
 # Features<a name="features">&nbsp;</a>
 EasyRest is meant to be simple and cover the most common use cases. So it supports,
+* search
 * pagination
 * authentication
 * restricting by owner
-* search
+
 
 # When should I use EasyRest?<a name="when-should-i-use-easyrest">&nbsp;</a>
 * When you need a simple read-only REST API for your own Backbone/Ember/Angular app
@@ -77,7 +80,17 @@ You only need to specify 3 things when subclassing APIResource:
 2. `name`: this is the name of resource in the url: '/api/{{ name }}/'. If you don't set it, it will fallback to the Model.meta.db_table
 3. `serialize` method: returns a serialized version of an instance of your Model, however you want it to. You can reference properties and whatever else. You're not just limited to the model fields.
 
-You can also specify the `get_queryset` method, which will return the base queryset that will be used in the item-list endpoint as well as the search endpoint.
+## Define `get_queryset`<a name="define-get-queryset">&nbsp;</a>
+`get_queryset` returns the base results for the resource. It defaults to the following:
+
+```python
+def get_queryset(self, get_params):
+    # get_params are is request.GET.dict()
+    return self.model.objects.all()
+```
+
+Modify it however you like.
+
 So if you wanted to have the queryset ordered by `id` descending and `status > 7`, you would add to the above `ItemResource` the following method:
 
 ```python
@@ -85,8 +98,36 @@ So if you wanted to have the queryset ordered by `id` descending and `status > 7
         return Item.objects.filter(status__gt=7).order_by('-id')
 ```
 
-Use this method to customize the set of results you want returned any way you like.
-For example, you can do preprocessing as we did above with the `status` as well as specify an ordering.
+## Search: use `get_queryset`<a name="search">&nbsp;</a>
+
+Sometimes you might want to allow your API user to search for a result set rather than just listing the results in a certain order.
+The way to set this up in EasyRest is intentionally very barebones so you can extend it and implement the search you want for your resource, no matter how simple or complicated.
+
+#### All you have to do is modify the `get_queryset` method
+```python
+    def get_queryset(self, get_params):
+        """
+        Some custom search logic.
+        You always have access to the request.GET params
+        through `get_params`
+        """
+        base_queryset = self.model.objects.all()
+        filter_kwargs = {}
+        if get_params.get("popular"):
+            filter_kwargs["status__gte"] = 9
+
+        if get_params.get("contains"):
+            filter_kwargs["text__icontains"] = get_params["contains"]
+        return base_queryset.filter(**filter_kwargs)
+```
+
+The important thing here is you can plug in whatever search system you want. You're not even tied to SQL or the Django ORM. You can use ElasticSearch or whatever backend makes sense for your use case.
+
+#### Make a search request
+The format of the request will depend on how you implement the `get_queryset` method, but in this case, it looks like this:
+
+`GET /api/searchable_item/?popular=1&contains=fun`
+
 
 ## Register the Resource with the API<a name="register-the-resource-with-the-api">&nbsp;</a>
 
@@ -181,49 +222,6 @@ Simple.
 ```
 GET /api/paginated_item/?page=2
 ```
-
-
-## Search<a name="search">&nbsp;</a>
-
-Sometimes you might want to allow your API user to search for a result set rather than just listing the results in a certain order.
-The way to set this up in EasyRest is intentionally very barebones so you can extend it and implement the search you want for your resource, no matter how simple or complicated.
-
-#### All you have to do is define the `search` method
-```python
-class SearchableItemResource(APIResource):
-    model = Item
-    name = 'searchable_item'
-    results_per_page = 20
-
-    def serialize(self, item):
-        return {
-            'id': item.id,
-            'text': item.text,
-            'popularity': item.popularity,
-        }
-
-    def search(self, get_params):
-        """
-        Some custom search logic.
-        You always have access to the request.GET params
-        through `get_params`
-        """
-        filter_kwargs = {}
-        if get_params.get("popular"):
-            filter_kwargs["status__gte"] = 9
-         
-        if get_params.get("contains"):
-            filter_kwargs["text__icontains"] = get_params["contains"]
-        return self.get_queryset().filter(**filter_kwargs)
-```
-
-The important thing here is you can plug in whatever search system you want. You're not even tied to SQL or the Django ORM. You can use ElasticSearch or whatever backend makes sense for your use case. You just have to define the `search` method that takes a dictionary of request GET params.
-
-#### Make a search request
-The URL will be "/{resource name}/search/"
-The format of the request will depend on how you implement the `search` method, but in this case, it looks like this:
-
-`GET /api/searchable_item/search/?popular=1&contains=fun`
 
 ## Authentication<a name="authentication">&nbsp;</a>
 EasyRest Authentication is really easy to use and extend, as you'll see below.
