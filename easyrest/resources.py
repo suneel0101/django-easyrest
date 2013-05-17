@@ -11,18 +11,18 @@ class APIResource(object):
     def authorize(self, request):
         pass
 
-    def get_queryset(self):
+    def get_queryset(self, get_params):
         return self.model.objects.all()
 
-    def get_list(self, user=None, page=None):
-        qs = self.get_queryset()
+    def get_list(self, get_params, user=None):
+        qs = self.get_queryset(get_params)
         # Restrict by user if `user_field_to_restrict_by` is specified
         qs = (self.filter_by_user(qs, user)
               if (user and self.user_field_to_restrict_by) else qs)
-        qs = self.paginate(qs, page)
+        qs = self.paginate(qs, get_params.get('page'))
         return {"items": [self.serialize(obj) for obj in qs.iterator()]}
 
-    def get_one(self, _id, user=None):
+    def get_one(self, get_params, _id, user=None):
         # Try to find the object
         try:
             item = self.model.objects.get(id=_id)
@@ -34,7 +34,7 @@ class APIResource(object):
         # So check that there is an object with this _id that is owned by
         # `user`
         if (self.user_field_to_restrict_by and
-            not (self.filter_by_user(self.get_queryset(), user)
+            not (self.filter_by_user(self.get_queryset(get_params), user)
                  .filter(pk=_id)
                  .exists())):
             return {"error": "You do not have access to this data"}

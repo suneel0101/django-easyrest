@@ -27,16 +27,14 @@ class BaseAPIView(View):
 
 class ListView(BaseAPIView):
     def get(self, request, *args, **kwargs):
-        return self.get_response(self.resource.get_list(
-                user=request._user,
-                page=request.GET.get('page')))
+        return self.get_response(
+            self.resource.get_list(
+                request.GET.dict(),
+                user=request._user))
 
 
 class ItemView(BaseAPIView):
     def get(self, request, _id, *args, **kwargs):
-        return self.get_response(self.resource.get_one(_id, request._user))
-
-
-class SearchView(BaseAPIView):
-    def get(self, request, *args, **kwargs):
-        return self.get_response(self.resource.search(request.GET.dict()))
+        return self.get_response(
+            self.resource.get_one(
+                request.GET.dict(), _id, request._user))

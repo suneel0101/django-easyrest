@@ -35,7 +35,7 @@ def test_search():
     # by the following search with
     # ?popular=1&contains=orange
     # as the querystring
-    response = client.get(reverse('searchable_item_search'),
+    response = client.get(reverse('searchable_item_list'),
                           data={"popular": 1, "contains": "orange"},
                           content_type='application/json')
 
@@ -50,6 +50,7 @@ def test_search():
                 "id": 2,
                 "text": "orange juice",
                 "popularity": 25,
-             }]}
+            }]
+    }
     expect(json.loads(response.content)).to.equal(expected_response_content)
     expect(response.status_code).to.equal(200)

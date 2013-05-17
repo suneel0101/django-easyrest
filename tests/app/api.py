@@ -22,7 +22,7 @@ class ReverseOrderItemResource(APIResource):
     model = Item
     name = 'reverse_order_item'
 
-    def get_queryset(self):
+    def get_queryset(self, get_params):
         return Item.objects.order_by('-id')
 
     def serialize(self, item):
@@ -57,21 +57,20 @@ class SearchableItemResource(APIResource):
             'popularity': item.popularity,
         }
 
-    def search(self, get_params):
+    def get_queryset(self, get_params):
         """
         Some custom search logic.
         You always have access to the request.GET params
         through `get_params`
         """
+        base_queryset = self.model.objects.all()
         filter_kwargs = {}
         if get_params.get("popular"):
             filter_kwargs["status__gte"] = 9
 
         if get_params.get("contains"):
             filter_kwargs["text__icontains"] = get_params["contains"]
-        return {"items": [
-            self.serialize(obj)
-            for obj in self.get_queryset().filter(**filter_kwargs)]}
+        return base_queryset.filter(**filter_kwargs)
 
 
 class AuthorizedItemResource(MyAuthenticatedResource):
