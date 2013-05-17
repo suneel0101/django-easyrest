@@ -17,7 +17,6 @@ EasyRest is an ultra-lightweight (160 LOC) read-only REST api framework for Djan
   * [URL Endpoints](#url-endpoints)
   * [Format of Requests and Responses](#format-of-requests-and-responses)
   * [Pagination](#pagination)
-
   * [Authorization](#authorization)
   * [Builtin APIKey Authorization System](#builtin-apikey-authorization-system)
   * [Authorization Helpers](#authorization-helpers)
