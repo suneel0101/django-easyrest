@@ -125,9 +125,10 @@ The way to set this up in EasyRest is intentionally very barebones so you can ex
 
 The important thing here is you can plug in whatever search system you want. You're not even tied to SQL or the Django ORM. You can use ElasticSearch or whatever backend makes sense for your use case.
 
-#### Make a search request
+#### What is the URL endpoint for a search request?
 The URL endpoint for the search request is the same as in list resource request. See [Format of Requests and Responses](#format-of-requests-and-responses)
 
+#### What does a search request to the API look like?
 The format of the request will depend on how you implement the `get_queryset` method, but in this case, it looks like this:
 
 `GET /api/searchable_item/?popular=1&contains=fun`
