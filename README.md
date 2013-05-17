@@ -126,7 +126,7 @@ The way to set this up in EasyRest is intentionally very barebones so you can ex
 The important thing here is you can plug in whatever search system you want. You're not even tied to SQL or the Django ORM. You can use ElasticSearch or whatever backend makes sense for your use case.
 
 #### What is the URL endpoint for a search request?
-The URL endpoint for the search request is the same as in list resource request. So if you register the api to "/api" and your resource name is "book", you would make the request to `/api/book/`
+The URL endpoint for the search request is the same as in list resource request. So if in your root urlconf, you register the api to "/api" and your resource name is "book", you would make the request to `/api/book/`
 
 
 See [Format of Requests and Responses](#format-of-requests-and-responses)
