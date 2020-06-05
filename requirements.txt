@@ -1,4 +1,4 @@
-Django==1.4.3
+Django==1.11.29
 coverage==3.6
 mock==1.0.1
 nose==1.2.1
